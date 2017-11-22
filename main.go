@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/harukasan/go-libwebp/webp"
 	"github.com/pixiv/go-libjpeg/jpeg"
@@ -15,9 +16,11 @@ var port = flag.String("port", "8080", "")
 var upstreamUrl = flag.String("upstream-url", "http://localhost:9000", "")
 
 func supportsWebp(r *http.Request) bool {
-	for _, value := range r.Header["Accept"] {
-		if value == "image/webp" {
-			return true
+	for _, v := range r.Header["Accept"] {
+		for _, contentType := range strings.Split(v, ",") {
+			if strings.HasPrefix(contentType, "image/webp") {
+				return true
+			}
 		}
 	}
 	return false
