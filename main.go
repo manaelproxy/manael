@@ -126,6 +126,7 @@ func transfer(w http.ResponseWriter, resp *http.Response) {
 			w.Header().Add(key, value)
 		}
 	}
+	w.Header().Set("Vary", "Accept")
 	w.WriteHeader(resp.StatusCode)
 	io.Copy(w, resp.Body)
 }
