@@ -56,7 +56,7 @@ func shouldEncodeToWebP(resp *http.Response) bool {
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	return !(contentType == "image/jpeg" || contentType == "image/png")
+	return contentType == "image/jpeg" || contentType == "image/png"
 }
 
 func decodeJPEG(src io.Reader) (img image.Image, err error) {
