@@ -19,21 +19,44 @@ import (
 var port = flag.String("port", "8080", "")
 var upstreamURL = flag.String("upstream-url", "http://localhost:9000", "")
 
-func getMediaType(contentTypes []string) (format string) {
-	contentType := contentTypes[len(contentTypes)-1]
-	mediaType := strings.Split(contentType, ";")[0]
-	return mediaType
+func request(url string, r *http.Request) (resp *http.Response, err error) {
+	client := &http.Client{}
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("If-Modified-Since", r.Header.Get("If-Modified-Since"))
+
+	resp, err = client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
 }
 
-func supportsWebp(accepts []string) bool {
-	for _, v := range accepts {
-		for _, contentType := range strings.Split(v, ",") {
-			if strings.HasPrefix(contentType, "image/webp") {
-				return true
-			}
+func canDecodeWebP(r *http.Request) bool {
+	accepts := r.Header.Get("Accept")
+
+	for _, v := range strings.Split(accepts, ",") {
+		t := strings.TrimSpace(v)
+		if strings.HasPrefix(t, "image/webp") {
+			return true
 		}
 	}
+
 	return false
+}
+
+func shouldEncodeToWebP(resp *http.Response) bool {
+	if !(resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusNotModified) {
+		return false
+	}
+
+	contentType := resp.Header.Get("Content-Type")
+	return !(contentType == "image/jpeg" || contentType == "image/png")
 }
 
 func decodeJPEG(src io.Reader) (img image.Image, err error) {
@@ -54,14 +77,14 @@ func decodePNG(src io.Reader) (img image.Image, err error) {
 	return img, nil
 }
 
-func decode(src io.Reader, mediaType string) (img image.Image, err error) {
-	switch mediaType {
+func decode(src io.Reader, contentType string) (img image.Image, err error) {
+	switch contentType {
 	case "image/jpeg":
 		return decodeJPEG(src)
 	case "image/png":
 		return decodePNG(src)
 	default:
-		return nil, fmt.Errorf("Unknown media type: %s", mediaType)
+		return nil, fmt.Errorf("Unknown content type: %s", contentType)
 	}
 }
 
@@ -80,8 +103,8 @@ func encode(img image.Image) (buf *bytes.Buffer, err error) {
 	return buf, nil
 }
 
-func convert(src io.Reader, mediaType string) (buf *bytes.Buffer, err error) {
-	img, err := decode(src, mediaType)
+func convert(src io.Reader, contentType string) (buf *bytes.Buffer, err error) {
+	img, err := decode(src, contentType)
 	if err != nil {
 		return nil, err
 	}
@@ -103,6 +126,7 @@ func transfer(w http.ResponseWriter, resp *http.Response) {
 			w.Header().Add(key, value)
 		}
 	}
+	w.WriteHeader(resp.StatusCode)
 	io.Copy(w, resp.Body)
 }
 
@@ -110,7 +134,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.RequestURI()
 	url := *upstreamURL + path
 
-	resp, err := http.Get(url)
+	resp, err := request(url, r)
 	if err != nil {
 		w.Header().Set("Content-Type", "text/plain")
 		http.Error(w, "Bad Gateway", http.StatusBadGateway)
@@ -118,14 +142,18 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	mediaType := getMediaType(resp.Header["Content-Type"])
-
-	if !(mediaType == "image/jpeg" || mediaType == "image/png") || !supportsWebp(r.Header["Accept"]) {
+	if !shouldEncodeToWebP(resp) && !canDecodeWebP(r) {
 		transfer(w, resp)
 		return
 	}
 
-	buf, err := convert(resp.Body, mediaType)
+	if resp.StatusCode == http.StatusNotModified {
+		w.Header().Set("Content-Type", "image/webp")
+		w.WriteHeader(http.StatusNotModified)
+		return
+	}
+
+	buf, err := convert(resp.Body, resp.Header.Get("Content-Type"))
 	if err != nil {
 		w.Header().Set("Content-Type", "text/plain")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -135,6 +163,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "image/webp")
 	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
+	w.Header().Set("Last-Modified", resp.Header.Get("Last-Modified"))
+	w.WriteHeader(http.StatusOK)
 	io.Copy(w, buf)
 }
 
