@@ -2,7 +2,9 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"image"
+	"image/png"
 	"io"
 	"log"
 	"net/http"
@@ -15,8 +17,14 @@ import (
 var port = flag.String("port", "8080", "")
 var upstreamURL = flag.String("upstream-url", "http://localhost:9000", "")
 
-func supportsWebp(r *http.Request) bool {
-	for _, v := range r.Header["Accept"] {
+func getMediaType(contentTypes []string) (format string) {
+	contentType := contentTypes[len(contentTypes)-1]
+	mediaType := strings.Split(contentType, ";")[0]
+	return mediaType
+}
+
+func supportsWebp(accepts []string) bool {
+	for _, v := range accepts {
 		for _, contentType := range strings.Split(v, ",") {
 			if strings.HasPrefix(contentType, "image/webp") {
 				return true
@@ -26,13 +34,33 @@ func supportsWebp(r *http.Request) bool {
 	return false
 }
 
-func decode(src io.Reader) (image.Image, error) {
-	img, err := jpeg.DecodeIntoRGBA(src, &jpeg.DecoderOptions{})
+func decodeJPEG(src io.Reader) (img image.Image, err error) {
+	img, err = jpeg.DecodeIntoRGBA(src, &jpeg.DecoderOptions{})
 	if err != nil {
 		return nil, err
 	}
 
 	return img, nil
+}
+
+func decodePNG(src io.Reader) (img image.Image, err error) {
+	img, err = png.Decode(src)
+	if err != nil {
+		return nil, err
+	}
+
+	return img, nil
+}
+
+func decode(src io.Reader, mediaType string) (img image.Image, err error) {
+	switch mediaType {
+	case "image/jpeg":
+		return decodeJPEG(src)
+	case "image/png":
+		return decodePNG(src)
+	default:
+		return nil, fmt.Errorf("Unknown media type: %s", mediaType)
+	}
 }
 
 func encode(w io.Writer, img image.Image) (err error) {
@@ -49,8 +77,8 @@ func encode(w io.Writer, img image.Image) (err error) {
 	return nil
 }
 
-func convert(w io.Writer, src io.Reader) (err error) {
-	img, err := decode(src)
+func convert(w io.Writer, src io.Reader, mediaType string) (err error) {
+	img, err := decode(src, mediaType)
 	if err != nil {
 		return err
 	}
@@ -87,16 +115,16 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	contentType := resp.Header["Content-Type"][0]
+	mediaType := getMediaType(resp.Header["Content-Type"])
 
-	if contentType != "image/jpeg" || !supportsWebp(r) {
+	if !(mediaType == "image/jpeg" || mediaType == "image/png") || !supportsWebp(r.Header["Accept"]) {
 		transfer(w, resp)
 		return
 	}
 
 	w.Header().Set("Content-Type", "image/webp")
 
-	err = convert(w, resp.Body)
+	err = convert(w, resp.Body, mediaType)
 	if err != nil {
 		w.Header().Set("Content-Type", "text/plain")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
