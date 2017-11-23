@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"image"
@@ -8,6 +9,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/harukasan/go-libwebp/webp"
@@ -63,32 +65,33 @@ func decode(src io.Reader, mediaType string) (img image.Image, err error) {
 	}
 }
 
-func encode(w io.Writer, img image.Image) (err error) {
+func encode(img image.Image) (buf *bytes.Buffer, err error) {
 	config, err := webp.ConfigPreset(webp.PresetDefault, 90)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	err = webp.EncodeRGBA(w, img, config)
+	buf = new(bytes.Buffer)
+	err = webp.EncodeRGBA(buf, img, config)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return buf, nil
 }
 
-func convert(w io.Writer, src io.Reader, mediaType string) (err error) {
+func convert(src io.Reader, mediaType string) (buf *bytes.Buffer, err error) {
 	img, err := decode(src, mediaType)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	err = encode(w, img)
+	buf, err = encode(img)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return buf, nil
 }
 
 func transfer(w http.ResponseWriter, resp *http.Response) {
@@ -122,15 +125,17 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "image/webp")
-
-	err = convert(w, resp.Body, mediaType)
+	buf, err := convert(resp.Body, mediaType)
 	if err != nil {
 		w.Header().Set("Content-Type", "text/plain")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		log.Println(err)
 		return
 	}
+
+	w.Header().Set("Content-Type", "image/webp")
+	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
+	io.Copy(w, buf)
 }
 
 func main() {
