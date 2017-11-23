@@ -2,10 +2,14 @@
 
 Simple WebP proxy server.
 
+## Install
+
 ```console
-$ git clone https://github.com/ykzts/webp-proxy.git
-$ cd ./webp-proxy
-$ dep ensure
-$ go build
+$ go get -u github.com/ykzts/webp-proxy
+```
+
+## Usage
+
+```console
 $ ./webp-proxy -port 8080 -upstream-url http://localhost:9000
 ```
