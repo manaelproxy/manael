@@ -13,7 +13,7 @@ import (
 )
 
 var port = flag.String("port", "8080", "")
-var upstreamUrl = flag.String("upstream-url", "http://localhost:9000", "")
+var upstreamURL = flag.String("upstream-url", "http://localhost:9000", "")
 
 func supportsWebp(r *http.Request) bool {
 	for _, v := range r.Header["Accept"] {
@@ -41,7 +41,22 @@ func encode(w io.Writer, img image.Image) (err error) {
 		return err
 	}
 
-	if err = webp.EncodeRGBA(w, img, config); err != nil {
+	err = webp.EncodeRGBA(w, img, config)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func convert(w io.Writer, src io.Reader) (err error) {
+	img, err := decode(src)
+	if err != nil {
+		return err
+	}
+
+	err = encode(w, img)
+	if err != nil {
 		return err
 	}
 
@@ -49,7 +64,7 @@ func encode(w io.Writer, img image.Image) (err error) {
 }
 
 func transfer(w http.ResponseWriter, resp *http.Response) {
-	for key, _ := range w.Header() {
+	for key := range w.Header() {
 		w.Header().Del(key)
 	}
 	for key, values := range resp.Header {
@@ -62,7 +77,7 @@ func transfer(w http.ResponseWriter, resp *http.Response) {
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.RequestURI()
-	url := *upstreamUrl + path
+	url := *upstreamURL + path
 
 	resp, err := http.Get(url)
 	if err != nil {
@@ -79,17 +94,10 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	img, err := decode(resp.Body)
-	if err != nil {
-		w.Header().Set("Content-Type", "text/plain")
-		http.Error(w, "Bad Gateway", http.StatusBadGateway)
-		log.Println(err)
-		return
-	}
-
 	w.Header().Set("Content-Type", "image/webp")
 
-	if err := encode(w, img); err != nil {
+	err = convert(w, resp.Body)
+	if err != nil {
 		w.Header().Set("Content-Type", "text/plain")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		log.Println(err)
