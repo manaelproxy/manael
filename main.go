@@ -143,7 +143,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	if !shouldEncodeToWebP(resp) && !canDecodeWebP(r) {
+	if !(shouldEncodeToWebP(resp) && canDecodeWebP(r)) {
 		transfer(w, resp)
 		return
 	}
