@@ -148,7 +148,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if resp.StatusCode == http.StatusNotModified {
-		w.Header().Set("Content-Type", "image/webp")
+		w.Header().Set("Cache-Control", resp.Header.Get("Cache-Control"))
 		w.WriteHeader(http.StatusNotModified)
 		return
 	}
@@ -163,6 +163,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "image/webp")
 	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
+	w.Header().Set("Cache-Control", resp.Header.Get("Cache-Control"))
 	w.Header().Set("Last-Modified", resp.Header.Get("Last-Modified"))
 	w.Header().Set("Vary", "Accept")
 	w.WriteHeader(http.StatusOK)
