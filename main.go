@@ -76,9 +76,7 @@ func decodePNG(src io.Reader) (img image.Image, err error) {
 	}
 
 	switch img.(type) {
-	case *image.RGBA:
-		return img, nil
-	case *image.NRGBA:
+	case *image.Gray, *image.RGBA, *image.NRGBA:
 		return img, nil
 	case *image.Paletted:
 		bounds := img.Bounds()
@@ -106,16 +104,24 @@ func decode(src io.Reader, contentType string) (img image.Image, err error) {
 	}
 }
 
-func encode(img image.Image) (buf *bytes.Buffer, err error) {
+func encode(src image.Image) (buf *bytes.Buffer, err error) {
 	config, err := webp.ConfigPreset(webp.PresetDefault, 90)
 	if err != nil {
 		return nil, err
 	}
 
 	buf = new(bytes.Buffer)
-	err = webp.EncodeRGBA(buf, img, config)
-	if err != nil {
-		return nil, err
+	switch img := src.(type) {
+	case *image.Gray:
+		err = webp.EncodeGray(buf, img, config)
+		if err != nil {
+			return nil, err
+		}
+	case *image.RGBA, *image.NRGBA:
+		err = webp.EncodeRGBA(buf, img, config)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return buf, nil
