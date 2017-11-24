@@ -13,3 +13,7 @@ $ go get -u github.com/ykzts/webp-proxy
 ```console
 $ webp-proxy -port 8080 -upstream-url http://localhost:9000
 ```
+
+## License
+
+[MIT](/LICENSE)
