@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"flag"
 	"fmt"
 	"image"
@@ -74,7 +75,24 @@ func decodePNG(src io.Reader) (img image.Image, err error) {
 		return nil, err
 	}
 
-	return img, nil
+	switch img.(type) {
+	case *image.RGBA:
+		return img, nil
+	case *image.NRGBA:
+		return img, nil
+	case *image.Paletted:
+		bounds := img.Bounds()
+		newImg := image.NewRGBA(bounds)
+		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+			for x := bounds.Min.X; x < bounds.Max.X; x++ {
+				newImg.Set(x, y, img.At(x, y))
+			}
+		}
+
+		return newImg, nil
+	}
+
+	return nil, errors.New("Not supported PNG format")
 }
 
 func decode(src io.Reader, contentType string) (img image.Image, err error) {
