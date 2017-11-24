@@ -28,6 +28,7 @@ func request(url string, r *http.Request) (resp *http.Response, err error) {
 		return nil, err
 	}
 
+	req.Header.Add("User-Agent", r.Header.Get("User-Agent"))
 	req.Header.Add("If-Modified-Since", r.Header.Get("If-Modified-Since"))
 
 	resp, err = client.Do(req)
