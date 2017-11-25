@@ -79,7 +79,7 @@ func decodePNG(src io.Reader) (img image.Image, err error) {
 	switch img.(type) {
 	case *image.Gray, *image.RGBA, *image.NRGBA:
 		return img, nil
-	case *image.Paletted:
+	case *image.RGBA64, *image.NRGBA64, *image.Paletted:
 		bounds := img.Bounds()
 		newImg := image.NewRGBA(bounds)
 		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
