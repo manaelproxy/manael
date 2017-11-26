@@ -1,55 +1,126 @@
 package main
 
 import (
+	"bytes"
+	"errors"
+	"fmt"
+	"image"
+	"image/png"
 	"io"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/harukasan/go-libwebp/webp"
+	"github.com/pixiv/go-libjpeg/jpeg"
 )
+
+func decodeJPEG(src io.Reader) (img image.Image, err error) {
+	img, err = jpeg.DecodeIntoRGBA(src, &jpeg.DecoderOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	return img, nil
+}
+
+func decodePNG(src io.Reader) (img image.Image, err error) {
+	img, err = png.Decode(src)
+	if err != nil {
+		return nil, err
+	}
+
+	switch img.(type) {
+	case *image.Gray, *image.RGBA, *image.NRGBA:
+		return img, nil
+	case *image.RGBA64, *image.NRGBA64, *image.Paletted:
+		bounds := img.Bounds()
+		newImg := image.NewRGBA(bounds)
+		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+			for x := bounds.Min.X; x < bounds.Max.X; x++ {
+				newImg.Set(x, y, img.At(x, y))
+			}
+		}
+
+		return newImg, nil
+	}
+
+	return nil, errors.New("Not supported PNG format")
+}
+
+func decode(src io.Reader, contentType string) (img image.Image, err error) {
+	switch contentType {
+	case "image/jpeg":
+		return decodeJPEG(src)
+	case "image/png":
+		return decodePNG(src)
+	default:
+		return nil, fmt.Errorf("Unknown content type: %s", contentType)
+	}
+}
+
+func encode(src image.Image) (buf *bytes.Buffer, err error) {
+	config, err := webp.ConfigPreset(webp.PresetDefault, 90)
+	if err != nil {
+		return nil, err
+	}
+
+	buf = bytes.NewBuffer(nil)
+	switch img := src.(type) {
+	case *image.Gray:
+		err = webp.EncodeGray(buf, img, config)
+		if err != nil {
+			return nil, err
+		}
+	case *image.RGBA, *image.NRGBA:
+		err = webp.EncodeRGBA(buf, img, config)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return buf, nil
+}
+
+func convert(src io.Reader, contentType string) (buf *bytes.Buffer, err error) {
+	img, err := decode(src, contentType)
+	if err != nil {
+		return nil, err
+	}
+
+	buf, err = encode(img)
+	if err != nil {
+		return nil, err
+	}
+
+	return buf, nil
+}
+
+var client http.Client
 
 // Handler is main process
 type Handler struct {
 	upstreamURL string
 }
 
-func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	path := r.URL.RequestURI()
-	url := h.upstreamURL + path
+func (h *Handler) request(r *http.Request) (resp *http.Response, err error) {
+	url := fmt.Sprintf("%s%s", h.upstreamURL, r.URL.RequestURI())
 
-	resp, err := request(url, r)
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		h.ErrorBadGateway(w, r)
-		log.Println(err)
-		return
-	}
-	defer resp.Body.Close()
-
-	if !(h.shouldEncodeToWebP(resp) && h.canDecodeWebP(r)) {
-		h.transfer(w, resp)
-		return
+		return nil, err
 	}
 
-	if resp.StatusCode == http.StatusNotModified {
-		w.Header().Set("Cache-Control", resp.Header.Get("Cache-Control"))
-		w.WriteHeader(http.StatusNotModified)
-		return
-	}
+	req.Header.Add("User-Agent", r.Header.Get("User-Agent"))
+	req.Header.Add("If-Modified-Since", r.Header.Get("If-Modified-Since"))
 
-	buf, err := convert(resp.Body, resp.Header.Get("Content-Type"))
+	resp, err = client.Do(req)
 	if err != nil {
-		h.ErrorInternalServerError(w, r)
-		log.Println(err)
-		return
+		return nil, err
 	}
 
-	w.Header().Set("Content-Type", "image/webp")
-	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
-	w.Header().Set("Cache-Control", resp.Header.Get("Cache-Control"))
-	w.Header().Set("Last-Modified", resp.Header.Get("Last-Modified"))
-	w.Header().Set("Vary", "Accept")
-	w.WriteHeader(http.StatusOK)
-	io.Copy(w, buf)
+	return resp, nil
 }
 
 func (h *Handler) shouldEncodeToWebP(resp *http.Response) bool {
@@ -98,4 +169,40 @@ func (h *Handler) ErrorInternalServerError(w http.ResponseWriter, r *http.Reques
 func (h *Handler) ErrorBadGateway(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 	http.Error(w, "Bad Gateway", http.StatusBadGateway)
+}
+
+func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	resp, err := h.request(r)
+	if err != nil {
+		h.ErrorBadGateway(w, r)
+		log.Println(err)
+		return
+	}
+	defer resp.Body.Close()
+
+	if !(h.shouldEncodeToWebP(resp) && h.canDecodeWebP(r)) {
+		h.transfer(w, resp)
+		return
+	}
+
+	if resp.StatusCode == http.StatusNotModified {
+		w.Header().Set("Cache-Control", resp.Header.Get("Cache-Control"))
+		w.WriteHeader(http.StatusNotModified)
+		return
+	}
+
+	buf, err := convert(resp.Body, resp.Header.Get("Content-Type"))
+	if err != nil {
+		h.ErrorInternalServerError(w, r)
+		log.Println(err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "image/webp")
+	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
+	w.Header().Set("Cache-Control", resp.Header.Get("Cache-Control"))
+	w.Header().Set("Last-Modified", resp.Header.Get("Last-Modified"))
+	w.Header().Set("Vary", "Accept")
+	w.WriteHeader(http.StatusOK)
+	io.Copy(w, buf)
 }
