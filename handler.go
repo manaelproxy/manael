@@ -16,19 +16,14 @@ import (
 	"github.com/pixiv/go-libjpeg/jpeg"
 )
 
-func decodeJPEG(src io.Reader) (img image.Image, err error) {
-	img, err = jpeg.DecodeIntoRGBA(src, &jpeg.DecoderOptions{})
-	if err != nil {
-		return nil, err
-	}
-
-	return img, nil
-}
-
-func decodePNG(src io.Reader) (img image.Image, err error) {
-	img, err = png.Decode(src)
-	if err != nil {
-		return nil, err
+func decode(src io.Reader, contentType string) (img image.Image, err error) {
+	switch contentType {
+	case "image/jpeg":
+		img, err = jpeg.DecodeIntoRGBA(src, &jpeg.DecoderOptions{})
+	case "image/png":
+		img, err = png.Decode(src)
+	default:
+		return nil, fmt.Errorf("Unknown content type: %s", contentType)
 	}
 
 	switch img.(type) {
@@ -46,18 +41,7 @@ func decodePNG(src io.Reader) (img image.Image, err error) {
 		return newImg, nil
 	}
 
-	return nil, errors.New("Not supported PNG format")
-}
-
-func decode(src io.Reader, contentType string) (img image.Image, err error) {
-	switch contentType {
-	case "image/jpeg":
-		return decodeJPEG(src)
-	case "image/png":
-		return decodePNG(src)
-	default:
-		return nil, fmt.Errorf("Unknown content type: %s", contentType)
-	}
+	return nil, errors.New("Not supported image format")
 }
 
 func encode(src image.Image) (buf *bytes.Buffer, err error) {
