@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "github.com/gorilla/handlers"
+  packages = ["."]
+  revision = "90663712d74cb411cbef281bc1e08c19d1a76145"
+  version = "v1.3.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/harukasan/go-libwebp"
   packages = ["webp"]
@@ -16,6 +22,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "52853ca1267b33c7fc7eddad27fbfecdb1f9d271ac53fbf767fa6c55af141f73"
+  inputs-digest = "f4a2d9e3a8d88c2758c617225c0d0a8a4562ddb99231cf65b431fbc8be681ac5"
   solver-name = "gps-cdcl"
   solver-version = 1

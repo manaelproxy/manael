@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+
+	"github.com/gorilla/handlers"
 )
 
 var bind = flag.String("bind", "0.0.0.0", "")
@@ -19,7 +22,7 @@ func main() {
 	}
 
 	addr := fmt.Sprintf("%s:%s", *bind, *port)
-	err := http.ListenAndServe(addr, h)
+	err := http.ListenAndServe(addr, handlers.LoggingHandler(os.Stdout, h))
 	if err != nil {
 		log.Fatal(err)
 	}
