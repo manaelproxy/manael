@@ -143,14 +143,12 @@ func (h *Handler) transfer(w http.ResponseWriter, resp *http.Response) {
 	io.Copy(w, resp.Body)
 }
 
-// ErrorInternalServerError return 500
-func (h *Handler) ErrorInternalServerError(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) errorInternalServerError(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 	http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 }
 
-// ErrorBadGateway returns 502
-func (h *Handler) ErrorBadGateway(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) errorBadGateway(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 	http.Error(w, "Bad Gateway", http.StatusBadGateway)
 }
@@ -158,7 +156,7 @@ func (h *Handler) ErrorBadGateway(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	resp, err := h.request(r)
 	if err != nil {
-		h.ErrorBadGateway(w, r)
+		h.errorBadGateway(w, r)
 		log.Println(err)
 		return
 	}
@@ -177,7 +175,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	buf, err := convert(resp.Body, resp.Header.Get("Content-Type"))
 	if err != nil {
-		h.ErrorInternalServerError(w, r)
+		h.errorInternalServerError(w, r)
 		log.Println(err)
 		return
 	}
