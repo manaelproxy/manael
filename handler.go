@@ -97,7 +97,11 @@ func (h *Handler) request(r *http.Request) (resp *http.Response, err error) {
 	}
 
 	req.Header.Add("User-Agent", r.Header.Get("User-Agent"))
-	req.Header.Add("If-Modified-Since", r.Header.Get("If-Modified-Since"))
+
+	ims := r.Header.Get("If-Modified-Since")
+	if ims != "" {
+		req.Header.Add("If-Modified-Since", ims)
+	}
 
 	resp, err = client.Do(req)
 	if err != nil {
