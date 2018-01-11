@@ -1,16 +1,40 @@
-FROM golang:1.9-stretch
+FROM golang:1.9.2-alpine3.7 AS build
 
-WORKDIR /go/src/app
-COPY . /go/src/app
+COPY Gopkg.lock Gopkg.toml *.go /go/src/github.com/ykzts/webp-proxy/
 
-RUN apt-get update \
-	&& apt-get install -y --no-install-recommends \
+RUN set -ex \
+	\
+	&& apk add --update --virtual .build-deps \
 		gcc \
 		git \
-		libjpeg62-turbo-dev \
+		libjpeg-turbo-dev \
 		libwebp-dev \
-	&& rm -rf /var/lib/apt/lists/* \
-	&& go-wrapper download \
-	&& go-wrapper install
+		musl-dev \
+	&& go get -u github.com/golang/dep/cmd/dep \
+	&& cd /go/src/github.com/ykzts/webp-proxy \
+	&& dep ensure \
+	&& rm Gopkg.lock Gopkg.toml \
+	&& go install \
+	&& cd /go \
+	&& apk del .build-deps \
+	&& rm \
+		/var/cache/apk/* \
+		/usr/local/bin/* \
+		/go/bin/dep \
+	&& rm -r \
+		/usr/local/go \
+		/go/pkg \
+		/go/src
 
-CMD ["go-wrapper", "run"]
+FROM alpine:3.7
+
+COPY --from=build /go/bin/webp-proxy /usr/bin/
+
+RUN set -ex \
+	\
+	&& apk add --update \
+		ca-certificates \
+		libjpeg-turbo \
+		libwebp
+
+CMD ["webp-proxy"]
