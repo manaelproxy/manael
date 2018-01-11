@@ -14,7 +14,7 @@ RUN set -ex \
 	&& go get -u github.com/golang/dep/cmd/dep \
 	&& cd /go/src/github.com/ykzts/webp-proxy \
 	&& dep ensure \
-	&& go install \
+	&& go install -ldflags '-s -w' \
 	&& cd /go \
 	&& apk del .build-deps \
 	&& rm \
