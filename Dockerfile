@@ -4,7 +4,8 @@ COPY Gopkg.lock Gopkg.toml *.go /go/src/github.com/ykzts/webp-proxy/
 
 RUN set -ex \
 	\
-	&& apk add --update --virtual .build-deps \
+	&& echo http://dl-cdn.alpinelinux.org/alpine/v3.7/main > /etc/apk/repositories \
+	&& apk --update-cache add --virtual .build-deps \
 		gcc \
 		git \
 		libjpeg-turbo-dev \
@@ -13,7 +14,6 @@ RUN set -ex \
 	&& go get -u github.com/golang/dep/cmd/dep \
 	&& cd /go/src/github.com/ykzts/webp-proxy \
 	&& dep ensure \
-	&& rm Gopkg.lock Gopkg.toml \
 	&& go install \
 	&& cd /go \
 	&& apk del .build-deps \
@@ -32,7 +32,8 @@ COPY --from=build /go/bin/webp-proxy /usr/bin/
 
 RUN set -ex \
 	\
-	&& apk add --update \
+	&& echo http://dl-cdn.alpinelinux.org/alpine/v3.7/main > /etc/apk/repositories \
+	&& apk add --no-cache \
 		ca-certificates \
 		libjpeg-turbo \
 		libwebp
