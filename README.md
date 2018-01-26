@@ -14,6 +14,8 @@ $ go get -u github.com/ykzts/webp-proxy
 $ webp-proxy -port 8080 -upstream-url http://localhost:9000
 ```
 
+### Sample nginx.conf
+
 ```
 # /etc/nginx/conf.d/files.example.com.conf
 proxy_cache_path /var/cache/nginx/cache levels=1:2 keys_zone=CACHE:128m max_size=512m inactive=1d;
