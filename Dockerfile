@@ -1,6 +1,6 @@
 FROM golang:1.9.2-alpine3.7 AS build
 
-COPY Gopkg.lock Gopkg.toml *.go /go/src/github.com/ykzts/webp-proxy/
+COPY Gopkg.lock Gopkg.toml *.go /go/src/github.com/ykzts/manael/
 
 RUN set -ex \
 	\
@@ -13,15 +13,15 @@ RUN set -ex \
 		musl-dev \
 	\
 	&& go get -u github.com/golang/dep/cmd/dep \
-	&& cd /go/src/github.com/ykzts/webp-proxy \
+	&& cd /go/src/github.com/ykzts/manael \
 	&& dep ensure \
 	&& go install -ldflags '-s -w' \
 	\
 	&& cd /tmp \
 	&& mkdir -p rootfs/usr/bin \
-	&& cp /go/bin/webp-proxy rootfs/usr/bin \
+	&& cp /go/bin/manael rootfs/usr/bin \
 	&& mkdir -p rootfs/lib rootfs/usr/lib \
-	&& for lib in $(ldd rootfs/usr/bin/webp-proxy | awk '{ print $(NF-1) }'); do \
+	&& for lib in $(ldd rootfs/usr/bin/manael | awk '{ print $(NF-1) }'); do \
 		cp $lib rootfs$lib; \
 	done \
 	&& mkdir -p rootfs/etc/ssl/certs \
@@ -41,4 +41,4 @@ FROM scratch
 
 COPY --from=build /tmp/rootfs /
 
-CMD ["webp-proxy"]
+CMD ["manael"]
