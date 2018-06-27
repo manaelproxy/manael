@@ -1,4 +1,4 @@
-package main
+package main // import "manael.org/x/manael/cmd/manael"
 
 import (
 	"flag"
@@ -9,7 +9,7 @@ import (
 	"runtime"
 
 	"github.com/gorilla/handlers"
-	"github.com/manaelproxy/manael"
+	"manael.org/x/manael"
 )
 
 var bind = flag.String("bind", "0.0.0.0", "")
