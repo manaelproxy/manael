@@ -1,4 +1,4 @@
-package main
+package manael
 
 import (
 	"bytes"
@@ -85,11 +85,11 @@ var client http.Client
 
 // Handler is main process
 type Handler struct {
-	upstreamURL string
+	UpstreamURL string
 }
 
 func (h *Handler) request(r *http.Request) (resp *http.Response, err error) {
-	url := fmt.Sprintf("%s%s", h.upstreamURL, r.URL.RequestURI())
+	url := fmt.Sprintf("%s%s", h.UpstreamURL, r.URL.RequestURI())
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
