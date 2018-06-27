@@ -1,4 +1,4 @@
-package manael
+package manael // import "manael.org/x/manael"
 
 import (
 	"bytes"
