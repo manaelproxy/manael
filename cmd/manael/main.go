@@ -9,7 +9,7 @@ import (
 	"runtime"
 
 	"github.com/gorilla/handlers"
-	"github.com/ykzts/manael"
+	"github.com/manaelproxy/manael"
 )
 
 var bind = flag.String("bind", "0.0.0.0", "")
