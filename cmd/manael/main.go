@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime"
 
 	"github.com/gorilla/handlers"
 	"github.com/ykzts/manael"
@@ -17,6 +18,8 @@ var upstreamURL = flag.String("upstream-url", "http://localhost:9000", "")
 
 func main() {
 	flag.Parse()
+
+	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	h := &manael.Handler{
 		UpstreamURL: *upstreamURL,
