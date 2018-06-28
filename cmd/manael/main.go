@@ -18,7 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// Package main provides CLI client for Manael
 package main // import "manael.org/x/manael/cmd/manael"
 
 import (
