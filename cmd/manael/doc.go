@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Yamagishi Kazutoshi <ykzts@desire.sh>
+// Copyright (c) 2018 Yamagishi Kazutoshi <ykzts@desire.sh>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,6 @@
 //
 // Example:
 //
-//    manael -port 8080 -upstream-url http://localhost:9000
+//    manael -http=:8080 -upstream_url=http://localhost:9000
 //
 package main
