@@ -13,6 +13,12 @@ Simple WebP proxy server.
 $ go get -u manael.org/x/manael/cmd/manael
 ```
 
+## Usage
+
+```console
+$ manael -http=:8080 -upstream_url=http://localhost:9000
+```
+
 ## License
 
 [MIT](/LICENSE)
