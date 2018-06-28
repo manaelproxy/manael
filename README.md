@@ -2,6 +2,11 @@
 
 Simple WebP proxy server.
 
+## Dependencies
+
+- libjpeg (or libjpeg-turbo)
+- libwebp
+
 ## Installation
 
 ```console
