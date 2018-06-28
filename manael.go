@@ -32,7 +32,7 @@ import (
 
 var client http.Client
 
-// Handler is main process
+// A Handler responds to an HTTP request.
 type Handler struct {
 	UpstreamURL string
 }
