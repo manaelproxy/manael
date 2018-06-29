@@ -1,0 +1,63 @@
+version: 2
+
+aliases:
+  - &defaults
+      docker:
+        - image: circleci/golang:1.10.3-stretch
+      working_directory: /go/src/manael.org/x/manael
+
+  - &install_system_dependencies
+      run:
+        name: Install system dependencies
+        command: |
+          sudo apt-get update
+          sudo apt-get install -y libjpeg-dev libwebp-dev
+
+  - &test_steps
+      steps:
+        - checkout
+
+        - *install_system_dependencies
+
+        - run: go get -v -t -d ./...
+        - run: go test -v ./...
+
+jobs:
+  test-go1.10:
+    <<: *defaults
+    <<: *test_steps
+
+  test-go1.9:
+    <<: *defaults
+    docker:
+      - image: circleci/golang:1.9.7-stretch
+    <<: *test_steps
+
+  test-go1.8:
+    <<: *defaults
+    docker:
+      - image: circleci/golang:1.8.7-stretch
+    <<: *test_steps
+
+  build:
+    <<: *defaults
+    steps:
+      - checkout
+
+      - *install_system_dependencies
+
+      - run: go get -v -t -d ./...
+      - run: go build ./cmd/manael
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - test-go1.10
+      - test-go1.9
+      - test-go1.8
+      - build:
+          requires:
+            - test-go1.10
+            - test-go1.9
+            - test-go1.8
