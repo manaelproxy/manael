@@ -18,14 +18,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// Manael is a proxy server for processing images.
-//
-// Usage:
-//
-//     manael [arguments]
-//
-// Example:
-//
-//    manael -http=:8080 -upstream_url=http://localhost:9000
-//
-package main
+package manael_test // import "manael.org/x/manael"
+
+import (
+	"log"
+	"net/http"
+
+	"manael.org/x/manael"
+)
+
+func ExampleHandler() {
+	h := &manael.Handler{
+		UpstreamURL: "http://localhost:9000",
+	}
+
+	err := http.ListenAndServe(":8080", h)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
