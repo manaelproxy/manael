@@ -96,20 +96,10 @@ func (h *Handler) transfer(w http.ResponseWriter, resp *http.Response) {
 	io.Copy(w, resp.Body)
 }
 
-func (h *Handler) errorInternalServerError(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain")
-	http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-}
-
-func (h *Handler) errorBadGateway(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain")
-	http.Error(w, "Bad Gateway", http.StatusBadGateway)
-}
-
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	resp, err := h.request(r)
 	if err != nil {
-		h.errorBadGateway(w, r)
+		http.Error(w, "Bad Gateway", http.StatusBadGateway)
 		log.Println(err)
 		return
 	}
@@ -128,7 +118,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	buf, err := convert(resp.Body, resp.Header.Get("Content-Type"))
 	if err != nil {
-		h.errorInternalServerError(w, r)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		log.Println(err)
 		return
 	}
