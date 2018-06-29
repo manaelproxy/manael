@@ -32,14 +32,12 @@ import (
 
 var client http.Client
 
-// A Handler responds to an HTTP request.
-type Handler struct {
+// A ServeProxy responds to an HTTP request.
+type ServeProxy struct {
 	UpstreamURL string
 }
 
-func (h *Handler) request(r *http.Request) (resp *http.Response, err error) {
-	url := fmt.Sprintf("%s%s", h.UpstreamURL, r.URL.RequestURI())
-
+func request(url string, r *http.Request) (resp *http.Response, err error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -60,7 +58,7 @@ func (h *Handler) request(r *http.Request) (resp *http.Response, err error) {
 	return resp, nil
 }
 
-func (h *Handler) shouldEncodeToWebP(resp *http.Response) bool {
+func shouldEncodeToWebP(resp *http.Response) bool {
 	if !(resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusNotModified) {
 		return false
 	}
@@ -69,7 +67,7 @@ func (h *Handler) shouldEncodeToWebP(resp *http.Response) bool {
 	return contentType == "image/jpeg" || contentType == "image/png"
 }
 
-func (h *Handler) canDecodeWebP(r *http.Request) bool {
+func canDecodeWebP(r *http.Request) bool {
 	accepts := r.Header.Get("Accept")
 
 	for _, v := range strings.Split(accepts, ",") {
@@ -82,7 +80,7 @@ func (h *Handler) canDecodeWebP(r *http.Request) bool {
 	return false
 }
 
-func (h *Handler) transfer(w http.ResponseWriter, resp *http.Response) {
+func transfer(w http.ResponseWriter, resp *http.Response) {
 	for key := range w.Header() {
 		w.Header().Del(key)
 	}
@@ -96,8 +94,10 @@ func (h *Handler) transfer(w http.ResponseWriter, resp *http.Response) {
 	io.Copy(w, resp.Body)
 }
 
-func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	resp, err := h.request(r)
+func (p *ServeProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	url := fmt.Sprintf("%s%s", p.UpstreamURL, r.URL.RequestURI())
+
+	resp, err := request(url, r)
 	if err != nil {
 		http.Error(w, "Bad Gateway", http.StatusBadGateway)
 		log.Println(err)
@@ -105,8 +105,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	if !(h.shouldEncodeToWebP(resp) && h.canDecodeWebP(r)) {
-		h.transfer(w, resp)
+	if !(shouldEncodeToWebP(resp) && canDecodeWebP(r)) {
+		transfer(w, resp)
 		return
 	}
 
@@ -130,4 +130,10 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Vary", "Accept")
 	w.WriteHeader(http.StatusOK)
 	io.Copy(w, buf)
+}
+
+func NewServeProxy(upstreamURL string) *ServeProxy {
+	return &ServeProxy{
+		UpstreamURL: upstreamURL,
+	}
 }

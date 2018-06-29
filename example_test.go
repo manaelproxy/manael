@@ -27,12 +27,10 @@ import (
 	"manael.org/x/manael"
 )
 
-func ExampleHandler() {
-	h := &manael.Handler{
-		UpstreamURL: "http://localhost:9000",
-	}
+func ExampleNewServeProxy() {
+	p := manael.NewServeProxy("http://localhost:9000")
 
-	err := http.ListenAndServe(":8080", h)
+	err := http.ListenAndServe(":8080", p)
 	if err != nil {
 		log.Fatal(err)
 	}

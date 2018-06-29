@@ -27,6 +27,7 @@ import (
 	"os"
 
 	"github.com/gorilla/handlers"
+
 	"manael.org/x/manael"
 )
 
@@ -38,11 +39,9 @@ var (
 func main() {
 	flag.Parse()
 
-	h := &manael.Handler{
-		UpstreamURL: *upstreamURL,
-	}
+	p := manael.NewServeProxy(*upstreamURL)
 
-	err := http.ListenAndServe(*httpAddr, handlers.LoggingHandler(os.Stdout, h))
+	err := http.ListenAndServe(*httpAddr, handlers.LoggingHandler(os.Stdout, p))
 	if err != nil {
 		log.Fatal(err)
 	}
