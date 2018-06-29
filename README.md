@@ -1,6 +1,6 @@
 # Manael
 
-Simple WebP proxy server.
+A simple HTTP proxy for processing images.
 
 ## Dependencies
 
