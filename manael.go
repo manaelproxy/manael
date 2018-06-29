@@ -26,6 +26,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 )
@@ -34,7 +35,7 @@ var client http.Client
 
 // A ServeProxy responds to an HTTP request.
 type ServeProxy struct {
-	UpstreamURL string
+	UpstreamURL *url.URL
 }
 
 func request(url string, r *http.Request) (resp *http.Response, err error) {
@@ -95,7 +96,7 @@ func transfer(w http.ResponseWriter, resp *http.Response) {
 }
 
 func (p *ServeProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	url := fmt.Sprintf("%s%s", p.UpstreamURL, r.URL.RequestURI())
+	url := fmt.Sprintf("%s%s", p.UpstreamURL.String(), r.URL.RequestURI())
 
 	resp, err := request(url, r)
 	if err != nil {
@@ -132,8 +133,8 @@ func (p *ServeProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	io.Copy(w, buf)
 }
 
-func NewServeProxy(upstreamURL string) *ServeProxy {
-	return &ServeProxy{
-		UpstreamURL: upstreamURL,
-	}
+func NewServeProxy(rawURL string) *ServeProxy {
+	u, _ := url.Parse(rawURL)
+
+	return &ServeProxy{u}
 }
