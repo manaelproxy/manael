@@ -46,6 +46,12 @@ func TestServeProxy_ServeHTTP(t *testing.T) {
 	mux.HandleFunc("/logo.png", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "testdata/logo.png")
 	})
+	mux.HandleFunc("/empty.jpeg", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "testdata/empty.jpeg")
+	})
+	mux.HandleFunc("/empty.gif", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "testdata/empty.gif")
+	})
 	mux.HandleFunc("/empty.txt", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "testdata/empty.txt")
 	})
@@ -75,6 +81,34 @@ func TestServeProxy_ServeHTTP(t *testing.T) {
 			statusCode:  http.StatusOK,
 			contentType: "image/webp",
 			checksum:    "7af3f597f7965426d92f0333d27cf39377c9415107b2ffa716f72b7fe28ba2e9",
+		},
+		{
+			accept:      "image/*,*/*",
+			path:        "/empty.jpeg",
+			statusCode:  http.StatusOK,
+			contentType: "image/jpeg",
+			checksum:    "1a8b498fcc782ef585778f6cd29640d78f0d2a25371786dcd62b61867d382b94",
+		},
+		{
+			accept:      "image/webp,image/*,*/*",
+			path:        "/empty.jpeg",
+			statusCode:  http.StatusOK,
+			contentType: "image/webp",
+			checksum:    "69e3fa438596fdb60d6dee6aea10a92ebe2f19d50c4b069a8aaa97aa06b1a255",
+		},
+		{
+			accept:      "image/*,*/*",
+			path:        "/empty.gif",
+			statusCode:  http.StatusOK,
+			contentType: "image/gif",
+			checksum:    "a065920df8cc4016d67c3a464be90099c9d28ffe7c9e6ee3a18f257efc58cbd7",
+		},
+		{
+			accept:      "image/webp,image/*,*/*",
+			path:        "/empty.gif",
+			statusCode:  http.StatusOK,
+			contentType: "image/gif",
+			checksum:    "a065920df8cc4016d67c3a464be90099c9d28ffe7c9e6ee3a18f257efc58cbd7",
 		},
 		{
 			accept:      "image/webp,image/*,*/*",
