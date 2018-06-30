@@ -21,6 +21,9 @@
 package manael // import "manael.org/x/manael"
 
 import (
+	"crypto/sha256"
+	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -57,24 +60,28 @@ func TestServeProxy_ServeHTTP(t *testing.T) {
 		path        string
 		statusCode  int
 		contentType string
+		checksum    string
 	}{
 		{
 			accept:      "image/*,*/*",
 			path:        "/logo.png",
 			statusCode:  http.StatusOK,
 			contentType: "image/png",
+			checksum:    "87209ba2999bf451589e6333d0699dfcf6fa7c07eda5f4aa39051787dca62f2a",
 		},
 		{
 			accept:      "image/webp,image/*,*/*",
 			path:        "/logo.png",
 			statusCode:  http.StatusOK,
 			contentType: "image/webp",
+			checksum:    "7af3f597f7965426d92f0333d27cf39377c9415107b2ffa716f72b7fe28ba2e9",
 		},
 		{
 			accept:      "image/webp,image/*,*/*",
 			path:        "/empty.txt",
 			statusCode:  http.StatusOK,
 			contentType: "text/plain; charset=utf-8",
+			checksum:    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
 		},
 	}
 
@@ -87,6 +94,7 @@ func TestServeProxy_ServeHTTP(t *testing.T) {
 		p.ServeHTTP(w, req)
 
 		resp := w.Result()
+		defer resp.Body.Close()
 
 		if got, want := resp.StatusCode, tc.statusCode; got != want {
 			t.Errorf("Status Code is %d, want %d", got, want)
@@ -94,6 +102,13 @@ func TestServeProxy_ServeHTTP(t *testing.T) {
 
 		if got, want := resp.Header.Get("Content-Type"), tc.contentType; got != want {
 			t.Errorf("Content-Type is %s, want %s", got, want)
+		}
+
+		h := sha256.New()
+		io.Copy(h, resp.Body)
+
+		if got, want := fmt.Sprintf("%x", h.Sum(nil)), tc.checksum; got != want {
+			t.Errorf("Chacksum is %s, want %s", got, want)
 		}
 	}
 }
