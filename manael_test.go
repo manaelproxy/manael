@@ -164,10 +164,46 @@ func getModTime(name string) (time.Time, error) {
 	return i.ModTime().UTC(), nil
 }
 
+var ifModifiedSinceTests = []struct {
+	path          string
+	modtime       time.Time
+	statusCode    int
+	contentLength int
+}{
+	{
+		"/logo.png",
+		time.Date(2018, time.June, 30, 14, 4, 31, 0, time.UTC),
+		http.StatusNotModified,
+		0,
+	},
+	{
+		"/logo.png",
+		time.Date(2018, time.June, 30, 14, 3, 31, 0, time.UTC),
+		http.StatusOK,
+		6435,
+	},
+	{
+		"/logo.png",
+		time.Date(2018, time.June, 30, 14, 5, 31, 0, time.UTC),
+		http.StatusNotModified,
+		0,
+	},
+}
+
 func TestServeProxy_ServeHTTP_ifModifiedSince(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/logo.png", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "testdata/logo.png")
+		modtime := time.Date(2018, time.June, 30, 14, 4, 31, 0, time.UTC)
+
+		ims := r.Header.Get("If-Modified-Since")
+		t, _ := time.Parse(http.TimeFormat, ims)
+
+		if t.Before(modtime) {
+			r.Header.Del("If-Modified-Since")
+			http.ServeFile(w, r, "testdata/logo.png")
+		} else {
+			w.WriteHeader(http.StatusNotModified)
+		}
 	})
 
 	ts := httptest.NewServer(mux)
@@ -175,38 +211,67 @@ func TestServeProxy_ServeHTTP_ifModifiedSince(t *testing.T) {
 
 	p := NewServeProxy(ts.URL)
 
-	mt, err := getModTime("testdata/logo.png")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	for _, tc := range []struct {
-		path          string
-		modtime       time.Time
-		statusCode    int
-		contentLength int
-	}{
-		{
-			"/logo.png",
-			mt,
-			http.StatusNotModified,
-			0,
-		},
-		{
-			"/logo.png",
-			mt.Add(-time.Minute),
-			http.StatusOK,
-			6435,
-		},
-		{
-			"/logo.png",
-			mt.Add(time.Minute),
-			http.StatusNotModified,
-			0,
-		},
-	} {
+	for _, tc := range ifModifiedSinceTests {
 		req := httptest.NewRequest(http.MethodGet, tc.path, nil)
 		req.Header.Add("If-Modified-Since", tc.modtime.Format(http.TimeFormat))
+
+		w := httptest.NewRecorder()
+
+		p.ServeHTTP(w, req)
+
+		resp := w.Result()
+		defer resp.Body.Close()
+
+		if got, want := resp.StatusCode, tc.statusCode; got != want {
+			t.Errorf("Status Code is %d, want %d (%s)", got, want, tc.modtime)
+		}
+
+		body, _ := ioutil.ReadAll(resp.Body)
+
+		if got, want := len(body), tc.contentLength; got != want {
+			t.Errorf("Response body is %d bytes, want %d", got, want)
+		}
+	}
+}
+
+var ifNoneMatchTests = []struct {
+	path          string
+	etag          string
+	statusCode    int
+	contentLength int
+}{
+	{
+		"/logo.png",
+		`W/"fcaec3a55087c997f24ba2a70383ed9b7607fd85f0ae2e0dccb5ec094c75f009"`,
+		http.StatusNotModified,
+		0,
+	},
+	{
+		"/logo.png",
+		"invalidETag",
+		http.StatusOK,
+		6435,
+	},
+}
+
+func TestServeProxy_ServeHTTP_ifNoneMatch(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/logo.png", func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("If-None-Match") != fmt.Sprintf(`W/"%x"`, sha256.Sum256([]byte("etag"))) {
+			http.ServeFile(w, r, "testdata/logo.png")
+		} else {
+			w.WriteHeader(http.StatusNotModified)
+		}
+	})
+
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
+
+	p := NewServeProxy(ts.URL)
+
+	for _, tc := range ifNoneMatchTests {
+		req := httptest.NewRequest(http.MethodGet, tc.path, nil)
+		req.Header.Add("If-None-Match", tc.etag)
 
 		w := httptest.NewRecorder()
 
