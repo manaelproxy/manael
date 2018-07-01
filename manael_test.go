@@ -122,7 +122,7 @@ func TestServeProxy_ServeHTTP(t *testing.T) {
 	p := NewServeProxy(ts.URL)
 
 	for _, tc := range serveProxyTests {
-		req := httptest.NewRequest("GET", tc.path, nil)
+		req := httptest.NewRequest(http.MethodGet, tc.path, nil)
 		req.Header.Add("Accept", tc.accept)
 
 		w := httptest.NewRecorder()
@@ -205,7 +205,7 @@ func TestServeProxy_ServeHTTP_ifModifiedSince(t *testing.T) {
 			0,
 		},
 	} {
-		req := httptest.NewRequest("GET", tc.path, nil)
+		req := httptest.NewRequest(http.MethodGet, tc.path, nil)
 		req.Header.Add("If-Modified-Since", tc.modtime.Format(http.TimeFormat))
 
 		w := httptest.NewRecorder()

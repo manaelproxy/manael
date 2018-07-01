@@ -27,7 +27,7 @@ import (
 var client http.Client
 
 func request(url string, r *http.Request) (resp *http.Response, err error) {
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
 	}
