@@ -29,16 +29,73 @@ import (
 	"testing"
 )
 
-const (
-	cdnURL = "https://cdn.example.com"
-)
-
 func TestNewServeProxy(t *testing.T) {
-	p := NewServeProxy(cdnURL)
+	ts := httptest.NewServer(nil)
+	defer ts.Close()
 
-	if got, want := p.UpstreamURL.String(), cdnURL; got != want {
+	p := NewServeProxy(ts.URL)
+
+	if got, want := p.UpstreamURL.String(), ts.URL; got != want {
 		t.Errorf("Upstream URL is %s, want %s", got, want)
 	}
+}
+
+var serveProxyTests = []struct {
+	accept      string
+	path        string
+	statusCode  int
+	contentType string
+	checksum    string
+}{
+	{
+		"image/*,*/*;q=0.8",
+		"/logo.png",
+		http.StatusOK,
+		"image/png",
+		"87209ba2999bf451589e6333d0699dfcf6fa7c07eda5f4aa39051787dca62f2a",
+	},
+	{
+		"image/webp,image/*,*/*;q=0.8",
+		"/logo.png",
+		http.StatusOK,
+		"image/webp",
+		"7af3f597f7965426d92f0333d27cf39377c9415107b2ffa716f72b7fe28ba2e9",
+	},
+	{
+		"image/*,*/*",
+		"/empty.jpeg",
+		http.StatusOK,
+		"image/jpeg",
+		"1a8b498fcc782ef585778f6cd29640d78f0d2a25371786dcd62b61867d382b94",
+	},
+	{
+		"image/webp,image/*,*/*;q=0.8",
+		"/empty.jpeg",
+		http.StatusOK,
+		"image/webp",
+		"69e3fa438596fdb60d6dee6aea10a92ebe2f19d50c4b069a8aaa97aa06b1a255",
+	},
+	{
+		"image/*,*/*;q=0.8",
+		"/empty.gif",
+		http.StatusOK,
+		"image/gif",
+		"a065920df8cc4016d67c3a464be90099c9d28ffe7c9e6ee3a18f257efc58cbd7",
+	},
+	{
+		"image/webp,image/*,*/*;q=0.8",
+		"/empty.gif",
+		http.StatusOK,
+		"image/gif",
+		"a065920df8cc4016d67c3a464be90099c9d28ffe7c9e6ee3a18f257efc58cbd7",
+	},
+	{
+		"image/webp,image/*,*/*",
+		"/empty.txt",
+		http.StatusOK,
+		"text/plain; charset=utf-8",
+		"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+	},
 }
 
 func TestServeProxy_ServeHTTP(t *testing.T) {
@@ -61,65 +118,7 @@ func TestServeProxy_ServeHTTP(t *testing.T) {
 
 	p := NewServeProxy(ts.URL)
 
-	tests := []struct {
-		accept      string
-		path        string
-		statusCode  int
-		contentType string
-		checksum    string
-	}{
-		{
-			accept:      "image/*,*/*",
-			path:        "/logo.png",
-			statusCode:  http.StatusOK,
-			contentType: "image/png",
-			checksum:    "87209ba2999bf451589e6333d0699dfcf6fa7c07eda5f4aa39051787dca62f2a",
-		},
-		{
-			accept:      "image/webp,image/*,*/*",
-			path:        "/logo.png",
-			statusCode:  http.StatusOK,
-			contentType: "image/webp",
-			checksum:    "7af3f597f7965426d92f0333d27cf39377c9415107b2ffa716f72b7fe28ba2e9",
-		},
-		{
-			accept:      "image/*,*/*",
-			path:        "/empty.jpeg",
-			statusCode:  http.StatusOK,
-			contentType: "image/jpeg",
-			checksum:    "1a8b498fcc782ef585778f6cd29640d78f0d2a25371786dcd62b61867d382b94",
-		},
-		{
-			accept:      "image/webp,image/*,*/*",
-			path:        "/empty.jpeg",
-			statusCode:  http.StatusOK,
-			contentType: "image/webp",
-			checksum:    "69e3fa438596fdb60d6dee6aea10a92ebe2f19d50c4b069a8aaa97aa06b1a255",
-		},
-		{
-			accept:      "image/*,*/*",
-			path:        "/empty.gif",
-			statusCode:  http.StatusOK,
-			contentType: "image/gif",
-			checksum:    "a065920df8cc4016d67c3a464be90099c9d28ffe7c9e6ee3a18f257efc58cbd7",
-		},
-		{
-			accept:      "image/webp,image/*,*/*",
-			path:        "/empty.gif",
-			statusCode:  http.StatusOK,
-			contentType: "image/gif",
-			checksum:    "a065920df8cc4016d67c3a464be90099c9d28ffe7c9e6ee3a18f257efc58cbd7",
-		},
-		{
-			accept:      "image/webp,image/*,*/*",
-			path:        "/empty.txt",
-			statusCode:  http.StatusOK,
-			contentType: "text/plain; charset=utf-8",
-			checksum:    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-		},
-	}
-
-	for _, tc := range tests {
+	for _, tc := range serveProxyTests {
 		req := httptest.NewRequest("GET", tc.path, nil)
 		req.Header.Add("Accept", tc.accept)
 
