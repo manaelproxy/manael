@@ -31,32 +31,9 @@ import (
 	"strings"
 )
 
-var client http.Client
-
 // A ServeProxy responds to an HTTP request.
 type ServeProxy struct {
 	UpstreamURL *url.URL
-}
-
-func request(url string, r *http.Request) (resp *http.Response, err error) {
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("User-Agent", r.Header.Get("User-Agent"))
-
-	ims := r.Header.Get("If-Modified-Since")
-	if ims != "" {
-		req.Header.Add("If-Modified-Since", ims)
-	}
-
-	resp, err = client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
 }
 
 func shouldEncodeToWebP(resp *http.Response) bool {
