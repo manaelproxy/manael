@@ -39,6 +39,11 @@ func request(url string, r *http.Request) (resp *http.Response, err error) {
 		req.Header.Add("If-Modified-Since", ims)
 	}
 
+	inm := r.Header.Get("If-None-Match")
+	if inm != "" {
+		req.Header.Add("If-None-Match", inm)
+	}
+
 	resp, err = client.Do(req)
 	if err != nil {
 		return nil, err
