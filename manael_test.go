@@ -24,9 +24,12 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
+	"time"
 )
 
 func TestNewServeProxy(t *testing.T) {
@@ -142,6 +145,84 @@ func TestServeProxy_ServeHTTP(t *testing.T) {
 
 		if got, want := fmt.Sprintf("%x", h.Sum(nil)), tc.checksum; got != want {
 			t.Errorf("Chacksum is %s, want %s", got, want)
+		}
+	}
+}
+
+func getModTime(name string) (time.Time, error) {
+	f, err := os.Open(name)
+	if err != nil {
+		return time.Time{}, err
+	}
+	defer f.Close()
+
+	i, err := f.Stat()
+	if err != nil {
+		return time.Time{}, err
+	}
+
+	return i.ModTime().UTC(), nil
+}
+
+func TestServeProxy_ServeHTTP_ifModifiedSince(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/logo.png", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "testdata/logo.png")
+	})
+
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
+
+	p := NewServeProxy(ts.URL)
+
+	mt, err := getModTime("testdata/logo.png")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, tc := range []struct {
+		path          string
+		modtime       time.Time
+		statusCode    int
+		contentLength int
+	}{
+		{
+			"/logo.png",
+			mt,
+			http.StatusNotModified,
+			0,
+		},
+		{
+			"/logo.png",
+			mt.Add(-time.Minute),
+			http.StatusOK,
+			6435,
+		},
+		{
+			"/logo.png",
+			mt.Add(time.Minute),
+			http.StatusNotModified,
+			0,
+		},
+	} {
+		req := httptest.NewRequest("GET", tc.path, nil)
+		req.Header.Add("If-Modified-Since", tc.modtime.Format(http.TimeFormat))
+
+		w := httptest.NewRecorder()
+
+		p.ServeHTTP(w, req)
+
+		resp := w.Result()
+		defer resp.Body.Close()
+
+		if got, want := resp.StatusCode, tc.statusCode; got != want {
+			t.Errorf("Status Code is %d, want %d", got, want)
+		}
+
+		body, _ := ioutil.ReadAll(resp.Body)
+
+		if got, want := len(body), tc.contentLength; got != want {
+			t.Errorf("Response body is %d bytes, want %d", got, want)
 		}
 	}
 }
