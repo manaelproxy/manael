@@ -1,5 +1,7 @@
 # Manael
 
+[![CircleCI](https://circleci.com/gh/manaelproxy/manael/tree/master.svg?style=shield)](https://circleci.com/gh/manaelproxy/manael/tree/master)
+
 A simple HTTP proxy for processing images.
 
 ## Dependencies
