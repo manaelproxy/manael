@@ -110,6 +110,7 @@ func (p *ServeProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	io.Copy(w, buf)
 }
 
+// NewServeProxy returns a new ServeProxy given a upstream URL
 func NewServeProxy(rawURL string) *ServeProxy {
 	u, _ := url.Parse(rawURL)
 
