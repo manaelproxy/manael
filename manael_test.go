@@ -27,7 +27,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 	"time"
 )
@@ -147,21 +146,6 @@ func TestServeProxy_ServeHTTP(t *testing.T) {
 			t.Errorf("Chacksum is %s, want %s", got, want)
 		}
 	}
-}
-
-func getModTime(name string) (time.Time, error) {
-	f, err := os.Open(name)
-	if err != nil {
-		return time.Time{}, err
-	}
-	defer f.Close()
-
-	i, err := f.Stat()
-	if err != nil {
-		return time.Time{}, err
-	}
-
-	return i.ModTime().UTC(), nil
 }
 
 var ifModifiedSinceTests = []struct {
