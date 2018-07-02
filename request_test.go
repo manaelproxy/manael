@@ -21,10 +21,12 @@
 package manael // import "manael.org/x/manael"
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 )
 
 var requestTests = []struct {
@@ -44,7 +46,7 @@ var requestTests = []struct {
 func TestRequest(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/logo.png", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "testdata/logo.png")
+		w.WriteHeader(http.StatusOK)
 	})
 
 	ts := httptest.NewServer(mux)
@@ -52,6 +54,121 @@ func TestRequest(t *testing.T) {
 
 	for _, tc := range requestTests {
 		req := httptest.NewRequest(http.MethodGet, tc.path, nil)
+
+		resp, err := request(fmt.Sprintf("%s%s", ts.URL, tc.path), req)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if got, want := resp.StatusCode, tc.statusCode; got != want {
+			t.Errorf("Status code is %d, want %d", got, want)
+		}
+	}
+}
+
+var requestTests2 = []struct {
+	path       string
+	modtime    time.Time
+	statusCode int
+}{
+	{
+		"/logo.png",
+		time.Date(2018, time.June, 30, 14, 4, 31, 0, time.UTC),
+		http.StatusNotModified,
+	},
+	{
+		"/logo.png",
+		time.Time{},
+		http.StatusOK,
+	},
+	{
+		"/logo.png",
+		time.Date(2018, time.June, 30, 14, 3, 31, 0, time.UTC),
+		http.StatusOK,
+	},
+	{
+		"/logo.png",
+		time.Date(2018, time.June, 30, 14, 5, 31, 0, time.UTC),
+		http.StatusNotModified,
+	},
+}
+
+func TestRequest_ifModifiedSince(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/logo.png", func(w http.ResponseWriter, r *http.Request) {
+		modtime := time.Date(2018, time.June, 30, 14, 4, 31, 0, time.UTC)
+
+		ims := r.Header.Get("If-Modified-Since")
+		t, _ := time.Parse(http.TimeFormat, ims)
+
+		if t.IsZero() || t.Before(modtime) {
+			w.WriteHeader(http.StatusOK)
+		} else {
+			w.WriteHeader(http.StatusNotModified)
+		}
+	})
+
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
+
+	for _, tc := range requestTests2 {
+		req := httptest.NewRequest(http.MethodGet, tc.path, nil)
+		if !tc.modtime.IsZero() {
+			req.Header.Add("If-Modified-Since", tc.modtime.Format(http.TimeFormat))
+		}
+
+		resp, err := request(fmt.Sprintf("%s%s", ts.URL, tc.path), req)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if got, want := resp.StatusCode, tc.statusCode; got != want {
+			t.Errorf("Status code is %d, want %d", got, want)
+		}
+	}
+}
+
+var requestTests3 = []struct {
+	path       string
+	etag       string
+	statusCode int
+}{
+	{
+		"/logo.png",
+		`W/"fcaec3a55087c997f24ba2a70383ed9b7607fd85f0ae2e0dccb5ec094c75f009"`,
+		http.StatusNotModified,
+	},
+	{
+		"/logo.png",
+		"",
+		http.StatusOK,
+	},
+	{
+		"/logo.png",
+		"invalidETag",
+		http.StatusOK,
+	},
+}
+
+func TestRequest_ifNoneMatch(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/logo.png", func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("If-None-Match") != fmt.Sprintf(`W/"%x"`, sha256.Sum256([]byte("etag"))) {
+			w.WriteHeader(http.StatusOK)
+		} else {
+			w.WriteHeader(http.StatusNotModified)
+		}
+	})
+
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
+
+	for _, tc := range requestTests3 {
+		req := httptest.NewRequest(http.MethodGet, tc.path, nil)
+
+		if tc.etag != "" {
+			req.Header.Add("If-None-Match", tc.etag)
+		}
 
 		resp, err := request(fmt.Sprintf("%s%s", ts.URL, tc.path), req)
 		if err != nil {
