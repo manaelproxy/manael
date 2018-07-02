@@ -53,9 +53,15 @@ workflows:
   version: 2
   build:
     jobs:
-      - test-go1.10
-      - test-go1.9
-      - test-go1.8
+      - test-go1.10:
+          filters:
+            only: master
+      - test-go1.9:
+          filters:
+            only: master
+      - test-go1.8:
+          filters:
+            only: master
       - build:
           requires:
             - test-go1.10
