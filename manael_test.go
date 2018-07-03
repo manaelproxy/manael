@@ -23,7 +23,6 @@ package manael // import "manael.org/x/manael"
 import (
 	"crypto/sha256"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -47,56 +46,48 @@ var serveProxyTests = []struct {
 	path        string
 	statusCode  int
 	contentType string
-	checksum    string
 }{
 	{
 		"image/*,*/*;q=0.8",
 		"/logo.png",
 		http.StatusOK,
 		"image/png",
-		"87209ba2999bf451589e6333d0699dfcf6fa7c07eda5f4aa39051787dca62f2a",
 	},
 	{
 		"image/webp,image/*,*/*;q=0.8",
 		"/logo.png",
 		http.StatusOK,
 		"image/webp",
-		"7af3f597f7965426d92f0333d27cf39377c9415107b2ffa716f72b7fe28ba2e9",
 	},
 	{
 		"image/*,*/*",
 		"/empty.jpeg",
 		http.StatusOK,
 		"image/jpeg",
-		"1a8b498fcc782ef585778f6cd29640d78f0d2a25371786dcd62b61867d382b94",
 	},
 	{
 		"image/webp,image/*,*/*;q=0.8",
 		"/empty.jpeg",
 		http.StatusOK,
 		"image/webp",
-		"69e3fa438596fdb60d6dee6aea10a92ebe2f19d50c4b069a8aaa97aa06b1a255",
 	},
 	{
 		"image/*,*/*;q=0.8",
 		"/empty.gif",
 		http.StatusOK,
 		"image/gif",
-		"a065920df8cc4016d67c3a464be90099c9d28ffe7c9e6ee3a18f257efc58cbd7",
 	},
 	{
 		"image/webp,image/*,*/*;q=0.8",
 		"/empty.gif",
 		http.StatusOK,
 		"image/gif",
-		"a065920df8cc4016d67c3a464be90099c9d28ffe7c9e6ee3a18f257efc58cbd7",
 	},
 	{
 		"image/webp,image/*,*/*",
 		"/empty.txt",
 		http.StatusOK,
 		"text/plain; charset=utf-8",
-		"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
 	},
 }
 
@@ -139,11 +130,10 @@ func TestServeProxy_ServeHTTP(t *testing.T) {
 			t.Errorf("Content-Type is %s, want %s", got, want)
 		}
 
-		h := sha256.New()
-		io.Copy(h, resp.Body)
+		body, _ := ioutil.ReadAll(resp.Body)
 
-		if got, want := fmt.Sprintf("%x", h.Sum(nil)), tc.checksum; got != want {
-			t.Errorf("Chacksum is %s, want %s", got, want)
+		if got, want := http.DetectContentType(body), tc.contentType; got != want {
+			t.Errorf("Detect Content-Type is %s, want %s", got, want)
 		}
 	}
 }
