@@ -148,7 +148,7 @@ func TestServeProxy_ServeHTTP(t *testing.T) {
 	}
 }
 
-var ifModifiedSinceTests = []struct {
+var serveProxyTests2 = []struct {
 	path          string
 	modtime       time.Time
 	statusCode    int
@@ -159,6 +159,12 @@ var ifModifiedSinceTests = []struct {
 		time.Date(2018, time.June, 30, 14, 4, 31, 0, time.UTC),
 		http.StatusNotModified,
 		0,
+	},
+	{
+		"/logo.png",
+		time.Time{},
+		http.StatusOK,
+		6435,
 	},
 	{
 		"/logo.png",
@@ -182,7 +188,7 @@ func TestServeProxy_ServeHTTP_ifModifiedSince(t *testing.T) {
 		ims := r.Header.Get("If-Modified-Since")
 		t, _ := time.Parse(http.TimeFormat, ims)
 
-		if t.Before(modtime) {
+		if t.IsZero() || t.Before(modtime) {
 			r.Header.Del("If-Modified-Since")
 			http.ServeFile(w, r, "testdata/logo.png")
 		} else {
@@ -195,9 +201,12 @@ func TestServeProxy_ServeHTTP_ifModifiedSince(t *testing.T) {
 
 	p := NewServeProxy(ts.URL)
 
-	for _, tc := range ifModifiedSinceTests {
+	for _, tc := range serveProxyTests2 {
 		req := httptest.NewRequest(http.MethodGet, tc.path, nil)
-		req.Header.Add("If-Modified-Since", tc.modtime.Format(http.TimeFormat))
+
+		if !tc.modtime.IsZero() {
+			req.Header.Add("If-Modified-Since", tc.modtime.Format(http.TimeFormat))
+		}
 
 		w := httptest.NewRecorder()
 
@@ -218,7 +227,7 @@ func TestServeProxy_ServeHTTP_ifModifiedSince(t *testing.T) {
 	}
 }
 
-var ifNoneMatchTests = []struct {
+var serveProxyTests3 = []struct {
 	path          string
 	etag          string
 	statusCode    int
@@ -229,6 +238,12 @@ var ifNoneMatchTests = []struct {
 		`W/"fcaec3a55087c997f24ba2a70383ed9b7607fd85f0ae2e0dccb5ec094c75f009"`,
 		http.StatusNotModified,
 		0,
+	},
+	{
+		"/logo.png",
+		"",
+		http.StatusOK,
+		6435,
 	},
 	{
 		"/logo.png",
@@ -253,9 +268,12 @@ func TestServeProxy_ServeHTTP_ifNoneMatch(t *testing.T) {
 
 	p := NewServeProxy(ts.URL)
 
-	for _, tc := range ifNoneMatchTests {
+	for _, tc := range serveProxyTests3 {
 		req := httptest.NewRequest(http.MethodGet, tc.path, nil)
-		req.Header.Add("If-None-Match", tc.etag)
+
+		if tc.etag != "" {
+			req.Header.Add("If-None-Match", tc.etag)
+		}
 
 		w := httptest.NewRecorder()
 

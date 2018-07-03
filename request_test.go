@@ -113,6 +113,7 @@ func TestRequest_ifModifiedSince(t *testing.T) {
 
 	for _, tc := range requestTests2 {
 		req := httptest.NewRequest(http.MethodGet, tc.path, nil)
+
 		if !tc.modtime.IsZero() {
 			req.Header.Add("If-Modified-Since", tc.modtime.Format(http.TimeFormat))
 		}
