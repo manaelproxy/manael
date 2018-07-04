@@ -15,6 +15,7 @@ aliases:
       root: /go/
       paths:
         - ./src/github.com/*/*/
+        - ./src/golang.org/x/*/
         - ./src/manael.org/x/manael/
 
   - &install_system_dependencies

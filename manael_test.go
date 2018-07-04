@@ -23,11 +23,18 @@ package manael // import "manael.org/x/manael"
 import (
 	"crypto/sha256"
 	"fmt"
+	"image"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	_ "golang.org/x/image/webp"
 )
 
 func TestNewServeProxy(t *testing.T) {
@@ -41,53 +48,70 @@ func TestNewServeProxy(t *testing.T) {
 	}
 }
 
+func detectFormat(r io.Reader) string {
+	_, f, err := image.DecodeConfig(r)
+	if err != nil {
+		return "not image"
+	}
+
+	return f
+}
+
 var serveProxyTests = []struct {
 	accept      string
 	path        string
 	statusCode  int
 	contentType string
+	format      string
 }{
 	{
 		"image/*,*/*;q=0.8",
 		"/logo.png",
 		http.StatusOK,
 		"image/png",
+		"png",
 	},
 	{
 		"image/webp,image/*,*/*;q=0.8",
 		"/logo.png",
 		http.StatusOK,
 		"image/webp",
+		"webp",
 	},
 	{
 		"image/*,*/*",
 		"/empty.jpeg",
 		http.StatusOK,
 		"image/jpeg",
+		"jpeg",
 	},
 	{
 		"image/webp,image/*,*/*;q=0.8",
 		"/empty.jpeg",
 		http.StatusOK,
 		"image/webp",
+		"webp",
 	},
 	{
 		"image/*,*/*;q=0.8",
 		"/empty.gif",
 		http.StatusOK,
 		"image/gif",
+		"gif",
 	},
 	{
 		"image/webp,image/*,*/*;q=0.8",
 		"/empty.gif",
 		http.StatusOK,
 		"image/gif",
+		"gif",
 	},
 	{
 		"image/webp,image/*,*/*",
 		"/empty.txt",
 		http.StatusOK,
 		"text/plain; charset=utf-8",
+		"not image",
 	},
 }
 
@@ -130,10 +154,8 @@ func TestServeProxy_ServeHTTP(t *testing.T) {
 			t.Errorf("Content-Type is %s, want %s", got, want)
 		}
 
-		body, _ := ioutil.ReadAll(resp.Body)
-
-		if got, want := http.DetectContentType(body), tc.contentType; got != want {
-			t.Errorf("Detect Content-Type is %s, want %s", got, want)
+		if got, want := detectFormat(resp.Body), tc.format; got != want {
+			t.Errorf("Detect format is %s, want %s", got, want)
 		}
 	}
 }
