@@ -36,6 +36,23 @@ type ServeProxy struct {
 	UpstreamURL *url.URL
 }
 
+func copyHeaders(w http.ResponseWriter, resp *http.Response) {
+	for key, values := range resp.Header {
+		for _, value := range values {
+			w.Header().Add(key, value)
+		}
+	}
+}
+
+func (p *ServeProxy) transfer(w http.ResponseWriter, resp *http.Response) {
+	copyHeaders(w, resp)
+
+	w.Header().Set("Vary", "Accept")
+	w.WriteHeader(resp.StatusCode)
+
+	io.Copy(w, resp.Body)
+}
+
 func shouldEncodeToWebP(resp *http.Response) bool {
 	if !(resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusNotModified) {
 		return false
@@ -58,20 +75,6 @@ func canDecodeWebP(r *http.Request) bool {
 	return false
 }
 
-func transfer(w http.ResponseWriter, resp *http.Response) {
-	for key := range w.Header() {
-		w.Header().Del(key)
-	}
-	for key, values := range resp.Header {
-		for _, value := range values {
-			w.Header().Add(key, value)
-		}
-	}
-	w.Header().Set("Vary", "Accept")
-	w.WriteHeader(resp.StatusCode)
-	io.Copy(w, resp.Body)
-}
-
 func (p *ServeProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	url := fmt.Sprintf("%s%s", p.UpstreamURL.String(), r.URL.RequestURI())
 
@@ -79,18 +82,23 @@ func (p *ServeProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "Bad Gateway", http.StatusBadGateway)
 		log.Println(err)
+
 		return
 	}
 	defer resp.Body.Close()
 
 	if !(shouldEncodeToWebP(resp) && canDecodeWebP(r)) {
-		transfer(w, resp)
+		p.transfer(w, resp)
+
 		return
 	}
 
 	if resp.StatusCode == http.StatusNotModified {
+		copyHeaders(w, resp)
+
 		w.Header().Set("Cache-Control", resp.Header.Get("Cache-Control"))
 		w.WriteHeader(http.StatusNotModified)
+
 		return
 	}
 
@@ -98,15 +106,17 @@ func (p *ServeProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		log.Println(err)
+
 		return
 	}
 
+	copyHeaders(w, resp)
+
 	w.Header().Set("Content-Type", "image/webp")
 	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
-	w.Header().Set("Cache-Control", resp.Header.Get("Cache-Control"))
-	w.Header().Set("Last-Modified", resp.Header.Get("Last-Modified"))
 	w.Header().Set("Vary", "Accept")
 	w.WriteHeader(http.StatusOK)
+
 	io.Copy(w, buf)
 }
 
