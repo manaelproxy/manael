@@ -102,7 +102,7 @@ func (p *ServeProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	buf, err := convert(resp.Body, resp.Header.Get("Content-Type"))
+	buf, err := convert(resp.Body)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		log.Println(err)
