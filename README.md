@@ -6,7 +6,6 @@ A simple HTTP proxy for processing images.
 
 ## Dependencies
 
-- libjpeg (or libjpeg-turbo)
 - libwebp
 
 ## Installation

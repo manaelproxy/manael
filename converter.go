@@ -23,29 +23,26 @@ package manael // import "manael.org/x/manael"
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"image"
-	"image/png"
+	// Register JPEG
+	_ "image/jpeg"
+	// Register PNG
+	_ "image/png"
 	"io"
 
 	"github.com/harukasan/go-libwebp/webp"
-	"github.com/pixiv/go-libjpeg/jpeg"
 )
 
-func decode(src io.Reader, contentType string) (img image.Image, err error) {
-	switch contentType {
-	case "image/jpeg":
-		img, err = jpeg.DecodeIntoRGBA(src, &jpeg.DecoderOptions{})
-	case "image/png":
-		img, err = png.Decode(src)
-	default:
-		return nil, fmt.Errorf("Unknown content type: %s", contentType)
+func decode(src io.Reader) (image.Image, error) {
+	img, _, err := image.Decode(src)
+	if err != nil {
+		return nil, err
 	}
 
 	switch img.(type) {
 	case *image.Gray, *image.RGBA, *image.NRGBA:
 		return img, nil
-	case *image.RGBA64, *image.NRGBA64, *image.Paletted:
+	case *image.RGBA64, *image.NRGBA64, *image.YCbCr, *image.Paletted:
 		bounds := img.Bounds()
 		newImg := image.NewRGBA(bounds)
 		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
@@ -83,8 +80,8 @@ func encode(src image.Image) (buf *bytes.Buffer, err error) {
 	return buf, nil
 }
 
-func convert(src io.Reader, contentType string) (buf *bytes.Buffer, err error) {
-	img, err := decode(src, contentType)
+func convert(src io.Reader) (buf *bytes.Buffer, err error) {
+	img, err := decode(src)
 	if err != nil {
 		return nil, err
 	}
