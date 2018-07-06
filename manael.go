@@ -115,6 +115,11 @@ func (p *ServeProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "image/webp")
 	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
 	w.Header().Set("Vary", "Accept")
+
+	if w.Header().Get("Accept-Ranges") != "" {
+		w.Header().Del("Accept-Ranges")
+	}
+
 	w.WriteHeader(http.StatusOK)
 
 	io.Copy(w, buf)

@@ -305,3 +305,48 @@ func TestServeProxy_ServeHTTP_ifNoneMatch(t *testing.T) {
 		}
 	}
 }
+
+var serveProxyTests4 = []struct {
+	path         string
+	accept       string
+	acceptRanges string
+}{
+	{
+		"/logo.png",
+		"image/webp,image/*,*/*;q=0.8",
+		"",
+	},
+	{
+		"/logo.png",
+		"image/*,*/*;q=0.8",
+		"bytes",
+	},
+}
+
+func TestServeProxy_ServeHTTP_acceptRanges(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/logo.png", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Accept-Ranges", "bytes")
+		http.ServeFile(w, r, "testdata/logo.png")
+	})
+
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
+
+	p := NewServeProxy(ts.URL)
+
+	for _, tc := range serveProxyTests4 {
+		req := httptest.NewRequest(http.MethodGet, tc.path, nil)
+		req.Header.Add("Accept", tc.accept)
+
+		w := httptest.NewRecorder()
+
+		p.ServeHTTP(w, req)
+
+		resp := w.Result()
+
+		if got, want := resp.Header.Get("Accept-Ranges"), tc.acceptRanges; got != want {
+			t.Errorf(`Accept-Ranges is "%s", want "%s"`, got, want)
+		}
+	}
+}
