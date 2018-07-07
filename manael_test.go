@@ -350,3 +350,73 @@ func TestServeProxy_ServeHTTP_acceptRanges(t *testing.T) {
 		}
 	}
 }
+
+var serveProxyTests5 = []struct {
+	path        string
+	contentType string
+	format      string
+}{
+	{
+		"/logo.png",
+		"image/webp",
+		"webp",
+	},
+	{
+		"/logo.png?raw=1",
+		"image/png",
+		"png",
+	},
+	{
+		"/empty.jpeg",
+		"image/webp",
+		"webp",
+	},
+	{
+		"/empty.jpeg?raw=1",
+		"image/jpeg",
+		"jpeg",
+	},
+}
+
+func TestServeProxy_ServeHTTP_noTransform(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/logo.png", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Get("raw") == "1" {
+			w.Header().Set("Cache-Control", "no-transform")
+		}
+
+		http.ServeFile(w, r, "testdata/logo.png")
+	})
+	mux.HandleFunc("/empty.jpeg", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Get("raw") == "1" {
+			w.Header().Set("Cache-Control", "no-transform")
+		}
+
+		http.ServeFile(w, r, "testdata/empty.jpeg")
+	})
+
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
+
+	p := NewServeProxy(ts.URL)
+
+	for _, tc := range serveProxyTests5 {
+		req := httptest.NewRequest(http.MethodGet, tc.path, nil)
+		req.Header.Add("Accept", "image/webp,image/*,*/*;q=0.8")
+
+		w := httptest.NewRecorder()
+
+		p.ServeHTTP(w, req)
+
+		resp := w.Result()
+		defer resp.Body.Close()
+
+		if got, want := resp.Header.Get("Content-Type"), tc.contentType; got != want {
+			t.Errorf("Content-Type is %s, want %s", got, want)
+		}
+
+		if got, want := detectFormat(resp.Body), tc.format; got != want {
+			t.Errorf("Detect format is %s, want %s", got, want)
+		}
+	}
+}
