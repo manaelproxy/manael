@@ -54,6 +54,14 @@ func (p *ServeProxy) transfer(w http.ResponseWriter, resp *http.Response) {
 }
 
 func shouldEncodeToWebP(resp *http.Response) bool {
+	if s := resp.Header.Get("Cache-Control"); s != "" {
+		for _, v := range strings.Split(s, ",") {
+			if strings.TrimSpace(v) == "no-transform" {
+				return false
+			}
+		}
+	}
+
 	if !(resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusNotModified) {
 		return false
 	}
