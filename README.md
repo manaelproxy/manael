@@ -1,6 +1,6 @@
 # Manael
 
-[![CircleCI](https://circleci.com/gh/manaelproxy/manael/tree/master.svg?style=shield)](https://circleci.com/gh/manaelproxy/manael/tree/master)
+[![GoDoc](https://godoc.org/manael.org/x/manael?status.svg)](https://godoc.org/manael.org/x/manael) [![CircleCI](https://circleci.com/gh/manaelproxy/manael/tree/master.svg?style=shield)](https://circleci.com/gh/manaelproxy/manael/tree/master)
 
 A simple HTTP proxy for processing images.
 
