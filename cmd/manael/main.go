@@ -24,9 +24,6 @@ import (
 	"flag"
 	"log"
 	"net/http"
-	"os"
-
-	"github.com/gorilla/handlers"
 
 	"manael.org/x/manael"
 )
@@ -41,7 +38,7 @@ func main() {
 
 	p := manael.NewServeProxy(*upstreamURL)
 
-	err := http.ListenAndServe(*httpAddr, handlers.LoggingHandler(os.Stdout, p))
+	err := http.ListenAndServe(*httpAddr, p)
 	if err != nil {
 		log.Fatal(err)
 	}
