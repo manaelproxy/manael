@@ -23,6 +23,7 @@ package manael // import "manael.org/x/manael"
 import (
 	"crypto/sha256"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -178,6 +179,55 @@ func TestRequest_ifNoneMatch(t *testing.T) {
 
 		if got, want := resp.StatusCode, tc.statusCode; got != want {
 			t.Errorf("Status code is %d, want %d", got, want)
+		}
+	}
+}
+
+var requestTests4 = []struct {
+	path string
+	xff1 string
+	xff2 string
+}{
+	{
+		"/logo.png",
+		"",
+		"203.0.113.57",
+	},
+	{
+		"/logo.png",
+		"203.0.113.124",
+		"203.0.113.124,203.0.113.57",
+	},
+}
+
+func TestRequest_xForwardedFor(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/logo.png", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintf(w, "%s", r.Header.Get("X-Forwarded-For"))
+	})
+
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
+
+	for _, tc := range requestTests4 {
+		req := httptest.NewRequest(http.MethodGet, tc.path, nil)
+		req.RemoteAddr = "203.0.113.57"
+
+		if tc.xff1 != "" {
+			req.Header.Add("X-Forwarded-For", tc.xff1)
+		}
+
+		resp, err := request(fmt.Sprintf("%s%s", ts.URL, tc.path), req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer resp.Body.Close()
+
+		body, _ := ioutil.ReadAll(resp.Body)
+
+		if got, want := string(body), tc.xff2; got != want {
+			t.Errorf("X-Forwareded-For is %s, want %s", got, want)
 		}
 	}
 }
