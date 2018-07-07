@@ -22,9 +22,24 @@ package manael // import "manael.org/x/manael"
 
 import (
 	"net/http"
+	"strings"
 )
 
 var client http.Client
+
+func xff(r *http.Request) string {
+	var ips []string
+
+	if s := r.Header.Get("X-Forwarded-For"); s != "" {
+		for _, ip := range strings.Split(s, ",") {
+			ips = append(ips, strings.TrimSpace(ip))
+		}
+	}
+
+	ips = append(ips, r.RemoteAddr)
+
+	return strings.Join(ips[:], ",")
+}
 
 func request(url string, r *http.Request) (resp *http.Response, err error) {
 	req, err := http.NewRequest(http.MethodGet, url, nil)
@@ -33,15 +48,13 @@ func request(url string, r *http.Request) (resp *http.Response, err error) {
 	}
 
 	req.Header.Add("User-Agent", r.Header.Get("User-Agent"))
+	req.Header.Add("X-Forwarded-For", xff(r))
 
-	ims := r.Header.Get("If-Modified-Since")
-	if ims != "" {
-		req.Header.Add("If-Modified-Since", ims)
-	}
-
-	inm := r.Header.Get("If-None-Match")
-	if inm != "" {
-		req.Header.Add("If-None-Match", inm)
+	for _, h := range []string{"If-Modified-Since", "If-None-Match"} {
+		v := r.Header.Get(h)
+		if v != "" {
+			req.Header.Add(h, v)
+		}
 	}
 
 	resp, err = client.Do(req)
