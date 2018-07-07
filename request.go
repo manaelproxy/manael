@@ -50,7 +50,7 @@ func request(url string, r *http.Request) (resp *http.Response, err error) {
 	req.Header.Add("User-Agent", r.Header.Get("User-Agent"))
 	req.Header.Add("X-Forwarded-For", xff(r))
 
-	for _, h := range []string{"If-Modified-Since", "If-None-Match"} {
+	for _, h := range []string{"X-Forwarded-Proto", "If-Modified-Since", "If-None-Match"} {
 		v := r.Header.Get(h)
 		if v != "" {
 			req.Header.Add(h, v)
