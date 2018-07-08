@@ -80,14 +80,14 @@ var serveProxyTests = []struct {
 	},
 	{
 		"image/*,*/*",
-		"/empty.jpeg",
+		"/photo.jpeg",
 		http.StatusOK,
 		"image/jpeg",
 		"jpeg",
 	},
 	{
 		"image/webp,image/*,*/*;q=0.8",
-		"/empty.jpeg",
+		"/photo.jpeg",
 		http.StatusOK,
 		"image/webp",
 		"webp",
@@ -120,8 +120,8 @@ func TestServeProxy_ServeHTTP(t *testing.T) {
 	mux.HandleFunc("/logo.png", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "testdata/logo.png")
 	})
-	mux.HandleFunc("/empty.jpeg", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "testdata/empty.jpeg")
+	mux.HandleFunc("/photo.jpeg", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "testdata/photo.jpeg")
 	})
 	mux.HandleFunc("/empty.gif", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "testdata/empty.gif")
@@ -367,12 +367,12 @@ var serveProxyTests5 = []struct {
 		"png",
 	},
 	{
-		"/empty.jpeg",
+		"/photo.jpeg",
 		"image/webp",
 		"webp",
 	},
 	{
-		"/empty.jpeg?raw=1",
+		"/photo.jpeg?raw=1",
 		"image/jpeg",
 		"jpeg",
 	},
@@ -387,12 +387,12 @@ func TestServeProxy_ServeHTTP_noTransform(t *testing.T) {
 
 		http.ServeFile(w, r, "testdata/logo.png")
 	})
-	mux.HandleFunc("/empty.jpeg", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/photo.jpeg", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("raw") == "1" {
 			w.Header().Set("Cache-Control", "no-transform")
 		}
 
-		http.ServeFile(w, r, "testdata/empty.jpeg")
+		http.ServeFile(w, r, "testdata/photo.jpeg")
 	})
 
 	ts := httptest.NewServer(mux)
