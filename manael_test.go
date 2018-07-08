@@ -176,13 +176,13 @@ var serveProxyTests2 = []struct {
 		"/logo.png",
 		time.Time{},
 		http.StatusOK,
-		6435,
+		4090,
 	},
 	{
 		"/logo.png",
 		time.Date(2018, time.June, 30, 14, 3, 31, 0, time.UTC),
 		http.StatusOK,
-		6435,
+		4090,
 	},
 	{
 		"/logo.png",
@@ -255,13 +255,13 @@ var serveProxyTests3 = []struct {
 		"/logo.png",
 		"",
 		http.StatusOK,
-		6435,
+		4090,
 	},
 	{
 		"/logo.png",
 		"invalidETag",
 		http.StatusOK,
-		6435,
+		4090,
 	},
 }
 
