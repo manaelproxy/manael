@@ -4,15 +4,9 @@
 
 A simple HTTP proxy for processing images.
 
-## Dependencies
-
-- libwebp
-
 ## Installation
 
-```console
-$ go get -u manael.org/x/manael/cmd/manael
-```
+- [Download latest binary](https://github.com/manaelproxy/manael/releases/latest)
 
 ## Usage
 
