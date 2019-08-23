@@ -1,0 +1,30 @@
+env:
+- GO111MODULE=on
+before:
+  hooks:
+  - go mod download
+builds:
+- main: ./cmd/manael/main.go
+  binary: manael
+  ldflags:
+  - -extldflags "-static"
+  env:
+  - CGO_ENABLED=1
+  goos:
+  - linux
+  goarch:
+  - amd64
+archives:
+- replacements:
+    linux: Linux
+    amd64: x86_64
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^docs:'
+    - '^test:'
