@@ -79,17 +79,29 @@ workflows:
   version: 2
   build:
     jobs:
-      - setup
+      - setup:
+          filters:
+            tags:
+              only: /.*/
       - test-go1.12:
           requires:
             - setup
+          filters:
+            tags:
+              only: /.*/
       - test-go1.11:
           requires:
             - setup
+          filters:
+            tags:
+              only: /.*/
       - build:
           requires:
             - test-go1.12
             - test-go1.11
+          filters:
+            tags:
+              only: /.*/
       - release:
           requires:
             - build
