@@ -22,23 +22,54 @@ package main // import "manael.org/x/manael/cmd/manael"
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"manael.org/x/manael"
 )
 
-var (
-	httpAddr    = flag.String("http", ":8080", "HTTP server address")
-	upstreamURL = flag.String("upstream_url", "http://localhost:9000", "Upstream URL for processing images")
-)
+type config struct {
+	httpAddr    string
+	upstreamURL string
+}
 
 func main() {
-	flag.Parse()
+	fs := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 
-	p := manael.NewServeProxy(*upstreamURL)
+	conf := config{}
 
-	err := http.ListenAndServe(*httpAddr, p)
+	fs.StringVar(&conf.httpAddr, "http", "", "HTTP server address")
+	fs.StringVar(&conf.upstreamURL, "upstream_url", "", "Upstream URL for processing images")
+
+	if err := fs.Parse(os.Args[1:]); err != nil {
+		log.Fatalf("Error: %v", err)
+	}
+
+	if conf.httpAddr == "" {
+		port := os.Getenv("PORT")
+
+		if port != "" {
+			conf.httpAddr = fmt.Sprintf(":%s", port)
+		} else {
+			conf.httpAddr = ":8080"
+		}
+	}
+
+	if conf.upstreamURL == "" {
+		u := os.Getenv("MANAEL_UPSTREAM_URL")
+
+		if u != "" {
+			conf.upstreamURL = u
+		} else {
+			conf.upstreamURL = "http://localhost:9000"
+		}
+	}
+
+	p := manael.NewServeProxy(conf.upstreamURL)
+
+	err := http.ListenAndServe(conf.httpAddr, p)
 	if err != nil {
 		log.Fatal(err)
 	}
