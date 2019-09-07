@@ -40,9 +40,9 @@ func decode(src io.Reader) (image.Image, error) {
 	}
 
 	switch img.(type) {
-	case *image.Gray, *image.RGBA, *image.NRGBA:
+	case *image.Gray, *image.NRGBA, *image.RGBA:
 		return img, nil
-	case *image.RGBA64, *image.NRGBA64, *image.YCbCr, *image.Paletted:
+	case *image.CMYK, *image.NRGBA64, *image.Paletted, *image.RGBA64, *image.YCbCr:
 		bounds := img.Bounds()
 		newImg := image.NewRGBA(bounds)
 		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
