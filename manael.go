@@ -37,17 +37,29 @@ type ServeProxy struct {
 }
 
 func copyHeaders(w http.ResponseWriter, resp *http.Response) {
-	for key, values := range resp.Header {
-		for _, value := range values {
-			w.Header().Add(key, value)
+	for k, values := range resp.Header {
+		if k != "Vary" {
+			for _, v := range values {
+				w.Header().Add(k, v)
+			}
 		}
 	}
+
+	keys := []string{"Accept"}
+	for _, v := range strings.Split(resp.Header.Get("Vary"), ",") {
+		v = strings.TrimSpace(v)
+
+		if v != "" && strings.ToLower(v) != "accept" {
+			keys = append(keys, v)
+		}
+	}
+
+	w.Header().Set("Vary", strings.Join(keys[:], ", "))
 }
 
 func (p *ServeProxy) transfer(w http.ResponseWriter, resp *http.Response) {
 	copyHeaders(w, resp)
 
-	w.Header().Set("Vary", "Accept")
 	w.WriteHeader(resp.StatusCode)
 
 	io.Copy(w, resp.Body)
@@ -122,7 +134,6 @@ func (p *ServeProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "image/webp")
 	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
-	w.Header().Set("Vary", "Accept")
 
 	if w.Header().Get("Accept-Ranges") != "" {
 		w.Header().Del("Accept-Ranges")
