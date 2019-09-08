@@ -51,6 +51,8 @@ jobs:
 
       - checkout
 
+      - setup_remote_docker
+
       - run: curl -sL https://git.io/goreleaser | bash -s -- --snapshot
 
   release:
@@ -60,7 +62,16 @@ jobs:
       CGO_LDFLAGS: -L/tmp/libwebp/lib -lwebp
       GO111MODULE: 'on'
     steps:
-      - run: |
+      - checkout
+
+      - setup_remote_docker
+
+      - name: Login on Docker Hub
+        run: |
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+      - name: Install libwebp
+        run: |
           mkdir -p /tmp/src
           cd /tmp/src
           wget -O libwebp.tar.gz https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-1.0.3.tar.gz
@@ -71,9 +82,8 @@ jobs:
           make -j4
           make install
 
-      - checkout
-
-      - run: curl -sL https://git.io/goreleaser | bash
+      - name: Release
+        run: curl -sL https://git.io/goreleaser | bash
 
 workflows:
   version: 2
