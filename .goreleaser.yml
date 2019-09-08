@@ -24,7 +24,12 @@ snapshot:
   name_template: "{{ .Tag }}-next"
 changelog:
   sort: asc
-  filters:
-    exclude:
-    - '^docs:'
-    - '^test:'
+dockers:
+- image_templates:
+  - "manael/{{ .ProjectName }}:latest"
+  - "manael/{{ .ProjectName }}:{{ .Major }}"
+  - "manael/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}"
+  - "manael/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
+  dockerfile: Dockerfile
+  binaries:
+  - manael
