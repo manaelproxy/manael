@@ -27,9 +27,8 @@ changelog:
 dockers:
 - image_templates:
   - "manael/{{ .ProjectName }}:latest"
-  - "manael/{{ .ProjectName }}:{{ .Major }}"
-  - "manael/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}"
   - "manael/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
+  - "manael/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}"
   dockerfile: Dockerfile
   binaries:
   - manael
