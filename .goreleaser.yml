@@ -24,6 +24,9 @@ snapshot:
   name_template: "{{ .Tag }}-next"
 changelog:
   sort: asc
+  filters:
+    exclude:
+    - '^v\d+(?:\.\d+){0,2}$'
 dockers:
 - image_templates:
   - "manael/{{ .ProjectName }}:latest"
