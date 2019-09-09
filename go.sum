@@ -1,3 +1,5 @@
+github.com/gorilla/handlers v1.4.2 h1:0QniY0USkHQ1RGCLfKxeNHK9bkDHGRYGNDFBCS+YARg=
+github.com/gorilla/handlers v1.4.2/go.mod h1:Qkdc/uu4tH4g6mTK6auzZ766c4CA0Ng8+o/OAirnOIQ=
 github.com/harukasan/go-libwebp v0.0.0-20190703060927-68562c9c99af h1:WmgySY+bcDEGQ42RmkJhL5cPbnWi3nFpAyRuRxoofDY=
 github.com/harukasan/go-libwebp v0.0.0-20190703060927-68562c9c99af/go.mod h1:ldE44ycRKJi6dVHIWnbUlEJqHQUhK5gJ4TKIfAwFbCg=
 golang.org/x/image v0.0.0-20190823064033-3a9bac650e44 h1:1/e6LjNi7iqpDTz8tCLSKoR5dqrX4C3ub4H31JJZM4U=
