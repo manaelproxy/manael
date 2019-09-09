@@ -22,7 +22,9 @@ aliases:
       - checkout
 
       - run: go mod download
-      - run: go test -v ./...
+      - run: mkdir -p cover
+      - run: go test -v -coverprofile=cover/cover.out ./...
+      - run: go tool cover -func=cover/cover.out
 
 jobs:
   setup:
