@@ -27,7 +27,16 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gorilla/handlers"
 	"manael.org/x/manael"
+)
+
+const (
+	// DefaultPort is returned by default port.
+	DefaultPort = 8080
+
+	// DefaultUpstreamURL is returned by default upstream URL.
+	DefaultUpstreamURL = "http://localhost:9000"
 )
 
 type config struct {
@@ -53,7 +62,7 @@ func main() {
 		if port != "" {
 			conf.httpAddr = fmt.Sprintf(":%s", port)
 		} else {
-			conf.httpAddr = ":8080"
+			conf.httpAddr = fmt.Sprintf(":%d", DefaultPort)
 		}
 	}
 
@@ -63,13 +72,14 @@ func main() {
 		if u != "" {
 			conf.upstreamURL = u
 		} else {
-			conf.upstreamURL = "http://localhost:9000"
+			conf.upstreamURL = DefaultUpstreamURL
 		}
 	}
 
 	p := manael.NewServeProxy(conf.upstreamURL)
+	loggedProxy := handlers.CombinedLoggingHandler(os.Stdout, p)
 
-	err := http.ListenAndServe(conf.httpAddr, p)
+	err := http.ListenAndServe(conf.httpAddr, loggedProxy)
 	if err != nil {
 		log.Fatal(err)
 	}
