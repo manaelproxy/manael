@@ -55,6 +55,7 @@ func copyHeaders(w http.ResponseWriter, resp *http.Response) {
 	}
 
 	w.Header().Set("Vary", strings.Join(keys[:], ", "))
+	w.Header().Set("Server", "Manael")
 }
 
 func (p *ServeProxy) transfer(w http.ResponseWriter, resp *http.Response) {
@@ -132,7 +133,6 @@ func (p *ServeProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	copyHeaders(w, resp)
 
-	w.Header().Set("Server", "Manael")
 	w.Header().Set("Content-Type", "image/webp")
 	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
 
