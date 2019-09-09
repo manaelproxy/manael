@@ -132,6 +132,7 @@ func (p *ServeProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	copyHeaders(w, resp)
 
+	w.Header().Set("Server", "Manael")
 	w.Header().Set("Content-Type", "image/webp")
 	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
 
