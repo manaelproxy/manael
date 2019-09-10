@@ -1,0 +1,49 @@
+name: Go
+
+on:
+  pull_request:
+    branches:
+    - master
+
+  push:
+    branches:
+    - master
+    tags:
+    - '!*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        go-version: ["1.11", "1.12", "1.13"]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Go ${{ matrix.go-version }}
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go-version }}
+
+    - name: Get dependencies
+      env:
+        GO111MODULE: on
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libwebp-dev
+        go mod download
+
+    - name: Test
+      env:
+        GO111MODULE: on
+      run: |
+        mkdir -p cover
+        go test -v -coverprofile=cover/cover.out ./...
+        go tool cover -func=cover/cover.out
+
+    - name: Run goreleaser
+      env:
+        CGO_CFLAGS: -I/tmp/libwebp/include
+        CGO_LDFLAGS: -L/tmp/libwebp/lib -lwebp
+      run: curl -sL https://git.io/goreleaser | bash -s -- --snapshot
