@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Yamagishi Kazutoshi <ykzts@desire.sh>
+// Copyright (c) 2019 Yamagishi Kazutoshi <ykzts@desire.sh>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,46 +21,52 @@
 package manael // import "manael.org/x/manael"
 
 import (
+	"io"
+	"log"
 	"net/http"
 	"strings"
 )
 
-var client http.Client
-
-func xff(r *http.Request) string {
-	var ips []string
-
-	if s := r.Header.Get("X-Forwarded-For"); s != "" {
-		for _, ip := range strings.Split(s, ",") {
-			ips = append(ips, strings.TrimSpace(ip))
-		}
-	}
-
-	ips = append(ips, r.RemoteAddr)
-
-	return strings.Join(ips[:], ",")
+// A Proxy responds to an HTTP request.
+type Proxy struct {
+	Transport http.RoundTripper
 }
 
-func request(url string, r *http.Request) (resp *http.Response, err error) {
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("User-Agent", r.Header.Get("User-Agent"))
-	req.Header.Add("X-Forwarded-For", xff(r))
-
-	for _, h := range []string{"Origin", "X-Forwarded-Proto", "If-Modified-Since", "If-None-Match"} {
-		v := r.Header.Get(h)
-		if v != "" {
-			req.Header.Add(h, v)
+func copyHeaders(w http.ResponseWriter, resp *http.Response) {
+	for k, values := range resp.Header {
+		if k != "Vary" {
+			for _, v := range values {
+				w.Header().Add(k, v)
+			}
 		}
 	}
 
-	resp, err = client.Do(req)
-	if err != nil {
-		return nil, err
+	keys := []string{"Accept"}
+	for _, v := range strings.Split(resp.Header.Get("Vary"), ",") {
+		v = strings.TrimSpace(v)
+
+		if strings.EqualFold(v, "Accept") {
+			keys = append(keys, v)
+		}
 	}
 
-	return resp, nil
+	w.Header().Set("Vary", strings.Join(keys[:], ", "))
+	w.Header().Set("Server", "Manael")
+}
+
+func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	resp, err := p.Transport.RoundTrip(r)
+	if err != nil {
+		http.Error(w, "Bad Gateway", http.StatusBadGateway)
+		log.Printf("error: %v\n", err)
+
+		return
+	}
+	defer resp.Body.Close()
+
+	copyHeaders(w, resp)
+
+	w.WriteHeader(resp.StatusCode)
+
+	io.Copy(w, resp.Body)
 }

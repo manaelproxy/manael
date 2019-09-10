@@ -76,10 +76,11 @@ func main() {
 		}
 	}
 
-	p := manael.NewServeProxy(conf.upstreamURL)
-	loggedProxy := handlers.CombinedLoggingHandler(os.Stdout, p)
+	var handler http.Handler
+	handler = manael.NewServeProxy(conf.upstreamURL)
+	handler = handlers.CombinedLoggingHandler(os.Stdout, handler)
 
-	err := http.ListenAndServe(conf.httpAddr, loggedProxy)
+	err := http.ListenAndServe(conf.httpAddr, handler)
 	if err != nil {
 		log.Fatal(err)
 	}

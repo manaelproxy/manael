@@ -21,133 +21,13 @@
 // Package manael provides HTTP handler for processing images.
 package manael // import "manael.org/x/manael"
 
-import (
-	"fmt"
-	"io"
-	"log"
-	"net/http"
-	"net/url"
-	"strconv"
-	"strings"
-)
-
-// A ServeProxy responds to an HTTP request.
-type ServeProxy struct {
-	UpstreamURL *url.URL
-}
-
-func copyHeaders(w http.ResponseWriter, resp *http.Response) {
-	for k, values := range resp.Header {
-		if k != "Vary" {
-			for _, v := range values {
-				w.Header().Add(k, v)
-			}
-		}
+// NewServeProxy returns a new Proxy given a upstream URL
+func NewServeProxy(u string) *Proxy {
+	t := &Transport{
+		UpstreamURL: u,
 	}
 
-	keys := []string{"Accept"}
-	for _, v := range strings.Split(resp.Header.Get("Vary"), ",") {
-		v = strings.TrimSpace(v)
-
-		if v != "" && strings.ToLower(v) != "accept" {
-			keys = append(keys, v)
-		}
+	return &Proxy{
+		Transport: t,
 	}
-
-	w.Header().Set("Vary", strings.Join(keys[:], ", "))
-	w.Header().Set("Server", "Manael")
-}
-
-func (p *ServeProxy) transfer(w http.ResponseWriter, resp *http.Response) {
-	copyHeaders(w, resp)
-
-	w.WriteHeader(resp.StatusCode)
-
-	io.Copy(w, resp.Body)
-}
-
-func shouldEncodeToWebP(resp *http.Response) bool {
-	if s := resp.Header.Get("Cache-Control"); s != "" {
-		for _, v := range strings.Split(s, ",") {
-			if strings.TrimSpace(v) == "no-transform" {
-				return false
-			}
-		}
-	}
-
-	if !(resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusNotModified) {
-		return false
-	}
-
-	contentType := resp.Header.Get("Content-Type")
-	return contentType == "image/jpeg" || contentType == "image/png"
-}
-
-func canDecodeWebP(r *http.Request) bool {
-	accepts := r.Header.Get("Accept")
-
-	for _, v := range strings.Split(accepts, ",") {
-		t := strings.TrimSpace(v)
-		if strings.HasPrefix(t, "image/webp") {
-			return true
-		}
-	}
-
-	return false
-}
-
-func (p *ServeProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	url := fmt.Sprintf("%s%s", p.UpstreamURL.String(), r.URL.RequestURI())
-
-	resp, err := request(url, r)
-	if err != nil {
-		http.Error(w, "Bad Gateway", http.StatusBadGateway)
-		log.Println(err)
-
-		return
-	}
-	defer resp.Body.Close()
-
-	if !(shouldEncodeToWebP(resp) && canDecodeWebP(r)) {
-		p.transfer(w, resp)
-
-		return
-	}
-
-	if resp.StatusCode == http.StatusNotModified {
-		copyHeaders(w, resp)
-
-		w.Header().Set("Cache-Control", resp.Header.Get("Cache-Control"))
-		w.WriteHeader(http.StatusNotModified)
-
-		return
-	}
-
-	buf, err := convert(resp.Body)
-	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		log.Println(err)
-
-		return
-	}
-
-	copyHeaders(w, resp)
-
-	w.Header().Set("Content-Type", "image/webp")
-	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
-
-	if w.Header().Get("Accept-Ranges") != "" {
-		w.Header().Del("Accept-Ranges")
-	}
-
-	w.WriteHeader(http.StatusOK)
-
-	io.Copy(w, buf)
-}
-
-// NewServeProxy returns a new ServeProxy given a upstream URL
-func NewServeProxy(rawURL string) *ServeProxy {
-	u, _ := url.Parse(rawURL)
-
-	return &ServeProxy{u}
 }
