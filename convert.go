@@ -24,11 +24,12 @@ import (
 	"bytes"
 	"errors"
 	"image"
+	"io"
+
 	// Register JPEG
 	_ "image/jpeg"
 	// Register PNG
 	_ "image/png"
-	"io"
 
 	"github.com/harukasan/go-libwebp/webp"
 )
@@ -57,13 +58,13 @@ func decode(src io.Reader) (image.Image, error) {
 	return nil, errors.New("Not supported image format")
 }
 
-func encode(src image.Image) (buf *bytes.Buffer, err error) {
+func encode(src image.Image) (*bytes.Buffer, error) {
 	config, err := webp.ConfigPreset(webp.PresetDefault, 90)
 	if err != nil {
 		return nil, err
 	}
 
-	buf = bytes.NewBuffer(nil)
+	buf := bytes.NewBuffer(nil)
 	switch img := src.(type) {
 	case *image.Gray:
 		err = webp.EncodeGray(buf, img, config)
@@ -80,13 +81,13 @@ func encode(src image.Image) (buf *bytes.Buffer, err error) {
 	return buf, nil
 }
 
-func convert(src io.Reader) (buf *bytes.Buffer, err error) {
+func convert(src io.ReadCloser) (*bytes.Buffer, error) {
 	img, err := decode(src)
 	if err != nil {
 		return nil, err
 	}
 
-	buf, err = encode(img)
+	buf, err := encode(img)
 	if err != nil {
 		return nil, err
 	}

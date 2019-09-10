@@ -37,17 +37,6 @@ import (
 	_ "golang.org/x/image/webp"
 )
 
-func TestNewServeProxy(t *testing.T) {
-	ts := httptest.NewServer(nil)
-	defer ts.Close()
-
-	p := NewServeProxy(ts.URL)
-
-	if got, want := p.UpstreamURL.String(), ts.URL; got != want {
-		t.Errorf("Upstream URL is %s, want %s", got, want)
-	}
-}
-
 func detectFormat(r io.Reader) string {
 	_, f, err := image.DecodeConfig(r)
 	if err != nil {
@@ -57,7 +46,7 @@ func detectFormat(r io.Reader) string {
 	return f
 }
 
-var serveProxyTests = []struct {
+var proxyTests = []struct {
 	accept      string
 	path        string
 	statusCode  int
@@ -115,7 +104,7 @@ var serveProxyTests = []struct {
 	},
 }
 
-func TestServeProxy_ServeHTTP(t *testing.T) {
+func TestProxy_ServeHTTP(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/logo.png", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "testdata/logo.png")
@@ -135,7 +124,7 @@ func TestServeProxy_ServeHTTP(t *testing.T) {
 
 	p := NewServeProxy(ts.URL)
 
-	for _, tc := range serveProxyTests {
+	for _, tc := range proxyTests {
 		req := httptest.NewRequest(http.MethodGet, tc.path, nil)
 		req.Header.Add("Accept", tc.accept)
 
@@ -160,7 +149,7 @@ func TestServeProxy_ServeHTTP(t *testing.T) {
 	}
 }
 
-var serveProxyTests2 = []struct {
+var proxyTests2 = []struct {
 	path          string
 	modtime       time.Time
 	statusCode    int
@@ -192,7 +181,7 @@ var serveProxyTests2 = []struct {
 	},
 }
 
-func TestServeProxy_ServeHTTP_ifModifiedSince(t *testing.T) {
+func TestProxy_ServeHTTP_ifModifiedSince(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/logo.png", func(w http.ResponseWriter, r *http.Request) {
 		modtime := time.Date(2018, time.June, 30, 14, 4, 31, 0, time.UTC)
@@ -213,7 +202,7 @@ func TestServeProxy_ServeHTTP_ifModifiedSince(t *testing.T) {
 
 	p := NewServeProxy(ts.URL)
 
-	for _, tc := range serveProxyTests2 {
+	for _, tc := range proxyTests2 {
 		req := httptest.NewRequest(http.MethodGet, tc.path, nil)
 
 		if !tc.modtime.IsZero() {
@@ -239,7 +228,7 @@ func TestServeProxy_ServeHTTP_ifModifiedSince(t *testing.T) {
 	}
 }
 
-var serveProxyTests3 = []struct {
+var proxyTests3 = []struct {
 	path          string
 	etag          string
 	statusCode    int
@@ -265,7 +254,7 @@ var serveProxyTests3 = []struct {
 	},
 }
 
-func TestServeProxy_ServeHTTP_ifNoneMatch(t *testing.T) {
+func TestProxy_ServeHTTP_ifNoneMatch(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/logo.png", func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("If-None-Match") != fmt.Sprintf(`W/"%x"`, sha256.Sum256([]byte("etag"))) {
@@ -280,7 +269,7 @@ func TestServeProxy_ServeHTTP_ifNoneMatch(t *testing.T) {
 
 	p := NewServeProxy(ts.URL)
 
-	for _, tc := range serveProxyTests3 {
+	for _, tc := range proxyTests3 {
 		req := httptest.NewRequest(http.MethodGet, tc.path, nil)
 
 		if tc.etag != "" {
@@ -306,7 +295,7 @@ func TestServeProxy_ServeHTTP_ifNoneMatch(t *testing.T) {
 	}
 }
 
-var serveProxyTests4 = []struct {
+var proxyTests4 = []struct {
 	path         string
 	accept       string
 	acceptRanges string
@@ -323,7 +312,7 @@ var serveProxyTests4 = []struct {
 	},
 }
 
-func TestServeProxy_ServeHTTP_acceptRanges(t *testing.T) {
+func TestProxy_ServeHTTP_acceptRanges(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/logo.png", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Accept-Ranges", "bytes")
@@ -335,7 +324,7 @@ func TestServeProxy_ServeHTTP_acceptRanges(t *testing.T) {
 
 	p := NewServeProxy(ts.URL)
 
-	for _, tc := range serveProxyTests4 {
+	for _, tc := range proxyTests4 {
 		req := httptest.NewRequest(http.MethodGet, tc.path, nil)
 		req.Header.Add("Accept", tc.accept)
 
@@ -351,7 +340,7 @@ func TestServeProxy_ServeHTTP_acceptRanges(t *testing.T) {
 	}
 }
 
-var serveProxyTests5 = []struct {
+var proxyTests5 = []struct {
 	path        string
 	contentType string
 	format      string
@@ -378,7 +367,7 @@ var serveProxyTests5 = []struct {
 	},
 }
 
-func TestServeProxy_ServeHTTP_noTransform(t *testing.T) {
+func TestProxy_ServeHTTP_noTransform(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/logo.png", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("raw") == "1" {
@@ -400,7 +389,7 @@ func TestServeProxy_ServeHTTP_noTransform(t *testing.T) {
 
 	p := NewServeProxy(ts.URL)
 
-	for _, tc := range serveProxyTests5 {
+	for _, tc := range proxyTests5 {
 		req := httptest.NewRequest(http.MethodGet, tc.path, nil)
 		req.Header.Add("Accept", "image/webp,image/*,*/*;q=0.8")
 
