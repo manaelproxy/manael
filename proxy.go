@@ -45,7 +45,7 @@ func copyHeaders(w http.ResponseWriter, resp *http.Response) {
 	for _, v := range strings.Split(resp.Header.Get("Vary"), ",") {
 		v = strings.TrimSpace(v)
 
-		if strings.EqualFold(v, "Accept") {
+		if !strings.EqualFold(v, "Accept") {
 			keys = append(keys, v)
 		}
 	}
