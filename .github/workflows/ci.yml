@@ -43,7 +43,4 @@ jobs:
         go tool cover -func=cover/cover.out
 
     - name: Run goreleaser
-      env:
-        CGO_CFLAGS: -I/tmp/libwebp/include
-        CGO_LDFLAGS: -L/tmp/libwebp/lib -lwebp
       run: curl -sL https://git.io/goreleaser | bash -s -- --snapshot

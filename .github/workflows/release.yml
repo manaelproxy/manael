@@ -41,4 +41,6 @@ jobs:
     - name: Release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        CGO_CFLAGS: -I/tmp/libwebp/include
+        CGO_LDFLAGS: -L/tmp/libwebp/lib -lwebp
       run: curl -sL https://git.io/goreleaser | bash
