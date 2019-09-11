@@ -39,8 +39,12 @@ jobs:
         GO111MODULE: on
       run: |
         mkdir -p cover
-        go test -v -coverprofile=cover/cover.out ./...
-        go tool cover -func=cover/cover.out
+        go test -race -coverprofile=coverage.txt -covermode=atomic
 
-    - name: Run goreleaser
+    - name: Codecov
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      run: curl -s https://codecov.io/bash | bash
+
+    - name: GoReleaser
       run: curl -sL https://git.io/goreleaser | bash -s -- --snapshot
