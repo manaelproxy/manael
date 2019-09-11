@@ -23,7 +23,9 @@ package manael_test // import "manael.org/x/manael"
 import (
 	"crypto/sha256"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -390,6 +392,53 @@ func TestTransport_RoundTrip_noTransform(t *testing.T) {
 
 		if got, want := testutil.DetectFormat(resp.Body), tc.format; got != want {
 			t.Errorf("Detect format is %s, want %s", got, want)
+		}
+	}
+}
+
+var transportTests6 = []struct {
+	path string
+	xff string
+}{
+	{
+		"/xff.txt",
+		"203.0.113.6, 192.0.2.44",
+	},
+}
+
+func TestTransport_RoundTrip_xForwardedFor(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/xff.txt", func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, r.Header.Get("X-Forwarded-For"))
+	})
+
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
+
+	tr := &manael.Transport{ts.URL, http.DefaultTransport}
+
+	for _, tc := range transportTests6 {
+		req := httptest.NewRequest(http.MethodGet, "https://manael.test"+tc.path, nil)
+		req.Header.Set("X-Forwarded-For", tc.xff)
+
+		resp, err := tr.RoundTrip(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer resp.Body.Close()
+
+		xff, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		remoteIP, _, err := net.SplitHostPort(req.RemoteAddr)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if got, want := string(xff), fmt.Sprintf("%s, %s", tc.xff, remoteIP); got != want {
+			t.Errorf(`X-Forwarded-For is "%s", want "%s"`, got, want)
 		}
 	}
 }
