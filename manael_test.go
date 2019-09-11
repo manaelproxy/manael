@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Yamagishi Kazutoshi <ykzts@desire.sh>
+// Copyright (c) 2019 Yamagishi Kazutoshi <ykzts@desire.sh>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -18,30 +18,56 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package manael // import "manael.org/x/manael"
+// Package manael provides HTTP handler for processing images.
+package manael_test // import "manael.org/x/manael"
 
 import (
-	"os"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
-	"manael.org/x/manael/internal/testutil"
+	"manael.org/x/manael"
 )
 
-func TestConvert(t *testing.T) {
-	f, err := os.Open("testdata/logo.png")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer f.Close()
+var manaelTests = []struct {
+	host string
+	path string
+	statusCode int
+}{
+	{
+		"Manael",
+		"/logo.png",
+		200,
+	},
+	{
+		"manael.local",
+		"/404.html",
+		404,
+	},
+}
 
-	img, err := convert(f)
-	if err != nil {
-		t.Fatal(err)
-	}
+func TestNewServeProxy(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/logo.png", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "testdata/logo.png")
+	})
 
-	format := testutil.DetectFormat(img)
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
 
-	if got, want := format, "webp"; got != want {
-		t.Errorf("Image format is %s, want %s", got, want)
+	p := manael.NewServeProxy(ts.URL)
+
+	for _, tc := range manaelTests {
+		req := httptest.NewRequest(http.MethodGet, "https://"+tc.host+tc.path, nil)
+
+		w := httptest.NewRecorder()
+
+		p.ServeHTTP(w, req)
+
+		resp := w.Result()
+
+		if got, want := resp.StatusCode, tc.statusCode; got != want {
+			t.Errorf("Status code is %d, want %d", got, want)
+		}
 	}
 }

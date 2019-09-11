@@ -21,13 +21,13 @@
 // Package manael provides HTTP handler for processing images.
 package manael // import "manael.org/x/manael"
 
+import (
+	"net/http"
+)
+
 // NewServeProxy returns a new Proxy given a upstream URL
 func NewServeProxy(u string) *Proxy {
-	t := &Transport{
-		UpstreamURL: u,
-	}
+	tr := &Transport{u, http.DefaultTransport}
 
-	return &Proxy{
-		Transport: t,
-	}
+	return &Proxy{tr}
 }

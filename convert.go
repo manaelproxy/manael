@@ -18,18 +18,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+// Package manael provides HTTP handler for processing images.
 package manael // import "manael.org/x/manael"
 
 import (
 	"bytes"
 	"errors"
 	"image"
-	"io"
-
-	// Register JPEG
+	// register jpeg
 	_ "image/jpeg"
-	// Register PNG
+	// register png
 	_ "image/png"
+	"io"
 
 	"github.com/harukasan/go-libwebp/webp"
 )

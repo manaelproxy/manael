@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Yamagishi Kazutoshi <ykzts@desire.sh>
+// Copyright (c) 2019 Yamagishi Kazutoshi <ykzts@desire.sh>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -18,7 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package manael // import "manael.org/x/manael"
+// Package manael provides HTTP handler for processing images.
+package testutil_test // import "manael.org/x/manael/internal/testutil"
 
 import (
 	"os"
@@ -27,21 +28,32 @@ import (
 	"manael.org/x/manael/internal/testutil"
 )
 
-func TestConvert(t *testing.T) {
-	f, err := os.Open("testdata/logo.png")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer f.Close()
+var testutilTests = []struct {
+	name string
+	format string
+}{
+	{
+		"../../testdata/logo.png",
+		"png",
+	},
+	{
+		"../../testdata/empty.txt",
+		"not image",
+	},
+}
 
-	img, err := convert(f)
-	if err != nil {
-		t.Fatal(err)
-	}
+func TestDetectFormat(t *testing.T) {
+	for _, tc := range testutilTests {
+		f, err := os.Open(tc.name)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer f.Close()
 
-	format := testutil.DetectFormat(img)
+		format := testutil.DetectFormat(f)
 
-	if got, want := format, "webp"; got != want {
-		t.Errorf("Image format is %s, want %s", got, want)
+		if got, want := format, tc.format; got != want {
+			t.Errorf("A format is %s, want %s", got, want)
+		}
 	}
 }
