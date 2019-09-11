@@ -30,8 +30,8 @@ import (
 )
 
 var manaelTests = []struct {
-	host string
-	path string
+	host       string
+	path       string
 	statusCode int
 }{
 	{

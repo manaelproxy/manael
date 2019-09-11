@@ -79,3 +79,24 @@ func TestProxy_ServeHTTP(t *testing.T) {
 		}
 	}
 }
+
+func TestProxy_ServeHTTP_badGateway(t *testing.T) {
+	p := &manael.Proxy{http.DefaultTransport}
+
+	req := httptest.NewRequest(http.MethodGet, "https://manael.test/test.png", nil)
+
+	w := httptest.NewRecorder()
+
+	p.ServeHTTP(w, req)
+
+	resp := w.Result()
+	defer resp.Body.Close()
+
+	if got, want := resp.Header.Get("Server"), ""; got != want {
+		t.Errorf(`Server is "%s", want "%s"`, got, want)
+	}
+
+	if got, want := resp.StatusCode, 502; got != want {
+		t.Errorf("Status code is %d, want %d", got, want)
+	}
+}

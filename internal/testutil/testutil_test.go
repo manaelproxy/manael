@@ -29,7 +29,7 @@ import (
 )
 
 var testutilTests = []struct {
-	name string
+	name   string
 	format string
 }{
 	{
