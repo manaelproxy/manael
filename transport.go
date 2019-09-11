@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+// Package manael provides HTTP handler for processing images.
 package manael // import "manael.org/x/manael"
 
 import (
@@ -68,14 +69,6 @@ func (t *Transport) makeRequest(r *http.Request) (*http.Request, error) {
 	return r2, nil
 }
 
-func (t *Transport) base() http.RoundTripper {
-	if t.Base != nil {
-		return t.Base
-	}
-
-	return http.DefaultTransport
-}
-
 func shouldEncodeToWebP(resp *http.Response) bool {
 	if s := resp.Header.Get("Cache-Control"); s != "" {
 		for _, v := range strings.Split(s, ",") {
@@ -113,7 +106,7 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 		return nil, err
 	}
 
-	resp, err := t.base().RoundTrip(req2)
+	resp, err := t.Base.RoundTrip(req2)
 	if err != nil {
 		return nil, err
 	}

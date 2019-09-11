@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+// Package manael provides HTTP handler for processing images.
 package manael // import "manael.org/x/manael"
 
 import (
@@ -45,7 +46,7 @@ func copyHeaders(w http.ResponseWriter, resp *http.Response) {
 	for _, v := range strings.Split(resp.Header.Get("Vary"), ",") {
 		v = strings.TrimSpace(v)
 
-		if !strings.EqualFold(v, "Accept") {
+		if v != "" && !strings.EqualFold(v, "Accept") {
 			keys = append(keys, v)
 		}
 	}

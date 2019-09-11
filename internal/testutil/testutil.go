@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Yamagishi Kazutoshi <ykzts@desire.sh>
+// Copyright (c) 2019 Yamagishi Kazutoshi <ykzts@desire.sh>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -18,30 +18,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package manael // import "manael.org/x/manael"
+package testutil // import "manael.org/x/manael/internal/testutil"
 
 import (
-	"os"
-	"testing"
+	"image"
+	// register gif
+	_ "image/gif"
+	// register jpeg
+	_ "image/jpeg"
+	// register png
+	_ "image/png"
+	"io"
 
-	"manael.org/x/manael/internal/testutil"
+	// register webp
+	_ "golang.org/x/image/webp"
 )
 
-func TestConvert(t *testing.T) {
-	f, err := os.Open("testdata/logo.png")
+// DetectFormat returns a format of an image
+func DetectFormat(r io.Reader) string {
+	_, f, err := image.DecodeConfig(r)
 	if err != nil {
-		t.Fatal(err)
-	}
-	defer f.Close()
-
-	img, err := convert(f)
-	if err != nil {
-		t.Fatal(err)
+		return "not image"
 	}
 
-	format := testutil.DetectFormat(img)
-
-	if got, want := format, "webp"; got != want {
-		t.Errorf("Image format is %s, want %s", got, want)
-	}
+	return f
 }
