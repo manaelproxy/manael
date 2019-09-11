@@ -83,7 +83,7 @@ func TestProxy_ServeHTTP(t *testing.T) {
 func TestProxy_ServeHTTP_badGateway(t *testing.T) {
 	p := &manael.Proxy{http.DefaultTransport}
 
-	req := httptest.NewRequest(http.MethodGet, "https://manael.test/test.png", nil)
+	req := httptest.NewRequest(http.MethodGet, "https://manael.invalid/test.png", nil)
 
 	w := httptest.NewRecorder()
 
