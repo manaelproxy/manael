@@ -117,7 +117,7 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 
 	defer resp.Body.Close()
 
-	buf, err := convert(resp.Body)
+	buf, err := Convert(resp.Body)
 	if err != nil {
 		resp = NewResponse(req2, http.StatusInternalServerError)
 		log.Printf("error: %v\n", err)
