@@ -1,8 +1,10 @@
 # Manael
 
-[![GoDoc](https://godoc.org/manael.org/x/manael?status.svg)](https://godoc.org/manael.org/x/manael) [![CircleCI](https://circleci.com/gh/manaelproxy/manael/tree/master.svg?style=shield)](https://circleci.com/gh/manaelproxy/manael/tree/master)
+[![GoDoc](https://godoc.org/manael.org/x/manael?status.svg)](https://godoc.org/manael.org/x/manael)
+[![CircleCI](https://circleci.com/gh/manaelproxy/manael/tree/master.svg?style=shield)](https://circleci.com/gh/manaelproxy/manael/tree/master)
+[![Codecov](https://codecov.io/gh/manaelproxy/manael/branch/master/graph/badge.svg)](https://codecov.io/gh/manaelproxy/manael)
 
-A simple HTTP proxy for processing images.
+Manael is a simple HTTP proxy for processing images.
 
 ## Installation
 
