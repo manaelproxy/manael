@@ -24,6 +24,7 @@ package manael // import "manael.org/x/manael"
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net"
 	"net/http"
 	"net/url"
@@ -119,7 +120,10 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 
 	buf, err := convert(resp.Body)
 	if err != nil {
-		return nil, err
+		resp = NewResponse(req2, http.StatusInternalServerError)
+		log.Printf("error: %v\n", err)
+
+		return resp, nil
 	}
 
 	resp.Body = ioutil.NopCloser(buf)

@@ -91,6 +91,13 @@ var transportTests = []struct {
 		"text/plain; charset=utf-8",
 		"not image",
 	},
+	{
+		"image/webp,image/*,*/*",
+		"/invalid.png",
+		http.StatusInternalServerError,
+		"text/plain; charset=utf-8",
+		"not image",
+	},
 }
 
 func TestTransport_RoundTrip(t *testing.T) {
@@ -106,6 +113,9 @@ func TestTransport_RoundTrip(t *testing.T) {
 	})
 	mux.HandleFunc("/empty.txt", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "testdata/empty.txt")
+	})
+	mux.HandleFunc("/invalid.png", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "testdata/invalid.png")
 	})
 
 	ts := httptest.NewServer(mux)
@@ -398,7 +408,7 @@ func TestTransport_RoundTrip_noTransform(t *testing.T) {
 
 var transportTests6 = []struct {
 	path string
-	xff string
+	xff  string
 }{
 	{
 		"/xff.txt",
