@@ -21,6 +21,7 @@
 package manael_test // import "manael.org/x/manael"
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -34,4 +35,16 @@ func ExampleNewServeProxy() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func ExampleNewResponse() {
+	req, err := http.NewRequest(http.MethodGet, "https://manael.test/", nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	resp := manael.NewResponse(req, http.StatusOK)
+
+	fmt.Println(resp.StatusCode)
+	// Output: 200
 }
