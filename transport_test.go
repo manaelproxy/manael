@@ -94,8 +94,8 @@ var transportTests = []struct {
 	{
 		"image/webp,image/*,*/*",
 		"/invalid.png",
-		http.StatusInternalServerError,
-		"text/plain; charset=utf-8",
+		http.StatusOK,
+		"image/png",
 		"not image",
 	},
 }
