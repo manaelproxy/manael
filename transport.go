@@ -21,7 +21,9 @@
 package manael // import "manael.org/x/manael"
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net"
@@ -117,9 +119,16 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 
 	defer resp.Body.Close()
 
-	buf, err := Convert(resp.Body)
+	var body io.Reader = resp.Body
+
+	p := bytes.NewBuffer(nil)
+	r := io.TeeReader(body, p)
+
+	buf, err := Convert(r)
 	if err != nil {
-		resp = NewResponse(req2, http.StatusInternalServerError)
+		body = io.MultiReader(p, body)
+
+		resp.Body = ioutil.NopCloser(body)
 		log.Printf("error: %v\n", err)
 
 		return resp, nil
