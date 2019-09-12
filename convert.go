@@ -80,7 +80,8 @@ func encode(src image.Image) (*bytes.Buffer, error) {
 	return buf, nil
 }
 
-func convert(src io.ReadCloser) (*bytes.Buffer, error) {
+// Convert returns a image buffer converted to webp
+func Convert(src io.ReadCloser) (*bytes.Buffer, error) {
 	img, err := decode(src)
 	if err != nil {
 		return nil, err

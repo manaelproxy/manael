@@ -18,30 +18,51 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package manael // import "manael.org/x/manael"
+package manael_test // import "manael.org/x/manael"
 
 import (
 	"os"
 	"testing"
 
+	"manael.org/x/manael"
 	"manael.org/x/manael/internal/testutil"
 )
 
+var convertTests = []struct {
+	name   string
+	format string
+}{
+	{
+		"testdata/logo.png",
+		"webp",
+	},
+	{
+		"testdata/gray.png",
+		"webp",
+	},
+	{
+		"testdata/photo.jpeg",
+		"webp",
+	},
+}
+
 func TestConvert(t *testing.T) {
-	f, err := os.Open("testdata/logo.png")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer f.Close()
+	for _, tc := range convertTests {
+		f, err := os.Open(tc.name)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer f.Close()
 
-	img, err := convert(f)
-	if err != nil {
-		t.Fatal(err)
-	}
+		img, err := manael.Convert(f)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	format := testutil.DetectFormat(img)
+		format := testutil.DetectFormat(img)
 
-	if got, want := format, "webp"; got != want {
-		t.Errorf("Image format is %s, want %s", got, want)
+		if got, want := format, tc.format; got != want {
+			t.Errorf("Image format is %s, want %s", got, want)
+		}
 	}
 }
