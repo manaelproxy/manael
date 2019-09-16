@@ -41,10 +41,9 @@ jobs:
         mkdir -p cover
         go test -race -coverprofile=coverage.txt -covermode=atomic
 
-    - name: Codecov
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      run: curl -s https://codecov.io/bash | bash
+    - use: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
 
     - name: GoReleaser
       run: curl -sL https://git.io/goreleaser | bash -s -- --snapshot
