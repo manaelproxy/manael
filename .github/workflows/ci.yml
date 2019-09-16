@@ -41,7 +41,7 @@ jobs:
         mkdir -p cover
         go test -race -coverprofile=coverage.txt -covermode=atomic
 
-    - uses: codecov/codecov-action@v1
+    - uses: codecov/codecov-action@v1.0.2
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
 
