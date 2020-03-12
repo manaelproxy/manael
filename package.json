@@ -1,0 +1,33 @@
+{
+  "devDependencies": {
+    "@inabagumi/eslint-config-react": "^5.1.0",
+    "@inabagumi/prettier-config": "^1.1.0",
+    "@types/react": "^16.9.23",
+    "eslint": "^6.8.0",
+    "prettier": "^1.19.1",
+    "typescript": "^3.8.3"
+  },
+  "engines": {
+    "node": "12.x"
+  },
+  "eslintConfig": {
+    "extends": [
+      "@inabagumi/react"
+    ],
+    "root": true,
+    "rules": {
+      "@typescript-eslint/explicit-function-return-type": "off",
+      "react/prop-types": "off"
+    }
+  },
+  "private": true,
+  "scripts": {
+    "format": "prettier --ignore-path .gitignore --write '**/*.{js,jsx}'",
+    "format-check": "prettier -c --ignore-path .gitignore '**/*.{js,jsx}'",
+    "lint": "eslint --ext .js,.jsx .",
+    "now-build": "yarn workspace @manael/website build"
+  },
+  "workspaces": [
+    "website"
+  ]
+}
