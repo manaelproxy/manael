@@ -1,0 +1,31 @@
+{
+  "browserslist": {
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ],
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ]
+  },
+  "devDependencies": {
+    "@docusaurus/core": "^2.0.0-alpha.48",
+    "@docusaurus/preset-classic": "^2.0.0-alpha.48",
+    "classnames": "^2.2.6",
+    "react": "^16.13.0",
+    "react-dom": "^16.13.0"
+  },
+  "name": "@manael/website",
+  "prettier": "@inabagumi/prettier-config",
+  "private": true,
+  "scripts": {
+    "build": "docusaurus build",
+    "deploy": "docusaurus deploy",
+    "start": "docusaurus start",
+    "swizzle": "docusaurus swizzle"
+  },
+  "version": "1.0.0"
+}
