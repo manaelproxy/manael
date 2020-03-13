@@ -43,14 +43,22 @@ function Home() {
   const { siteConfig = {} } = context
   return (
     <Layout description="Manael is a simple HTTP proxy for processing images.">
-      <header className={classnames('hero hero--primary', styles.heroBanner)}>
+      <header className={classnames('hero hero--dark', styles.heroBanner)}>
         <div className="container">
-          <h1 className="hero__title">{siteConfig.title}</h1>
+          <h1 className="hero__title">
+            <img
+              alt={siteConfig.title}
+              className={classnames('margin-vert--md', styles.heroBannerLogo)}
+              height={128}
+              src={useBaseUrl('img/logo.png')}
+              width={128}
+            />
+          </h1>
           <p className="hero__subtitle">{siteConfig.tagline}</p>
           <div className={styles.buttons}>
             <Link
               className={classnames(
-                'button button--secondary button--lg',
+                'button button--primary button--lg',
                 styles.getStarted
               )}
               to={useBaseUrl('docs/introduction')}
@@ -62,7 +70,7 @@ function Home() {
       </header>
       <main>
         {features && features.length && (
-          <section className={styles.features}>
+          <section className={classnames('padding-vert--xl', styles.features)}>
             <div className="container">
               <div className="row">
                 {features.map((props, idx) => (

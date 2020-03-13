@@ -8,8 +8,6 @@ module.exports = {
       {
         docs: {
           path: '../docs',
-          showLastUpdateAuthor: true,
-          showLastUpdateTime: true,
           sidebarPath: require.resolve('./sidebars.js')
         },
         theme: {
@@ -23,21 +21,7 @@ module.exports = {
   themeConfig: {
     footer: {
       copyright: 'Copyright © 2018 The Manael Authors.',
-      links: [
-        {
-          items: [
-            {
-              label: 'Introduction',
-              to: 'docs/introduction'
-            },
-            {
-              label: 'Installation',
-              to: 'docs/installation'
-            }
-          ],
-          title: 'Docs'
-        }
-      ],
+      links: [],
       style: 'dark'
     },
     navbar: {
@@ -56,7 +40,7 @@ module.exports = {
         }
       ],
       logo: {
-        alt: '',
+        alt: 'Manael Logo',
         src: 'img/manael.png'
       },
       title: 'Manael'
