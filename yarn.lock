@@ -908,7 +908,7 @@
   resolved "https://registry.yarnpkg.com/@csstools/convert-colors/-/convert-colors-1.4.0.tgz#ad495dc41b12e75d588c6db8b9834f08fa131eb7"
   integrity sha512-5a6wqoJV/xEdbRNKVo6I4hO3VjyDq//8q2f9I6PBAvMesJHFauXDorcNCsr9RzvsZnaWi5NYCcfyqP1QeFHFbw==
 
-"@docusaurus/core@^2.0.0-alpha.49":
+"@docusaurus/core@^2.0.0-alpha.50":
   version "2.0.0-alpha.50"
   resolved "https://registry.yarnpkg.com/@docusaurus/core/-/core-2.0.0-alpha.50.tgz#4631efd9956a95aff29a6dfc9b3afffbcf6939e4"
   integrity sha512-lNvft+di325Ww3/S/kgbJmDmZF6OgJc3gM5zE8Lcl2Hqa6gZ6INIsGhnGxIX5Of1apliWGRVSojEF+mxf0BE1g==
@@ -1041,7 +1041,7 @@
     "@docusaurus/types" "^2.0.0-alpha.50"
     sitemap "^3.2.2"
 
-"@docusaurus/preset-classic@^2.0.0-alpha.49":
+"@docusaurus/preset-classic@^2.0.0-alpha.50":
   version "2.0.0-alpha.50"
   resolved "https://registry.yarnpkg.com/@docusaurus/preset-classic/-/preset-classic-2.0.0-alpha.50.tgz#56a3ca2b7d7a01c410009309fed7d57a67bb8788"
   integrity sha512-SrVE95VNOY/X5Cc7ZL175TiCNjW50PEVoGVp/Y86/RAQEq7Wm5Bi32jFAcsjndbTOqKaEhRikSkqEQipbrF8GA==
