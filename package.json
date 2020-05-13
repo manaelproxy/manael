@@ -5,7 +5,7 @@
     "@types/react": "^16.9.35",
     "eslint": "^7.0.0",
     "prettier": "^2.0.5",
-    "typescript": "^3.8.3"
+    "typescript": "^3.9.2"
   },
   "engines": {
     "node": "12.x"
