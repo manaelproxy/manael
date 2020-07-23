@@ -19,9 +19,9 @@ jobs:
         go-version: ['1.11', '1.12', '1.13']
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Set up Go ${{ matrix.go-version }}
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v2
         with:
           go-version: ${{ matrix.go-version }}
 
@@ -45,4 +45,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: GoReleaser
-        run: curl -sL https://git.io/goreleaser | bash -s -- --snapshot
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: latest
+          args: release --snapshot
