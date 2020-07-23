@@ -19,7 +19,6 @@
     "react-dom": "^16.13.1"
   },
   "name": "@manael/website",
-  "prettier": "@inabagumi/prettier-config",
   "private": true,
   "scripts": {
     "build": "docusaurus build",

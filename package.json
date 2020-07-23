@@ -20,10 +20,11 @@
       "react/prop-types": "off"
     }
   },
+  "prettier": "@inabagumi/prettier-config",
   "private": true,
   "scripts": {
-    "format": "prettier --ignore-path .gitignore --write '**/*.{js,jsx}'",
-    "format-check": "prettier -c --ignore-path .gitignore '**/*.{js,jsx}'",
+    "format": "prettier --ignore-path .gitignore --write .",
+    "format-check": "prettier -c --ignore-path .gitignore .",
     "lint": "eslint --ext .js,.jsx .",
     "now-build": "yarn workspace @manael/website build"
   },

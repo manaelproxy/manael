@@ -1,37 +1,37 @@
 env:
-- GO111MODULE=on
+  - GO111MODULE=on
 before:
   hooks:
-  - go mod download
+    - go mod download
 builds:
-- main: ./cmd/manael/main.go
-  binary: manael
-  ldflags:
-  - -extldflags "-static"
-  env:
-  - CGO_ENABLED=1
-  goos:
-  - linux
-  goarch:
-  - amd64
+  - main: ./cmd/manael/main.go
+    binary: manael
+    ldflags:
+      - -extldflags "-static"
+    env:
+      - CGO_ENABLED=1
+    goos:
+      - linux
+    goarch:
+      - amd64
 archives:
-- replacements:
-    linux: Linux
-    amd64: x86_64
+  - replacements:
+      linux: Linux
+      amd64: x86_64
 checksum:
   name_template: 'checksums.txt'
 snapshot:
-  name_template: "{{ .Tag }}-next"
+  name_template: '{{ .Tag }}-next'
 changelog:
   sort: asc
   filters:
     exclude:
-    - '^v\d+(?:\.\d+){0,2}$'
+      - '^v\d+(?:\.\d+){0,2}$'
 dockers:
-- image_templates:
-  - "manael/{{ .ProjectName }}:latest"
-  - "manael/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
-  - "manael/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}"
-  dockerfile: Dockerfile
-  binaries:
-  - manael
+  - image_templates:
+      - 'manael/{{ .ProjectName }}:latest'
+      - 'manael/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}.{{ .Patch }}'
+      - 'manael/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}'
+    dockerfile: Dockerfile
+    binaries:
+      - manael
