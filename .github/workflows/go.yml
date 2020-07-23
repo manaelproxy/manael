@@ -16,7 +16,11 @@ jobs:
 
     strategy:
       matrix:
-        go-version: ['1.11', '1.12', '1.13']
+        go-version:
+          - '1.11'
+          - '1.12'
+          - '1.13'
+          - '1.14'
 
     steps:
       - uses: actions/checkout@v2
@@ -40,7 +44,7 @@ jobs:
           mkdir -p cover
           go test -race -coverprofile=coverage.txt -covermode=atomic
 
-      - uses: codecov/codecov-action@v1.0.2
+      - uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
