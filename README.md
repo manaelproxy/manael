@@ -2,7 +2,7 @@
 
 [![GoDoc](https://godoc.org/manael.org/x/manael?status.svg)](https://godoc.org/manael.org/x/manael)
 [![Go](https://github.com/manaelproxy/manael/workflows/Go/badge.svg)](https://github.com/manaelproxy/manael/actions?query=workflow%3AGo)
-[![Codecov](https://codecov.io/gh/manaelproxy/manael/branch/master/graph/badge.svg)](https://codecov.io/gh/manaelproxy/manael)
+[![Codecov](https://codecov.io/gh/manaelproxy/manael/branch/main/graph/badge.svg)](https://codecov.io/gh/manaelproxy/manael)
 
 Manael is a simple HTTP proxy for processing images.
 
