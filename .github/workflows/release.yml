@@ -15,16 +15,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-go@v1
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
         with:
-          go-version: 1.13
+          go-version: 1.14
 
       - name: Login on Docker Hub
+        run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
       - name: Install libwebp
         run: |
@@ -39,8 +39,11 @@ jobs:
           make install
 
       - name: Release
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: latest
+          args: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CGO_CFLAGS: -I/tmp/libwebp/include
           CGO_LDFLAGS: -L/tmp/libwebp/lib -lwebp
-        run: curl -sL https://git.io/goreleaser | bash
