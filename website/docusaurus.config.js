@@ -26,7 +26,7 @@ module.exports = {
     },
     navbar: {
       hideOnScroll: true,
-      links: [
+      items: [
         {
           activeBasePath: 'docs',
           label: 'Docs',
