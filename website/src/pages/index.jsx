@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React from 'react'
 import classnames from 'classnames'
 import Layout from '@theme/Layout'
@@ -38,9 +39,16 @@ function Feature({ description, imageUrl, title }) {
   )
 }
 
+Feature.propTypes = {
+  description: PropTypes.string.isRequired,
+  imageUrl: PropTypes.string,
+  title: PropTypes.string.isRequired
+}
+
 function Home() {
   const context = useDocusaurusContext()
   const { siteConfig = {} } = context
+
   return (
     <Layout description="Manael is a simple HTTP proxy for processing images.">
       <header className={classnames('hero hero--dark', styles.heroBanner)}>

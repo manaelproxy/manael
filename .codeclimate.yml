@@ -11,6 +11,9 @@ checks:
   similar-code:
     enabled: false
 plugins:
+  eslint:
+    channel: eslint-7
+    enabled: true
   gofmt:
     enabled: true
   golint:
