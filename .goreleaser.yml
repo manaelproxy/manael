@@ -30,10 +30,10 @@ changelog:
 dockers:
   - image_templates:
       - 'manael/{{ .ProjectName }}:latest'
-      - 'manael/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}.{{ .Patch }}'
-      - 'manael/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}'
       - 'ghcr.io/manaelproxy/{{ .ProjectName }}:latest'
+      - 'manael/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}.{{ .Patch }}'
       - 'ghcr.io/manaelproxy/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}.{{ .Patch }}'
+      - 'manael/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}'
       - 'ghcr.io/manaelproxy/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}'
     dockerfile: Dockerfile
     binaries:
