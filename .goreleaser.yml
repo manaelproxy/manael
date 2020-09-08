@@ -28,7 +28,18 @@ changelog:
     exclude:
       - '^v\d+(?:\.\d+){0,2}$'
 dockers:
-  - image_templates:
+  - build_flag_templates:
+      - '--pull'
+      - '--label=org.opencontainers.image.authors=Manael Authors'
+      - '--label=org.opencontainers.image.created={{.Date}}'
+      - '--label=org.opencontainers.image.description=Manael is a simple HTTP proxy for processing images.'
+      - '--label=org.opencontainers.image.licenses=MIT'
+      - '--label=org.opencontainers.image.revision={{.FullCommit}}'
+      - '--label=org.opencontainers.image.source={{.GitURL}}'
+      - '--label=org.opencontainers.image.title={{.ProjectName}}'
+      - '--label=org.opencontainers.image.url=https://manael.org/'
+      - '--label=org.opencontainers.image.version={{.Version}}'
+    image_templates:
       - 'manael/{{ .ProjectName }}:latest'
       - 'ghcr.io/manaelproxy/{{ .ProjectName }}:latest'
       - 'manael/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}.{{ .Patch }}'
