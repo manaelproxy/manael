@@ -20,11 +20,6 @@ jobs:
         with:
           go-version: 1.14
 
-      - name: Login on Docker Hub
-        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-      - name: Login on GHCR
-        run: echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
-
       - name: Install libwebp
         run: |
           mkdir -p /tmp/src
@@ -43,6 +38,8 @@ jobs:
           version: latest
           args: release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          GITHUB_TOKEN: ${{ secrets.CR_PAT }}
           CGO_CFLAGS: -I/tmp/libwebp/include
           CGO_LDFLAGS: -L/tmp/libwebp/lib -lwebp
