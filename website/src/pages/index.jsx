@@ -4,7 +4,7 @@ import classnames from 'classnames'
 import Layout from '@theme/Layout'
 import Link from '@docusaurus/Link'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
-import useBaseUrl from '@docusaurus/useBaseUrl'
+import { useBaseUrlUtils } from '@docusaurus/useBaseUrl'
 import styles from './styles.module.css'
 
 const features = [
@@ -25,12 +25,17 @@ const features = [
 ]
 
 function Feature({ description, imageUrl, title }) {
-  const imgUrl = useBaseUrl(imageUrl)
+  const { withBaseUrl } = useBaseUrlUtils()
+
   return (
     <div className={classnames('col col--4', styles.feature)}>
-      {imgUrl && (
+      {imageUrl && (
         <div className="text--center">
-          <img className={styles.featureImage} src={imgUrl} alt={title} />
+          <img
+            className={styles.featureImage}
+            src={withBaseUrl(imageUrl)}
+            alt={title}
+          />
         </div>
       )}
       <h3>{title}</h3>
@@ -46,8 +51,8 @@ Feature.propTypes = {
 }
 
 function Home() {
-  const context = useDocusaurusContext()
-  const { siteConfig = {} } = context
+  const { siteConfig = {} } = useDocusaurusContext()
+  const { withBaseUrl } = useBaseUrlUtils()
 
   return (
     <Layout description="Manael is a simple HTTP proxy for processing images.">
@@ -58,7 +63,7 @@ function Home() {
               alt={siteConfig.title}
               className={classnames('margin-vert--md', styles.heroBannerLogo)}
               height={128}
-              src={useBaseUrl('img/logo.png')}
+              src={withBaseUrl('img/logo.png')}
               width={128}
             />
           </h1>
@@ -69,7 +74,7 @@ function Home() {
                 'button button--primary button--lg',
                 styles.getStarted
               )}
-              to={useBaseUrl('docs/introduction')}
+              to={withBaseUrl('docs/')}
             >
               Get Started
             </Link>
