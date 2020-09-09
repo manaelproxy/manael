@@ -7,7 +7,6 @@ module.exports = {
       '@docusaurus/preset-classic',
       {
         docs: {
-          path: '../docs',
           sidebarPath: require.resolve('./sidebars.js')
         },
         theme: {
@@ -31,7 +30,7 @@ module.exports = {
           activeBasePath: 'docs',
           label: 'Docs',
           position: 'left',
-          to: 'docs/introduction'
+          to: 'docs/'
         },
         {
           href: 'https://github.com/manaelproxy/manael',
