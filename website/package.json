@@ -15,8 +15,8 @@
     "@docusaurus/core": "^2.0.0-alpha.66",
     "@docusaurus/preset-classic": "^2.0.0-alpha.66",
     "classnames": "^2.2.6",
-    "react": "^17.0.0",
-    "react-dom": "^17.0.0"
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1"
   },
   "name": "@manael/website",
   "private": true,
