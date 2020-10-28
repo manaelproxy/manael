@@ -2,7 +2,7 @@
   "devDependencies": {
     "@inabagumi/eslint-config-react": "^6.0.2",
     "@inabagumi/prettier-config": "^1.1.2",
-    "@types/react": "^16.9.54",
+    "@types/react": "^16.9.55",
     "eslint": "^7.12.1",
     "prettier": "^2.1.2",
     "typescript": "^4.0.5"
