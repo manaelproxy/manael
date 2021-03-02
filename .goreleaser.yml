@@ -47,5 +47,5 @@ dockers:
       - 'manael/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}'
       - 'ghcr.io/manaelproxy/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}'
     dockerfile: Dockerfile
-    binaries:
+    ids:
       - manael
