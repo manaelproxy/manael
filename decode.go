@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Yamagishi Kazutoshi <ykzts@desire.sh>
+// Copyright (c) 2021 Yamagishi Kazutoshi <ykzts@desire.sh>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -18,51 +18,40 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package manael_test // import "manael.org/x/manael"
+package manael // import "manael.org/x/manael"
 
 import (
-	"os"
-	"testing"
+	"errors"
+	"image"
+	"io"
 
-	"manael.org/x/manael"
-	"manael.org/x/manael/internal/testutil"
+	// register jpeg
+	_ "image/jpeg"
+	// register png
+	_ "image/png"
 )
 
-var convertTests = []struct {
-	name   string
-	format string
-}{
-	{
-		"testdata/logo.png",
-		"webp",
-	},
-	{
-		"testdata/gray.png",
-		"webp",
-	},
-	{
-		"testdata/photo.jpeg",
-		"webp",
-	},
-}
-
-func TestConvert(t *testing.T) {
-	for _, tc := range convertTests {
-		f, err := os.Open(tc.name)
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer f.Close()
-
-		img, err := manael.Convert(f)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		format := testutil.DetectFormat(img)
-
-		if got, want := format, tc.format; got != want {
-			t.Errorf("Image format is %s, want %s", got, want)
-		}
+// Decode returns an image.Image.
+func Decode(r io.Reader) (image.Image, error) {
+	img, _, err := image.Decode(r)
+	if err != nil {
+		return nil, err
 	}
+
+	switch img.(type) {
+	case *image.Gray, *image.NRGBA, *image.RGBA:
+		return img, nil
+	case *image.CMYK, *image.NRGBA64, *image.Paletted, *image.RGBA64, *image.YCbCr:
+		bounds := img.Bounds()
+		newImg := image.NewRGBA(bounds)
+		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+			for x := bounds.Min.X; x < bounds.Max.X; x++ {
+				newImg.Set(x, y, img.At(x, y))
+			}
+		}
+
+		return newImg, nil
+	}
+
+	return nil, errors.New("Not supported image format")
 }

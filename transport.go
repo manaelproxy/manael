@@ -71,77 +71,104 @@ func (t *Transport) makeRequest(r *http.Request) (*http.Request, error) {
 	return r2, nil
 }
 
-func shouldEncodeToWebP(resp *http.Response) bool {
-	if s := resp.Header.Get("Cache-Control"); s != "" {
-		for _, v := range strings.Split(s, ",") {
-			if strings.TrimSpace(v) == "no-transform" {
-				return false
-			}
-		}
-	}
-
-	if !(resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusNotModified) {
-		return false
-	}
-
-	contentType := resp.Header.Get("Content-Type")
-	return contentType == "image/jpeg" || contentType == "image/png"
-}
-
-func canDecodeWebP(r *http.Request) bool {
+func scanAcceptHeader(r *http.Request) string {
 	accepts := r.Header.Get("Accept")
 
 	for _, v := range strings.Split(accepts, ",") {
 		t := strings.TrimSpace(v)
-		if strings.HasPrefix(t, "image/webp") {
-			return true
+
+		if strings.HasPrefix(t, "image/avif") {
+			return "image/avif"
+		} else if strings.HasPrefix(t, "image/webp") {
+			return "image/webp"
 		}
 	}
 
-	return false
+	return "*/*"
+}
+
+func check(w *http.Response, r *http.Request) string {
+	if r.Method != "GET" {
+		return "*/*"
+	}
+
+	if w.StatusCode != http.StatusOK && w.StatusCode != http.StatusNotModified {
+		return "*/*"
+	}
+
+	if s := w.Header.Get("Cache-Control"); s != "" {
+		for _, v := range strings.Split(s, ",") {
+			if strings.TrimSpace(v) == "no-transform" {
+				return "*/*"
+			}
+		}
+	}
+
+	t := w.Header.Get("Content-Type")
+
+	if t != "image/jpeg" && t != "image/png" {
+		return "*/*"
+	}
+
+	return scanAcceptHeader(r)
+}
+
+func convert(src io.Reader, t string) (*bytes.Buffer, error) {
+	img, err := Decode(src)
+	if err != nil {
+		return nil, err
+	}
+
+	buf := bytes.NewBuffer(nil)
+
+	err = Encode(buf, img, t)
+	if err != nil {
+		return nil, err
+	}
+
+	return buf, nil
 }
 
 // RoundTrip responds to an converted image.
 func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
-	req2, err := t.makeRequest(req)
+	r, err := t.makeRequest(req)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := t.Base.RoundTrip(req2)
+	w, err := t.Base.RoundTrip(r)
 	if err != nil {
 		return nil, err
 	}
 
-	if !(shouldEncodeToWebP(resp) && canDecodeWebP(req2)) {
-		return resp, nil
+	typ := check(w, r)
+	if typ == "*/*" {
+		return w, nil
 	}
 
-	defer resp.Body.Close()
-
-	var body io.Reader = resp.Body
+	defer w.Body.Close()
 
 	p := bytes.NewBuffer(nil)
-	r := io.TeeReader(body, p)
+	b := io.TeeReader(w.Body, p)
 
-	buf, err := Convert(r)
+	buf, err := convert(b, typ)
 	if err != nil {
-		body = io.MultiReader(p, body)
+		body := io.MultiReader(p, w.Body)
 
-		resp.Body = ioutil.NopCloser(body)
+		w.Body = ioutil.NopCloser(body)
 		log.Printf("error: %v\n", err)
 
-		return resp, nil
+		return w, nil
 	}
 
-	resp.Body = ioutil.NopCloser(buf)
+	w.Body = ioutil.NopCloser(buf)
 
-	resp.Header.Set("Content-Type", "image/webp")
-	resp.Header.Set("Content-Length", strconv.Itoa(buf.Len()))
+	w.Header.Set("Content-Type", typ)
+	w.Header.Set("Content-Length", strconv.Itoa(buf.Len()))
 
-	if resp.Header.Get("Accept-Ranges") != "" {
-		resp.Header.Del("Accept-Ranges")
+	if w.Header.Get("Accept-Ranges") != "" {
+		w.Header.Del("Accept-Ranges")
 	}
 
-	return resp, nil
+	return w, nil
 }
