@@ -22,9 +22,13 @@
   "private": true,
   "scripts": {
     "build": "docusaurus build",
+    "clear": "docusaurus clear",
     "deploy": "docusaurus deploy",
+    "serve": "docusaurus serve",
     "start": "docusaurus start",
-    "swizzle": "docusaurus swizzle"
+    "swizzle": "docusaurus swizzle",
+    "write-heading-ids": "docusaurus write-heading-ids",
+    "write-translations": "docusaurus write-translations"
   },
   "version": "1.0.0"
 }
