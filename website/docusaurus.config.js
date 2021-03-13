@@ -35,6 +35,11 @@ module.exports = {
   projectName: 'manael',
   tagline: 'Manael is a simple HTTP proxy for processing images.',
   themeConfig: {
+    algolia: {
+      appId: 'ZX7VYOHRJ3',
+      apiKey: '43f66f766ffb77ee2280608d793ab235',
+      indexName: 'docusaurus'
+    },
     footer: {
       copyright: 'Copyright © 2018 The Manael Authors.',
       links: [],
