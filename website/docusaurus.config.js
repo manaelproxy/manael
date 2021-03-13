@@ -1,6 +1,23 @@
+/**
+ * @type {import('@docusaurus/types').DocusaurusConfig}
+ */
 module.exports = {
   baseUrl: '/',
   favicon: 'img/manael.png',
+  i18n: {
+    defaultLocale: 'en',
+    localeConfigs: {
+      en: {
+        label: 'English'
+      },
+      ja: {
+        label: '日本語'
+      }
+    },
+    locales: ['en', 'ja']
+  },
+  onBrokenLinks: 'throw',
+  onBrokenMarkdownLinks: 'warn',
   organizationName: 'manaelproxy',
   presets: [
     [
@@ -31,6 +48,10 @@ module.exports = {
           label: 'Docs',
           position: 'left',
           to: 'docs/'
+        },
+        {
+          type: 'localeDropdown',
+          position: 'right'
         },
         {
           href: 'https://github.com/manaelproxy/manael',
