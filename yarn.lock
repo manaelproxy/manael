@@ -1514,26 +1514,26 @@
   dependencies:
     "@hapi/hoek" "^9.0.0"
 
-"@inabagumi/eslint-config-react@^9.0.0":
-  version "9.0.0"
-  resolved "https://registry.yarnpkg.com/@inabagumi/eslint-config-react/-/eslint-config-react-9.0.0.tgz#1dc8cc26dfc19d86d643b3fe706a26b69b28a193"
-  integrity sha512-aYDIfIXeXR6mitZs1zXrPWnfU17HuAjdg3ln8nQf0FhEUrT7hO4AUfXgyMD9v6SNAkmsfXYcNB26uXplpoO6UQ==
+"@inabagumi/eslint-config-react@^9.0.1":
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/@inabagumi/eslint-config-react/-/eslint-config-react-9.0.1.tgz#722fe88c465f41e43d1021b89869d5564ccebaab"
+  integrity sha512-6QST+mkWKe7/empmph8qzzpiSa4Oc/i5w1A89ZRhD9v2d/UvMX/n3cWwinnPWdoCdLDGigCTpuRlnnpB+wPgew==
   dependencies:
-    "@inabagumi/eslint-config" "^9.0.0"
-    eslint-config-prettier "^8.1.0"
-    eslint-plugin-jsx-a11y "^6.4.1"
-    eslint-plugin-react "^7.22.0"
-    eslint-plugin-react-hooks "^4.2.0"
+    "@inabagumi/eslint-config" "^9.0.1"
+    eslint-config-prettier "~8.1.0"
+    eslint-plugin-jsx-a11y "~6.4.1"
+    eslint-plugin-react "~7.23.2"
+    eslint-plugin-react-hooks "~4.2.0"
 
-"@inabagumi/eslint-config@^9.0.0":
-  version "9.0.0"
-  resolved "https://registry.yarnpkg.com/@inabagumi/eslint-config/-/eslint-config-9.0.0.tgz#122d093ebcf1ad8acdb178a784e762c57b883be4"
-  integrity sha512-0ZSgq4o217J/adqis6M35eyj+7dwpqt6Pf1rhaE2Ev/g1nc+H7WnBJ4g9FHV2+3l3tZgSwV1E1vqlkj+07MGVg==
+"@inabagumi/eslint-config@^9.0.1":
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/@inabagumi/eslint-config/-/eslint-config-9.0.1.tgz#129de9927e8252e6cbe7417a572f454dd79bd7f1"
+  integrity sha512-tUPNtwLrh4ay7uE+XUZH8vwtKKeYRKZ7M4E6AqzsBz0+SUNuM0cHXWSpsEyV2hrqtHMVB90un7SXQfzYyQoapA==
   dependencies:
-    "@typescript-eslint/eslint-plugin" "^4.16.1"
-    "@typescript-eslint/parser" "^4.16.1"
-    eslint-config-prettier "^8.1.0"
-    eslint-plugin-prettier "^3.3.1"
+    "@typescript-eslint/eslint-plugin" "~4.21.0"
+    "@typescript-eslint/parser" "~4.21.0"
+    eslint-config-prettier "~8.1.0"
+    eslint-plugin-prettier "~3.3.1"
 
 "@inabagumi/prettier-config@^1.1.2":
   version "1.1.2"
@@ -1884,7 +1884,7 @@
     "@types/webpack-sources" "*"
     source-map "^0.6.0"
 
-"@typescript-eslint/eslint-plugin@^4.16.1":
+"@typescript-eslint/eslint-plugin@~4.21.0":
   version "4.21.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-4.21.0.tgz#3fce2bfa76d95c00ac4f33dff369cb593aab8878"
   integrity sha512-FPUyCPKZbVGexmbCFI3EQHzCZdy2/5f+jv6k2EDljGdXSRc0cKvbndd2nHZkSLqCNOPk0jB6lGzwIkglXcYVsQ==
@@ -1910,7 +1910,7 @@
     eslint-scope "^5.0.0"
     eslint-utils "^2.0.0"
 
-"@typescript-eslint/parser@^4.16.1":
+"@typescript-eslint/parser@~4.21.0":
   version "4.21.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-4.21.0.tgz#a227fc2af4001668c3e3f7415d4feee5093894c1"
   integrity sha512-eyNf7QmE5O/l1smaQgN0Lj2M/1jOuNg2NrBm1dqqQN0sVngTLyw8tdCbih96ixlhbF1oINoN8fDCyEH9SjLeIA==
@@ -4271,12 +4271,12 @@ escape-string-regexp@^4.0.0:
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-4.0.0.tgz#14ba83a5d373e3d311e5afca29cf5bfad965bf34"
   integrity sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==
 
-eslint-config-prettier@^8.1.0:
+eslint-config-prettier@~8.1.0:
   version "8.1.0"
   resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-8.1.0.tgz#4ef1eaf97afe5176e6a75ddfb57c335121abc5a6"
   integrity sha512-oKMhGv3ihGbCIimCAjqkdzx2Q+jthoqnXSP+d86M9tptwugycmTFdVR4IpLgq2c4SHifbwO90z2fQ8/Aio73yw==
 
-eslint-plugin-jsx-a11y@^6.4.1:
+eslint-plugin-jsx-a11y@~6.4.1:
   version "6.4.1"
   resolved "https://registry.yarnpkg.com/eslint-plugin-jsx-a11y/-/eslint-plugin-jsx-a11y-6.4.1.tgz#a2d84caa49756942f42f1ffab9002436391718fd"
   integrity sha512-0rGPJBbwHoGNPU73/QCLP/vveMlM1b1Z9PponxO87jfr6tuH5ligXbDT6nHSSzBC8ovX2Z+BQu7Bk5D/Xgq9zg==
@@ -4293,19 +4293,19 @@ eslint-plugin-jsx-a11y@^6.4.1:
     jsx-ast-utils "^3.1.0"
     language-tags "^1.0.5"
 
-eslint-plugin-prettier@^3.3.1:
+eslint-plugin-prettier@~3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/eslint-plugin-prettier/-/eslint-plugin-prettier-3.3.1.tgz#7079cfa2497078905011e6f82e8dd8453d1371b7"
   integrity sha512-Rq3jkcFY8RYeQLgk2cCwuc0P7SEFwDravPhsJZOQ5N4YI4DSg50NyqJ/9gdZHzQlHf8MvafSesbNJCcP/FF6pQ==
   dependencies:
     prettier-linter-helpers "^1.0.0"
 
-eslint-plugin-react-hooks@^4.2.0:
+eslint-plugin-react-hooks@~4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-4.2.0.tgz#8c229c268d468956334c943bb45fc860280f5556"
   integrity sha512-623WEiZJqxR7VdxFCKLI6d6LLpwJkGPYKODnkH3D7WpOG5KM8yWueBd8TLsNAetEJNF5iJmolaAKO3F8yzyVBQ==
 
-eslint-plugin-react@^7.22.0:
+eslint-plugin-react@~7.23.2:
   version "7.23.2"
   resolved "https://registry.yarnpkg.com/eslint-plugin-react/-/eslint-plugin-react-7.23.2.tgz#2d2291b0f95c03728b55869f01102290e792d494"
   integrity sha512-AfjgFQB+nYszudkxRkTFu0UR1zEQig0ArVMPloKhxwlwkzaw/fBiH0QWcBBhZONlXqQC51+nfqFrkn4EzHcGBw==
