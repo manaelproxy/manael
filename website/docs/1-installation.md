@@ -1,6 +1,4 @@
----
-title: Installation Guide
----
+# Installation Guide
 
 ## Using the Docker {#using-the-docker}
 
