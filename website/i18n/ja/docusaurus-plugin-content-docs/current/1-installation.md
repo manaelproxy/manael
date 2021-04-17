@@ -1,6 +1,4 @@
----
-title: インストールガイド
----
+# インストールガイド
 
 ## Docker を使う {#using-the-docker}
 
