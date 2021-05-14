@@ -74,9 +74,9 @@ func (t *Transport) makeRequest(r *http.Request) (*http.Request, error) {
 
 func scanAcceptHeader(r *http.Request) string {
 	f := os.Getenv("MANAEL_ENABLE_AVIF")
-	accepts := r.Header.Get("Accept")
+	a := r.Header.Get("Accept")
 
-	for _, v := range strings.Split(accepts, ",") {
+	for _, v := range strings.Split(a, ",") {
 		t := strings.TrimSpace(v)
 
 		if f == "true" && strings.HasPrefix(t, "image/avif") {
