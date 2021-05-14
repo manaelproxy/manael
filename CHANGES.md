@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.8.2](https://www.github.com/manaelproxy/manael/compare/v1.8.1...v1.8.2) (2021-05-14)
+
+
+### Bug Fixes
+
+* **transport:** change variable name ([#447](https://www.github.com/manaelproxy/manael/issues/447)) ([7b14d20](https://www.github.com/manaelproxy/manael/commit/7b14d203c38b3d9e1da98614efadadb2bed0c26e))
+
 ### [1.8.1](https://www.github.com/manaelproxy/manael/compare/v1.8.0...v1.8.1) (2021-05-14)
 
 
