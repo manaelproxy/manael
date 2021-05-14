@@ -29,6 +29,11 @@ jobs:
       - name: Login on GHCR
         run: echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
 
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y yasm
+
       - name: Install libwebp
         run: |
           mkdir -p /tmp/src
