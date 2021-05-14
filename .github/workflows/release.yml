@@ -46,6 +46,7 @@ jobs:
           mkdir -p /tmp/src
           cd /tmp/src
           wget -O libaom.tar.gz https://storage.googleapis.com/aom-releases/libaom-${LIBAOM_VERSION}.tar.gz
+          mkdir -p /tmp/src/libaom-${LIBAOM_VERSION}
           tar -xzf libaom.tar.gz -C /tmp/src/libaom-${LIBAOM_VERSION}
           rm libaom.tar.gz
           mkdir -p /tmp/src/aom_build
