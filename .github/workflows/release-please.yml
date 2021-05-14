@@ -12,5 +12,5 @@ jobs:
       - uses: google-github-actions/release-please-action@v2
         with:
           token: ${{ secrets.ACTIONS_BOT_TOKEN }}
-          package-name: pinkie
+          package-name: manael
           release-type: go
