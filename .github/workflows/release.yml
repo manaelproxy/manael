@@ -3,7 +3,7 @@ name: Release
 on:
   pull_request:
     branches:
-      - '!*'
+      # - '!*'
       - ykzts-patch-1 # test
   push:
     branches:
