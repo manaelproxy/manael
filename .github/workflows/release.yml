@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - '!*'
+      - ykzts-patch-1 # test
   push:
     branches:
       - '!*'
@@ -46,7 +47,7 @@ jobs:
           rm libaom.tar.gz
           mkdir -p /tmp/src/aom_build
           cd /tmp/src/aom_build
-          cmake /tmp/src/libaom-3.1.0
+          cmake /tmp/src/libaom-3.1.0 -DCMAKE_INSTALL_PREFIX=/tmp/libaom
           make -j4
           make install
 
@@ -54,8 +55,8 @@ jobs:
         uses: goreleaser/goreleaser-action@v2
         with:
           version: latest
-          args: release
+          args: release --snapshot
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CGO_CFLAGS: -I/tmp/libwebp/include
-          CGO_LDFLAGS: -L/tmp/libwebp/lib -lwebp
+          CGO_CFLAGS: -I/tmp/libwebp/include -I/tmp/libaom/include
+          CGO_LDFLAGS: -L/tmp/libwebp/lib -lwebp -L/tmp/libaom/lib -laom
