@@ -7,6 +7,13 @@
 
 * **release:** make directory for libaom ([#442](https://www.github.com/manaelproxy/manael/issues/442)) ([2790b2f](https://www.github.com/manaelproxy/manael/commit/2790b2f233d496eb21466329f3906e7b917add67))
 
+### [1.8.1](https://www.github.com/manaelproxy/manael/compare/v1.8.0...v1.8.1) (2021-05-14)
+
+
+### Bug Fixes
+
+* **release:** make directory for libaom ([#442](https://www.github.com/manaelproxy/manael/issues/442)) ([2790b2f](https://www.github.com/manaelproxy/manael/commit/2790b2f233d496eb21466329f3906e7b917add67))
+
 ## [1.8.0](https://www.github.com/manaelproxy/manael/compare/v1.7.1...v1.8.0) (2021-05-14)
 
 
