@@ -14,4 +14,3 @@ jobs:
           token: ${{ secrets.ACTIONS_BOT_TOKEN }}
           package-name: pinkie
           release-type: go
-          command: release-pr
