@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.8.3](https://www.github.com/manaelproxy/manael/compare/v1.8.2...v1.8.3) (2021-05-15)
+
+
+### Bug Fixes
+
+* **release:** add -lm to ldflags ([#453](https://www.github.com/manaelproxy/manael/issues/453)) ([ae591af](https://www.github.com/manaelproxy/manael/commit/ae591afe12f97257dc18bd31030535451e8af760))
+
 ### [1.8.2](https://www.github.com/manaelproxy/manael/compare/v1.8.1...v1.8.2) (2021-05-14)
 
 
