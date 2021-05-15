@@ -1,12 +1,3 @@
 # Security Policy
 
-## Supported Versions
-
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.6.x   | :white_check_mark: |
-| < 1.6   | :x:                |
-
-## Reporting a Vulnerability
-
-contact@manael.org
+Manael does not fix any vulnerabilities other than those in the latest major version. If you find a vulnerability, report to <contact@manael.org>.
