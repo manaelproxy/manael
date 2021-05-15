@@ -68,4 +68,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CGO_CFLAGS: -I/tmp/libwebp/include -I/tmp/libaom/include
-          CGO_LDFLAGS: -L/tmp/libwebp/lib -lwebp -L/tmp/libaom/lib -laom
+          CGO_LDFLAGS: -L/tmp/libwebp/lib -lwebp -L/tmp/libaom/lib -laom -lm
