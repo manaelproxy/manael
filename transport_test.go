@@ -28,6 +28,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 	"time"
 
@@ -449,6 +450,64 @@ func TestTransport_RoundTrip_xForwardedFor(t *testing.T) {
 
 		if got, want := string(xff), fmt.Sprintf("%s, %s", tc.xff, remoteIP); got != want {
 			t.Errorf(`X-Forwarded-For is "%s", want "%s"`, got, want)
+		}
+	}
+}
+
+var transportTests7 = []struct {
+	accept      string
+	path        string
+	statusCode  int
+	contentType string
+}{
+	{
+		"image/avif,image/webp,image/*,*/*;q=0.8",
+		"/photo.jpeg",
+		http.StatusOK,
+		"image/avif",
+	},
+	{
+		"image/avif,image/webp,image/*,*/*;q=0.8",
+		"/logo.png",
+		http.StatusOK,
+		"image/webp",
+	},
+}
+
+func TestTransport_RoundTrip_avif(t *testing.T) {
+	if os.Getenv("MANAEL_ENABLE_AVIF") != "true" {
+		t.Skip("Skipping test when avif disabled.")
+	}
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/logo.png", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "testdata/logo.png")
+	})
+	mux.HandleFunc("/photo.jpeg", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "testdata/photo.jpeg")
+	})
+
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
+
+	tr := &manael.Transport{ts.URL, http.DefaultTransport}
+
+	for _, tc := range transportTests7 {
+		req := httptest.NewRequest(http.MethodGet, "https://manael.test"+tc.path, nil)
+		req.Header.Set("Accept", tc.accept)
+
+		resp, err := tr.RoundTrip(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer resp.Body.Close()
+
+		if got, want := resp.StatusCode, tc.statusCode; got != want {
+			t.Errorf("Status Code is %d, want %d", got, want)
+		}
+
+		if got, want := resp.Header.Get("Content-Type"), tc.contentType; got != want {
+			t.Errorf("Content-Type is %s, want %s", got, want)
 		}
 	}
 }
