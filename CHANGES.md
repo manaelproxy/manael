@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.8.4](https://www.github.com/manaelproxy/manael/compare/v1.8.3...v1.8.4) (2021-05-20)
+
+
+### Bug Fixes
+
+* **transport:** disable avif when png ([#462](https://www.github.com/manaelproxy/manael/issues/462)) ([c293444](https://www.github.com/manaelproxy/manael/commit/c293444dc83670a61d53f5c1f035ec9d649abaa2))
+
 ### [1.8.3](https://www.github.com/manaelproxy/manael/compare/v1.8.2...v1.8.3) (2021-05-15)
 
 
