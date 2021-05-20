@@ -42,9 +42,10 @@ jobs:
       - name: Test
         env:
           GO111MODULE: on
+          MANAEL_ENABLE_AVIF: true
         run: |
           mkdir -p cover
-          go test -race -coverprofile=coverage.txt -covermode=atomic
+          go test -race -coverprofile=coverage.txt -covermode=atomic -v
 
       - uses: codecov/codecov-action@v1
         with:

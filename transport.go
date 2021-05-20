@@ -72,14 +72,19 @@ func (t *Transport) makeRequest(r *http.Request) (*http.Request, error) {
 	return r2, nil
 }
 
-func scanAcceptHeader(r *http.Request, t string) string {
-	f := os.Getenv("MANAEL_ENABLE_AVIF")
+func avifEnabled(w *http.Response) bool {
+	t := w.Header.Get("Content-Type")
+
+	return os.Getenv("MANAEL_ENABLE_AVIF") == "true" && t != "image/png"
+}
+
+func scanAcceptHeader(w *http.Response, r *http.Request) string {
 	a := r.Header.Get("Accept")
 
 	for _, v := range strings.Split(a, ",") {
 		t := strings.TrimSpace(v)
 
-		if f == "true" && t != "image/png" && strings.HasPrefix(t, "image/avif") {
+		if avifEnabled(w) && strings.HasPrefix(t, "image/avif") {
 			return "image/avif"
 		} else if strings.HasPrefix(t, "image/webp") {
 			return "image/webp"
@@ -112,7 +117,7 @@ func check(w *http.Response, r *http.Request) string {
 		return "*/*"
 	}
 
-	return scanAcceptHeader(r, t)
+	return scanAcceptHeader(w, r)
 }
 
 func convert(src io.Reader, t string) (*bytes.Buffer, error) {
