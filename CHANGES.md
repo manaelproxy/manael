@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.8.5](https://www.github.com/manaelproxy/manael/compare/v1.8.4...v1.8.5) (2021-05-20)
+
+
+### Bug Fixes
+
+* **transport:** fix duplicate variables ([#464](https://www.github.com/manaelproxy/manael/issues/464)) ([dd1f3d5](https://www.github.com/manaelproxy/manael/commit/dd1f3d573e41d94653c1d1e9fbebdd177ce6c6ee))
+
 ### [1.8.4](https://www.github.com/manaelproxy/manael/compare/v1.8.3...v1.8.4) (2021-05-20)
 
 
