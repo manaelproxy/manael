@@ -1720,10 +1720,10 @@
     eslint-config-prettier "~8.1.0"
     eslint-plugin-prettier "~3.3.1"
 
-"@inabagumi/prettier-config@^1.1.3":
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/@inabagumi/prettier-config/-/prettier-config-1.1.3.tgz#cab93c12099d2eff0cb621e6eddd1fc87374c4f1"
-  integrity sha512-Wj62i6x32fPyGzGFd4qa13Frq4TCg/x9q8hVvgycOkS/ODPJk3TCezczYi6tZcrZNOBhX1tF/sAkbt/mXa284w==
+"@inabagumi/prettier-config@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@inabagumi/prettier-config/-/prettier-config-2.0.0.tgz#a6087e00f49ed8d1de53301dbd7391a3bacbe509"
+  integrity sha512-b5tcbqpJv4gmJca3SQrRQ+QH/cDlMV5rS9gi9zTPXtIRGMByR4hLMuIffkknbKTOQ5UrDjvrWBbzY1mfw5geJA==
 
 "@mdx-js/mdx@^1.6.21":
   version "1.6.22"
