@@ -6,5 +6,5 @@ require (
 	github.com/Kagami/go-avif v0.1.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/harukasan/go-libwebp v0.0.0-20190703060927-68562c9c99af
-	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d
+	golang.org/x/image v0.0.0-20211028202545-6944b10bf410
 )
