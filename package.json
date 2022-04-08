@@ -18,6 +18,7 @@
     ],
     "root": true
   },
+  "packageManager": "yarn@1.22.18",
   "prettier": "@inabagumi/prettier-config",
   "private": true,
   "scripts": {
