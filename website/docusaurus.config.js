@@ -72,5 +72,6 @@ module.exports = {
     }
   },
   title: 'Manael',
+  trailingSlash: false,
   url: 'https://manael.org'
 }
