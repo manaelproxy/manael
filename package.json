@@ -21,6 +21,10 @@
   "packageManager": "yarn@1.22.18",
   "prettier": "@inabagumi/prettier-config",
   "private": true,
+  "resolutions": {
+    "cheerio": "^1.0.0-rc.10",
+    "trim": "^1.0.1"
+  },
   "scripts": {
     "build": "yarn workspace @manael/website build",
     "format": "prettier --write './**/*.{json,yml}'",
