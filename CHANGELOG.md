@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.9.1](https://github.com/manaelproxy/manael/compare/v1.9.0...v1.9.1) (2022-04-17)
+
+
+### Bug Fixes
+
+* **release:** fix path ([#695](https://github.com/manaelproxy/manael/issues/695)) ([1f3f36a](https://github.com/manaelproxy/manael/commit/1f3f36a8c962eb59f8fb891c17235e19a2c3e1aa))
+
 ## [1.9.0](https://github.com/manaelproxy/manael/compare/v1.8.5...v1.9.0) (2022-04-17)
 
 
