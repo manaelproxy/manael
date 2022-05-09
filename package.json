@@ -6,7 +6,7 @@
     "@inabagumi/prettier-config": "^2.0.0",
     "@types/react": "^17.0.45",
     "eslint": "^8.15.0",
-    "husky": "^7.0.4",
+    "husky": "^8.0.1",
     "is-ci": "^3.0.1",
     "lint-staged": "^12.4.1",
     "prettier": "^2.6.2",
