@@ -4,7 +4,7 @@
     "@commitlint/config-conventional": "^17.0.2",
     "@inabagumi/eslint-config-react": "^9.0.1",
     "@inabagumi/prettier-config": "^2.0.0",
-    "@types/react": "^17.0.45",
+    "@types/react": "^17.0.46",
     "eslint": "^8.17.0",
     "husky": "^8.0.1",
     "is-ci": "^3.0.1",
