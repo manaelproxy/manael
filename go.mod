@@ -6,7 +6,7 @@ require (
 	github.com/Kagami/go-avif v0.1.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/harukasan/go-libwebp v0.0.0-20220408054828-61eedf90d768
-	golang.org/x/image v0.0.0-20220902085622-e7cb96979f69
+	golang.org/x/image v0.0.0-20221017200508-ffcb3fe7d1bf
 )
 
 require github.com/felixge/httpsnoop v1.0.1 // indirect
