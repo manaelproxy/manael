@@ -68,7 +68,7 @@ jobs:
           make install
 
       - name: Release
-        uses: goreleaser/goreleaser-action@v3
+        uses: goreleaser/goreleaser-action@v4
         with:
           version: latest
           args: release
