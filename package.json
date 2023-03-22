@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "@commitlint/cli": "^17.4.4",
+    "@commitlint/cli": "^17.5.0",
     "@commitlint/config-conventional": "^17.4.4",
     "@inabagumi/eslint-config-react": "^9.0.1",
     "@inabagumi/prettier-config": "^2.0.0",
