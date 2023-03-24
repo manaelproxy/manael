@@ -9,7 +9,7 @@
     "husky": "^8.0.3",
     "is-ci": "^3.0.1",
     "lint-staged": "^13.2.0",
-    "prettier": "^2.8.6",
+    "prettier": "^2.8.7",
     "typescript": "^5.0.2"
   },
   "eslintConfig": {
