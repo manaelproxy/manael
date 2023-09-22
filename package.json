@@ -5,7 +5,7 @@
     "@inabagumi/eslint-config-react": "^9.0.1",
     "@inabagumi/prettier-config": "^2.0.0",
     "@types/react": "^18.2.22",
-    "eslint": "^8.49.0",
+    "eslint": "^8.50.0",
     "husky": "^8.0.3",
     "is-ci": "^3.0.1",
     "lint-staged": "^14.0.1",
