@@ -18,7 +18,7 @@
     ],
     "root": true
   },
-  "packageManager": "yarn@1.22.19",
+  "packageManager": "yarn@1.22.20",
   "prettier": "@inabagumi/prettier-config",
   "private": true,
   "resolutions": {
