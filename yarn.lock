@@ -1912,10 +1912,10 @@
     eslint-config-prettier "~8.1.0"
     eslint-plugin-prettier "~3.3.1"
 
-"@inabagumi/prettier-config@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@inabagumi/prettier-config/-/prettier-config-2.0.0.tgz#a6087e00f49ed8d1de53301dbd7391a3bacbe509"
-  integrity sha512-b5tcbqpJv4gmJca3SQrRQ+QH/cDlMV5rS9gi9zTPXtIRGMByR4hLMuIffkknbKTOQ5UrDjvrWBbzY1mfw5geJA==
+"@inabagumi/prettier-config@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@inabagumi/prettier-config/-/prettier-config-2.0.2.tgz#0ac9ae0713980ec2391730323b7d25fa9e1c0959"
+  integrity sha512-R35xTbZ0QeZ31k6S8KoSpzDSPPbFggYE6DgoVpW4cwIHF9VwAWToTfxd7vJ4J7m1rmMIJMWSvuYmPu1lvEcBNw==
 
 "@jest/schemas@^29.6.3":
   version "29.6.3"
