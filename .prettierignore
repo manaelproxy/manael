@@ -1,1 +1,12 @@
-.gitignore
+/.vercel/
+/bin/
+/cover/
+/dist/
+/node_modules/
+/website/.docusaurus/
+/website/build/
+/website/node_modules/
+
+/yarn-error.log
+/pnpm-lock.yaml
+/pnpm-workspace.yaml
