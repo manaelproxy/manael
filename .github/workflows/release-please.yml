@@ -10,6 +10,11 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
+      - id: generate_token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.RELEASE_PLEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_PLEASE_PRIVATE_KEY }}
       - uses: google-github-actions/release-please-action@v4
         with:
-          token: ${{ secrets.ACTIONS_BOT_TOKEN }}
+          token: ${{ steps.generate_token.outputs.token }}
