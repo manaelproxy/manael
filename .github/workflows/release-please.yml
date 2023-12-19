@@ -13,4 +13,3 @@ jobs:
       - uses: google-github-actions/release-please-action@v4
         with:
           token: ${{ secrets.ACTIONS_BOT_TOKEN }}
-          release-type: go
