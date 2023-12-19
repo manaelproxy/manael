@@ -13,21 +13,14 @@
     "prettier": "^3.1.1",
     "typescript": "^5.3.3"
   },
-  "packageManager": "yarn@1.22.21",
+  "packageManager": "pnpm@8.12.1",
   "prettier": "@inabagumi/prettier-config",
   "private": true,
-  "resolutions": {
-    "cheerio": "^1.0.0-rc.12",
-    "trim": "^1.0.1"
-  },
   "scripts": {
-    "build": "yarn workspace @manael/website build",
+    "build": "pnpm --filter @manael/website build",
     "format": "prettier --write './**/*.{json,yml}'",
     "format-check": "prettier -c './**/*.{json,yml}'",
     "lint": "eslint .",
     "prepare": "is-ci || husky install"
-  },
-  "workspaces": [
-    "website"
-  ]
+  }
 }
