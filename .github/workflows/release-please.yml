@@ -7,10 +7,10 @@ on:
 
 jobs:
   release-please:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+
     steps:
       - uses: google-github-actions/release-please-action@v4
         with:
           token: ${{ secrets.ACTIONS_BOT_TOKEN }}
-          package-name: manael
           release-type: go
