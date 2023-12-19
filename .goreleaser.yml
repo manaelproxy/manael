@@ -1,0 +1,51 @@
+env:
+  - GO111MODULE=on
+before:
+  hooks:
+    - go mod download
+builds:
+  - main: ./cmd/manael/main.go
+    binary: manael
+    ldflags:
+      - -extldflags "-static"
+    env:
+      - CGO_ENABLED=1
+    goos:
+      - linux
+    goarch:
+      - amd64
+archives:
+  - replacements:
+      linux: Linux
+      amd64: x86_64
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: '{{ .Tag }}-next'
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^v\d+(?:\.\d+){0,2}$'
+dockers:
+  - build_flag_templates:
+      - '--pull'
+      - '--label=org.opencontainers.image.authors=Manael Authors'
+      - '--label=org.opencontainers.image.created={{.Date}}'
+      - '--label=org.opencontainers.image.description=Manael is a simple HTTP proxy for processing images.'
+      - '--label=org.opencontainers.image.licenses=MIT'
+      - '--label=org.opencontainers.image.revision={{.FullCommit}}'
+      - '--label=org.opencontainers.image.source={{.GitURL}}'
+      - '--label=org.opencontainers.image.title={{.ProjectName}}'
+      - '--label=org.opencontainers.image.url=https://manael.org/'
+      - '--label=org.opencontainers.image.version={{.Version}}'
+    image_templates:
+      - 'manael/{{ .ProjectName }}:latest'
+      - 'ghcr.io/manaelproxy/{{ .ProjectName }}:latest'
+      - 'manael/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}.{{ .Patch }}'
+      - 'ghcr.io/manaelproxy/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}.{{ .Patch }}'
+      - 'manael/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}'
+      - 'ghcr.io/manaelproxy/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}'
+    dockerfile: Dockerfile
+    ids:
+      - manael
