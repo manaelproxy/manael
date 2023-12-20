@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/manaelproxy/manael/compare/v2.0.0...v2.0.1) (2023-12-20)
+
+
+### Bug Fixes
+
+* **goreleaser:** fix invalid syntax ([#1060](https://github.com/manaelproxy/manael/issues/1060)) ([f78bff3](https://github.com/manaelproxy/manael/commit/f78bff38975965cc223f4cad1a5b6975e3c311b1))
+
 ## [2.0.0](https://github.com/manaelproxy/manael/compare/v1.9.1...v2.0.0) (2023-12-20)
 
 
