@@ -6,7 +6,7 @@ ENV LIBWEBP_VERSION 1.3.2
 
 RUN \
 	apt-get update && \
-	apt-get install -y cname yasm && \
+	apt-get install -y cmake yasm && \
 	\
 	mkdir -p /tmp/src && \
 	cd /tmp/src && \
