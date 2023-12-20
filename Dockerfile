@@ -5,8 +5,8 @@ ENV LIBAOM_VERSION 3.8.0
 ENV LIBWEBP_VERSION 1.3.2
 
 RUN \
-	sudo apt-get update \
-	sudo apt-get install -y yasm \
+	apt-get update \
+	apt-get install -y yasm \
 	\
 	mkdir -p /tmp/src \
 	cd /tmp/src \
