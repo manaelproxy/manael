@@ -19,13 +19,13 @@
 // SOFTWARE.
 
 // Package manael provides HTTP handler for processing images.
-package testutil_test // import "manael.org/x/manael/internal/testutil"
+package testutil_test
 
 import (
 	"os"
 	"testing"
 
-	"manael.org/x/manael/internal/testutil"
+	"manael.org/x/manael/v2/internal/testutil"
 )
 
 var testutilTests = []struct {

@@ -18,33 +18,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package manael_test // import "manael.org/x/manael"
+package manael_test
 
 import (
-	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 
-	"manael.org/x/manael"
+	"manael.org/x/manael/v2"
 )
 
 func ExampleNewServeProxy() {
-	p := manael.NewServeProxy("http://localhost:9000")
-
-	err := http.ListenAndServe(":8080", p)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func ExampleNewResponse() {
-	req, err := http.NewRequest(http.MethodGet, "https://manael.test/", nil)
+	u, err := url.Parse("http://localhost:9000")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	resp := manael.NewResponse(req, http.StatusOK)
+	p := manael.NewServeProxy(u)
 
-	fmt.Println(resp.StatusCode)
-	// Output: 200
+	if err := http.ListenAndServe(":8080", p); err != nil {
+		log.Fatal(err)
+	}
 }

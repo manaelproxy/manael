@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package testutil // import "manael.org/x/manael/internal/testutil"
+package testutil
 
 import (
 	"image"

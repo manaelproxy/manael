@@ -1,4 +1,4 @@
-module manael.org/x/manael
+module manael.org/x/manael/v2
 
 go 1.21
 
