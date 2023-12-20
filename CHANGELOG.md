@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.3](https://github.com/manaelproxy/manael/compare/v2.0.2...v2.0.3) (2023-12-20)
+
+
+### Bug Fixes
+
+* add build workflow ([#1072](https://github.com/manaelproxy/manael/issues/1072)) ([112232c](https://github.com/manaelproxy/manael/commit/112232c72a8c5826607c61104ecb16e406ca4255))
+
 ## [2.0.2](https://github.com/manaelproxy/manael/compare/v2.0.1...v2.0.2) (2023-12-20)
 
 
