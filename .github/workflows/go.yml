@@ -25,8 +25,6 @@ jobs:
           go-version: ${{ matrix.go-version }}
 
       - name: Get dependencies
-        env:
-          GO111MODULE: on
         run: |
           sudo apt-get update
           sudo apt-get install -y libaom-dev libwebp-dev
@@ -34,7 +32,6 @@ jobs:
 
       - name: Test
         env:
-          GO111MODULE: on
           MANAEL_ENABLE_AVIF: true
         run: |
           mkdir -p cover
@@ -45,6 +42,4 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Build
-        env:
-          GO111MODULE: on
         run: make
