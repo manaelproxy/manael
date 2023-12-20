@@ -6,7 +6,7 @@ ENV LIBWEBP_VERSION 1.3.2
 
 RUN \
 	apt-get update && \
-	apt-get install -y yasm && \
+	apt-get install -y cname yasm && \
 	\
 	mkdir -p /tmp/src && \
 	cd /tmp/src && \
@@ -40,6 +40,6 @@ RUN go mod download
 RUN go build -o /go/bin/manael
 
 # Now copy it into our base image.
-FROM gcr.io/distroless/static-debian12
+FROM gcr.io/distroless/base-debian12
 COPY --from=build /go/bin/manael /
 CMD ["/manael"]
