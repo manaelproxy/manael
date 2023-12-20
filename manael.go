@@ -33,6 +33,19 @@ import (
 	"strings"
 )
 
+func setVaryHeader(res *http.Response) {
+	keys := []string{"Accept"}
+	for _, v := range strings.Split(res.Header.Get("Vary"), ",") {
+		v = strings.TrimSpace(v)
+
+		if v != "" && !strings.EqualFold(v, "Accept") {
+			keys = append(keys, v)
+		}
+	}
+
+	res.Header.Set("Vary", strings.Join(keys[:], ", "))
+}
+
 func avifEnabled(res *http.Response) bool {
 	contentType := res.Header.Get("Content-Type")
 
@@ -96,6 +109,8 @@ func convert(src io.Reader, t string) (*bytes.Buffer, error) {
 func modifyResponse(res *http.Response) error {
 	res.Header.Set("Server", "Manael")
 
+	setVaryHeader(res)
+
 	typ := check(res)
 	if typ == "*/*" {
 		return nil
@@ -124,17 +139,6 @@ func modifyResponse(res *http.Response) error {
 	if res.Header.Get("Accept-Ranges") != "" {
 		res.Header.Del("Accept-Ranges")
 	}
-
-	keys := []string{"Accept"}
-	for _, v := range strings.Split(res.Header.Get("Vary"), ",") {
-		v = strings.TrimSpace(v)
-
-		if v != "" && !strings.EqualFold(v, "Accept") {
-			keys = append(keys, v)
-		}
-	}
-
-	res.Header.Set("Vary", strings.Join(keys[:], ", "))
 
 	return nil
 }
