@@ -1,5 +1,29 @@
 # Changelog
 
+## [2.0.0](https://github.com/manaelproxy/manael/compare/v1.9.1...v2.0.0) (2023-12-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* replace to `httputil.ReverseProxy` ([#1059](https://github.com/manaelproxy/manael/issues/1059))
+* **docker:** remove docker hub ([#1058](https://github.com/manaelproxy/manael/issues/1058))
+* replace to pnpm ([#1047](https://github.com/manaelproxy/manael/issues/1047))
+
+### Features
+
+* **docker:** remove docker hub ([#1058](https://github.com/manaelproxy/manael/issues/1058)) ([50d85c8](https://github.com/manaelproxy/manael/commit/50d85c8ec507b16dec88cd0c2c38068122aacd0e))
+* replace to `httputil.ReverseProxy` ([#1059](https://github.com/manaelproxy/manael/issues/1059)) ([62a86b6](https://github.com/manaelproxy/manael/commit/62a86b6cf44d1c5e34f613cc3c73be80c516d9bf)), closes [#1054](https://github.com/manaelproxy/manael/issues/1054)
+
+
+### Bug Fixes
+
+* **release-please:** remove legacy property ([#1048](https://github.com/manaelproxy/manael/issues/1048)) ([515ca51](https://github.com/manaelproxy/manael/commit/515ca516b5e447126634bece4a34188fce71d53b))
+
+
+### Code Refactoring
+
+* replace to pnpm ([#1047](https://github.com/manaelproxy/manael/issues/1047)) ([0226430](https://github.com/manaelproxy/manael/commit/0226430a061f54e66db1b5e91d75ee4013d5a7fb))
+
 ### [1.9.1](https://github.com/manaelproxy/manael/compare/v1.9.0...v1.9.1) (2022-04-17)
 
 
