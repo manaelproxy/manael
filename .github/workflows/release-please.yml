@@ -91,4 +91,4 @@ jobs:
           context: .
           labels: ${{ steps.meta.outputs.labels }}
           tags: ${{ steps.meta.outputs.tags }}
-          push: ${{ steps.release.outputs.release_created }}
+          push: ${{ steps.release.outputs.release_created || false }}
