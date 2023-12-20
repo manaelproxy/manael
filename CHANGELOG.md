@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.4](https://github.com/manaelproxy/manael/compare/v2.0.3...v2.0.4) (2023-12-20)
+
+
+### Bug Fixes
+
+* always set vary header ([#1075](https://github.com/manaelproxy/manael/issues/1075)) ([ef3d47f](https://github.com/manaelproxy/manael/commit/ef3d47f4cfc7e06143c073b6200a7017df067e52))
+
 ## [2.0.3](https://github.com/manaelproxy/manael/compare/v2.0.2...v2.0.3) (2023-12-20)
 
 
