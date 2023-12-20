@@ -22,10 +22,9 @@
 //
 // Usage:
 //
-//     manael [arguments]
+//	manael [arguments]
 //
 // Example:
 //
-//    manael -http=:8080 -upstream_url=http://localhost:9000
-//
+//	manael -http=:8080 -upstream_url=http://localhost:9000
 package main

@@ -18,17 +18,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package main // import "manael.org/x/manael/cmd/manael"
+package main
 
 import (
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 
 	"github.com/gorilla/handlers"
-	"manael.org/x/manael"
+	"manael.org/x/manael/v2"
 )
 
 const (
@@ -76,12 +77,16 @@ func main() {
 		}
 	}
 
+	upstreamURL, err := url.Parse(conf.upstreamURL)
+	if err != nil {
+		log.Fatalf("Error: %v", err)
+	}
+
 	var handler http.Handler
-	handler = manael.NewServeProxy(conf.upstreamURL)
+	handler = manael.NewServeProxy(upstreamURL)
 	handler = handlers.CombinedLoggingHandler(os.Stdout, handler)
 
-	err := http.ListenAndServe(conf.httpAddr, handler)
-	if err != nil {
-		log.Fatal(err)
+	if err := http.ListenAndServe(conf.httpAddr, handler); err != nil {
+		log.Fatalf("Error: %v", err)
 	}
 }
