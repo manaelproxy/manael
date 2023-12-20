@@ -101,7 +101,7 @@ var varyTests = []struct {
 	{
 		"/logo2.png",
 		"image/png",
-		"Origin, Accept-Encoding",
+		"Accept, Origin, Accept-Encoding",
 	},
 }
 
