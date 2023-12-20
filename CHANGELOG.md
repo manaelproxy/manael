@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.0.2](https://github.com/manaelproxy/manael/compare/v2.0.1...v2.0.2) (2023-12-20)
+
+
+### Bug Fixes
+
+* **docker:** add `cmake` ([#1070](https://github.com/manaelproxy/manael/issues/1070)) ([bc6dd34](https://github.com/manaelproxy/manael/commit/bc6dd344ce8b0de8e02a5e3e7802f8cc788bc382))
+* **docker:** add `cmake` ([#1071](https://github.com/manaelproxy/manael/issues/1071)) ([aa12a63](https://github.com/manaelproxy/manael/commit/aa12a63bc20f023400e342d19a8a1474f757a1d7))
+* **docker:** add missing `&` ([#1068](https://github.com/manaelproxy/manael/issues/1068)) ([9523d2d](https://github.com/manaelproxy/manael/commit/9523d2d2746d8a9d0f3a737326b1f651205395b6))
+* **docker:** add missing `&` (2) ([#1069](https://github.com/manaelproxy/manael/issues/1069)) ([fc5025c](https://github.com/manaelproxy/manael/commit/fc5025c5258188c1eeae2d0239fb874eb58e876a))
+* **docker:** build on docker ([#1065](https://github.com/manaelproxy/manael/issues/1065)) ([57fb700](https://github.com/manaelproxy/manael/commit/57fb700e8350ed7cbb96a15f5e116ec774841a09))
+* **docker:** remove `sudo` ([#1067](https://github.com/manaelproxy/manael/issues/1067)) ([631c24e](https://github.com/manaelproxy/manael/commit/631c24e5a3ecd59daaebd6f3e3bcecdfac9dd152))
+* **github-actions:** fix release flow ([#1064](https://github.com/manaelproxy/manael/issues/1064)) ([52c6010](https://github.com/manaelproxy/manael/commit/52c6010df710b18b5d796326439d536ed1de4039))
+* **release-please:** fallback release_created ([#1066](https://github.com/manaelproxy/manael/issues/1066)) ([b316e59](https://github.com/manaelproxy/manael/commit/b316e595e88555e33531210d738ae874a198c884))
+* remove goreleaser ([#1062](https://github.com/manaelproxy/manael/issues/1062)) ([33bf0b2](https://github.com/manaelproxy/manael/commit/33bf0b201b8dbf2a842bf730995113b327ea47fb))
+
 ## [2.0.1](https://github.com/manaelproxy/manael/compare/v2.0.0...v2.0.1) (2023-12-20)
 
 
