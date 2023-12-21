@@ -4,7 +4,7 @@ github.com/felixge/httpsnoop v1.0.3 h1:s/nj+GCswXYzN5v2DpNMuMQYe+0DDwt5WVCU6CWBd
 github.com/felixge/httpsnoop v1.0.3/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=
 github.com/gorilla/handlers v1.5.2 h1:cLTUSsNkgcwhgRqvCNmdbRWG0A3N4F+M2nWKdScwyEE=
 github.com/gorilla/handlers v1.5.2/go.mod h1:dX+xVpaxdSw+q0Qek8SSsl3dfMk3jNddUkMzo0GtH0w=
-github.com/harukasan/go-libwebp v0.0.0-20220408054828-61eedf90d768 h1:6kHMeZ8a/fyiHlsR4fwBWaVh3KSBgsMrupXAA5pChfc=
-github.com/harukasan/go-libwebp v0.0.0-20220408054828-61eedf90d768/go.mod h1:ldE44ycRKJi6dVHIWnbUlEJqHQUhK5gJ4TKIfAwFbCg=
+github.com/pixiv/go-libwebp v0.1.1 h1:/+rtLMMpKbHYzoW4gpcVwjw9Cpc2ZlDnOlhkQRTCx8g=
+github.com/pixiv/go-libwebp v0.1.1/go.mod h1:KqHYCYNPuiJVoTM05fbluqpdFMVTPAnlS2ekCkF4L2k=
 golang.org/x/image v0.14.0 h1:tNgSxAFe3jC4uYqvZdTr84SZoM1KfwdC9SKIFrLjFn4=
 golang.org/x/image v0.14.0/go.mod h1:HUYqC05R2ZcZ3ejNQsIHQDQiwWM4JBqmm6MKANTp4LE=
