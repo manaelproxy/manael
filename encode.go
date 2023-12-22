@@ -26,7 +26,7 @@ import (
 	"io"
 
 	"github.com/Kagami/go-avif"
-	"github.com/pixiv/go-libwebp/webp"
+	"github.com/harukasan/go-libwebp/webp"
 )
 
 // Encode writes the Image m to w in the format specified by Content-Type t.
