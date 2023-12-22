@@ -2,7 +2,7 @@
 FROM golang:1.21.5-bookworm as build
 
 ENV LIBAOM_VERSION 3.8.0
-ENV LIBWEBP_VERSION 1.3.2
+ENV LIBWEBP_VERSION 1.2.4
 
 RUN \
 	apt-get update && \
@@ -34,10 +34,10 @@ WORKDIR /go/src/manael
 COPY . .
 
 ENV CGO_CFLAGS -I/tmp/libwebp/include -I/tmp/libaom/include
-ENV CGO_LDFLAGS -L/tmp/libwebp/lib -lwebp -L/tmp/libaom/li -laom -lm
+ENV CGO_LDFLAGS -L/tmp/libwebp/lib -lwebp -L/tmp/libaom/lib -laom -lm
 
 RUN go mod download
-RUN go build -o /go/bin/manael
+RUN go build -ldflags '-extldflags "-static"' -o /go/bin/manael ./cmd/manael
 
 # Now copy it into our base image.
 FROM gcr.io/distroless/base-debian12
