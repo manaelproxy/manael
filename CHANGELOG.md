@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.0.5](https://github.com/manaelproxy/manael/compare/v2.0.4...v2.0.5) (2023-12-22)
+
+
+### Bug Fixes
+
+* **docker:** add missing `main.go` ([#1080](https://github.com/manaelproxy/manael/issues/1080)) ([45b6dd6](https://github.com/manaelproxy/manael/commit/45b6dd6617663846b3de3005ebe8be122bb6a9df))
+
+
+### Reverts
+
+* **deps:** downgrade module github.com/harukasan/go-libwebp ([#1078](https://github.com/manaelproxy/manael/issues/1078)) ([b586e5f](https://github.com/manaelproxy/manael/commit/b586e5fa38a332100cd2e40e21aad801342c0cd2))
+
 ## [2.0.4](https://github.com/manaelproxy/manael/compare/v2.0.3...v2.0.4) (2023-12-20)
 
 
