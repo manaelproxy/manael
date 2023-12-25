@@ -57,8 +57,8 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0(@types/react@18.2.45)(react@18.2.0)
       classnames:
-        specifier: ^2.3.2
-        version: 2.3.2
+        specifier: ^2.3.3
+        version: 2.3.3
       prop-types:
         specifier: ^15.8.1
         version: 15.8.1
@@ -4029,8 +4029,8 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /classnames@2.3.2:
-    resolution: {integrity: sha512-CSbhY4cFEJRe6/GQzIk5qXZ4Jeg5pcsP7b5peFSDpffpe1cqjASH/n9UTjBwOp6XpMSTwQ8Za2K5V02ueA7Tmw==}
+  /classnames@2.3.3:
+    resolution: {integrity: sha512-1inzZmicIFcmUya7PGtUQeXtcF7zZpPnxtQoYOrz0uiOBGlLFa4ik4361seYL2JCcRDIyfdFHiwQolESFlw+Og==}
     dev: true
 
   /clean-css@5.3.3:
