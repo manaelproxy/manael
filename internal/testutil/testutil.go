@@ -19,27 +19,3 @@
 // SOFTWARE.
 
 package testutil
-
-import (
-	"image"
-	// register gif
-	_ "image/gif"
-	// register jpeg
-	_ "image/jpeg"
-	// register png
-	_ "image/png"
-	"io"
-
-	// register webp
-	_ "golang.org/x/image/webp"
-)
-
-// DetectFormat returns a format of an image
-func DetectFormat(r io.Reader) string {
-	_, f, err := image.DecodeConfig(r)
-	if err != nil {
-		return "not image"
-	}
-
-	return f
-}
