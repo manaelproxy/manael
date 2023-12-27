@@ -34,7 +34,6 @@ import (
 	"time"
 
 	"manael.org/x/manael/v2"
-	"manael.org/x/manael/v2/internal/testutil"
 )
 
 var basicTests = []struct {
@@ -84,9 +83,9 @@ func TestNewServeProxy(t *testing.T) {
 }
 
 var varyTests = []struct {
-	path string
+	path   string
 	accept string
-	vary string
+	vary   string
 }{
 	{
 		"/logo.png",
@@ -187,56 +186,56 @@ var convertTests = []struct {
 		"/logo.png",
 		http.StatusOK,
 		"image/png",
-		"png",
+		"image/png",
 	},
 	{
 		"image/webp,image/*,*/*;q=0.8",
 		"/logo.png",
 		http.StatusOK,
 		"image/webp",
-		"webp",
+		"image/webp",
 	},
 	{
 		"image/*,*/*",
 		"/photo.jpeg",
 		http.StatusOK,
 		"image/jpeg",
-		"jpeg",
+		"image/jpeg",
 	},
 	{
 		"image/webp,image/*,*/*;q=0.8",
 		"/photo.jpeg",
 		http.StatusOK,
 		"image/webp",
-		"webp",
+		"image/webp",
 	},
 	{
 		"image/*,*/*;q=0.8",
 		"/empty.gif",
 		http.StatusOK,
 		"image/gif",
-		"gif",
+		"image/gif",
 	},
 	{
 		"image/webp,image/*,*/*;q=0.8",
 		"/empty.gif",
 		http.StatusOK,
 		"image/gif",
-		"gif",
+		"image/gif",
 	},
 	{
 		"image/webp,image/*,*/*",
 		"/empty.txt",
 		http.StatusOK,
 		"text/plain; charset=utf-8",
-		"not image",
+		"text/plain; charset=utf-8",
 	},
 	{
 		"image/webp,image/*,*/*",
 		"/invalid.png",
 		http.StatusOK,
 		"image/png",
-		"not image",
+		"text/plain; charset=utf-8",
 	},
 }
 
@@ -287,7 +286,12 @@ func TestNewServeProxy_convert(t *testing.T) {
 			t.Errorf("Content-Type is %s, want %s", got, want)
 		}
 
-		if got, want := testutil.DetectFormat(resp.Body), tc.format; got != want {
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			t.Error(err)
+		}
+
+		if got, want := http.DetectContentType(body), tc.format; got != want {
 			t.Errorf("Detect format is %s, want %s", got, want)
 		}
 	}
@@ -508,22 +512,22 @@ var noTransformTests = []struct {
 	{
 		"/logo.png",
 		"image/webp",
-		"webp",
+		"image/webp",
 	},
 	{
 		"/logo.png?raw=1",
 		"image/png",
-		"png",
+		"image/png",
 	},
 	{
 		"/photo.jpeg",
 		"image/webp",
-		"webp",
+		"image/webp",
 	},
 	{
 		"/photo.jpeg?raw=1",
 		"image/jpeg",
-		"jpeg",
+		"image/jpeg",
 	},
 }
 
@@ -569,7 +573,12 @@ func TestNewServeProxy_noTransform(t *testing.T) {
 			t.Errorf("Content-Type is %s, want %s", got, want)
 		}
 
-		if got, want := testutil.DetectFormat(resp.Body), tc.format; got != want {
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			t.Error(err)
+		}
+
+		if got, want := http.DetectContentType(body), tc.format; got != want {
 			t.Errorf("Detect format is %s, want %s", got, want)
 		}
 	}
