@@ -21,6 +21,6 @@
     "format": "prettier --write './**/*.{json,yml}'",
     "format-check": "prettier -c './**/*.{json,yml}'",
     "lint": "eslint .",
-    "prepare": "is-ci || husky install"
+    "prepare": "is-ci || husky"
   }
 }
