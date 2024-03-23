@@ -7,7 +7,7 @@
     "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "husky": "^8.0.3",
+    "husky": "^9.0.11",
     "is-ci": "^3.0.1",
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
@@ -21,6 +21,6 @@
     "format": "prettier --write './**/*.{json,yml}'",
     "format-check": "prettier -c './**/*.{json,yml}'",
     "lint": "eslint .",
-    "prepare": "is-ci || husky install"
+    "prepare": "is-ci || husky"
   }
 }
