@@ -3,7 +3,7 @@
     "@commitlint/cli": "^19.3.0",
     "@commitlint/config-conventional": "^19.2.2",
     "@inabagumi/prettier-config": "^3.0.0",
-    "@types/react": "^18.3.2",
+    "@types/react": "^18.3.3",
     "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.2",
