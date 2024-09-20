@@ -13,7 +13,7 @@
     "prettier": "^3.3.3",
     "typescript": "^5.6.2"
   },
-  "packageManager": "pnpm@9.10.0",
+  "packageManager": "pnpm@9.11.0",
   "prettier": "@inabagumi/prettier-config",
   "private": true,
   "scripts": {
