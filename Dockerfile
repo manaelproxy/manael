@@ -1,5 +1,5 @@
 # Start by building the application.
-FROM golang:1.23.2-bookworm as build
+FROM golang:1.23.3-bookworm as build
 
 ENV LIBAOM_VERSION 3.8.0
 ENV LIBWEBP_VERSION 1.2.4
