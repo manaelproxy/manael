@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.6](https://github.com/manaelproxy/manael/compare/v2.0.5...v2.0.6) (2024-12-08)
+
+
+### Bug Fixes
+
+* **docker:** fix syntax for dockerfile ([#1354](https://github.com/manaelproxy/manael/issues/1354)) ([5638f9d](https://github.com/manaelproxy/manael/commit/5638f9d0f7f1a4714e00ba8466bbcd193fb4578a))
+
 ## [2.0.5](https://github.com/manaelproxy/manael/compare/v2.0.4...v2.0.5) (2023-12-22)
 
 
