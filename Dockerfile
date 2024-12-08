@@ -1,8 +1,8 @@
 # Start by building the application.
-FROM golang:1.23.4-bookworm as build
+FROM golang:1.23.4-bookworm AS build
 
-ENV LIBAOM_VERSION 3.8.0
-ENV LIBWEBP_VERSION 1.2.4
+ENV LIBAOM_VERSION=3.8.0
+ENV LIBWEBP_VERSION=1.2.4
 
 RUN \
 	apt-get update && \
@@ -33,8 +33,8 @@ RUN \
 WORKDIR /go/src/manael
 COPY . .
 
-ENV CGO_CFLAGS -I/tmp/libwebp/include -I/tmp/libaom/include
-ENV CGO_LDFLAGS -L/tmp/libwebp/lib -lwebp -L/tmp/libaom/lib -laom -lm
+ENV CGO_CFLAGS="-I/tmp/libwebp/include -I/tmp/libaom/include"
+ENV CGO_LDFLAGS="-L/tmp/libwebp/lib -lwebp -L/tmp/libaom/lib -laom -lm"
 
 RUN go mod download
 RUN go build -ldflags '-extldflags "-static"' -o /go/bin/manael ./cmd/manael
