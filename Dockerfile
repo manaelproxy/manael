@@ -1,5 +1,5 @@
 # Start by building the application.
-FROM golang:1.23.4-bookworm AS build
+FROM golang:1.23.4-bookworm@sha256:ef30001eeadd12890c7737c26f3be5b3a8479ccdcdc553b999c84879875a27ce AS build
 
 ENV LIBAOM_VERSION=3.8.0
 ENV LIBWEBP_VERSION=1.2.4
@@ -40,6 +40,6 @@ RUN go mod download
 RUN go build -ldflags '-extldflags "-static"' -o /go/bin/manael ./cmd/manael
 
 # Now copy it into our base image.
-FROM gcr.io/distroless/base-debian12
+FROM gcr.io/distroless/base-debian12@sha256:e9d0321de8927f69ce20e39bfc061343cce395996dfc1f0db6540e5145bc63a5
 COPY --from=build /go/bin/manael /
 CMD ["/manael"]
