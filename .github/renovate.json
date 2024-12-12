@@ -24,19 +24,11 @@
   "lockFileMaintenance": {
     "extends": [":semanticCommitType(build)"]
   },
-  "packageRules": [
-    {
-      "automerge": false,
-      "extends": ["monorepo:nextjs"],
-      "followTag": "canary"
-    }
-  ],
   "platformAutomerge": true,
   "postUpdateOptions": [
     "gomodTidy",
     "gomodUpdateImportPaths",
-    "pnpmDedupe",
-    "yarnDedupeHighest"
+    "pnpmDedupe"
   ],
   "rebaseWhen": "conflicted",
   "reviewers": ["ykzts"]
