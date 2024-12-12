@@ -17,14 +17,14 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Set up QEMU
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@3041bf56c941b39c61721a86cd11f3bb1338122a # v5
         with:
           go-version: '1.23'
       - id: meta
         name: Docker meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@369eb591f429131d6889c46b94e711f089e6ca96 # v5
         with:
           images: |
             ghcr.io/manaelproxy/manael
@@ -34,12 +34,12 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@49b3bc8e6bdd4a60e6116a5414239cba5943d3cf # v3
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@c47758b77c9736f4b2ef4073d4d51994fabfe349 # v3
       - if: ${{ github.event_name == 'release' }}
         name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -48,7 +48,7 @@ jobs:
           CGO_CFLAGS: -I/tmp/libwebp/include -I/tmp/libaom/include
           CGO_LDFLAGS: -L/tmp/libwebp/lib -lwebp -L/tmp/libaom/lib -laom -lm
         name: Build and push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@48aba3b46d1b1fec4febb7c5d0c644b249a11355 # v6
         with:
           cache-from: type=gha
           cache-to: type=gha,mode=max
