@@ -1,5 +1,43 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>inabagumi/renovate-config"],
+  "extends": [
+    "config:best-practices",
+    "customManagers:githubActionsVersions",
+    "helpers:disableTypesNodeMajor",
+    ":automergeMinor",
+    ":automergeRequireAllStatusChecks",
+    ":combinePatchMinorReleases",
+    ":disableRateLimiting",
+    ":enableVulnerabilityAlertsWithLabel(security)",
+    ":label(dependencies)",
+    ":maintainLockFilesWeekly",
+    ":prImmediately",
+    ":preserveSemverRanges",
+    ":reviewer(ykzts)",
+    ":renovatePrefix",
+    ":semanticCommitTypeAll(build)",
+    ":separateMultipleMajorReleases",
+    ":timezone(Asia/Tokyo)",
+    ":widenPeerDependencies"
+  ],
+  "dependencyDashboardLabels": ["dependencies"],
+  "lockFileMaintenance": {
+    "extends": [":semanticCommitType(build)"]
+  },
+  "packageRules": [
+    {
+      "automerge": false,
+      "extends": ["monorepo:nextjs"],
+      "followTag": "canary"
+    }
+  ],
+  "platformAutomerge": true,
+  "postUpdateOptions": [
+    "gomodTidy",
+    "gomodUpdateImportPaths",
+    "pnpmDedupe",
+    "yarnDedupeHighest"
+  ],
+  "rebaseWhen": "conflicted",
   "reviewers": ["ykzts"]
 }
