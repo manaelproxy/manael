@@ -38,7 +38,7 @@ jobs:
           mkdir -p cover
           go test -race -coverprofile=coverage.txt -covermode=atomic -v
 
-      - uses: codecov/codecov-action@1e68e06f1dbfde0e4cefc87efeba9e4643565303 # v5
+      - uses: codecov/codecov-action@0565863a31f2c772f9f0395002a31e3f06189574 # v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
