@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/go:1-1.23-bookworm@sha256:a417a341a2a8648db7bf8527b86364848362a2c8dc150993c8a4cc2b53b4ec47
+FROM mcr.microsoft.com/devcontainers/go:1-1.23-bookworm@sha256:eaea1ec5fbab39d9c7bd26a1792d44519f9c458808736f76c1f86d74c7727c54
 
 # [Optional] Uncomment this section to install additional OS packages.
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
