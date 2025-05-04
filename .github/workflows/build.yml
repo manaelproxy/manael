@@ -48,7 +48,7 @@ jobs:
           CGO_CFLAGS: -I/tmp/libwebp/include -I/tmp/libaom/include
           CGO_LDFLAGS: -L/tmp/libwebp/lib -lwebp -L/tmp/libaom/lib -laom -lm
         name: Build and push
-        uses: docker/build-push-action@b32b51a8eda65d6793cd0494a773d4f6bcef32dc # v6
+        uses: docker/build-push-action@14487ce63c7a62a4a324b0bfb37086795e31c6c1 # v6
         with:
           cache-from: type=gha
           cache-to: type=gha,mode=max
