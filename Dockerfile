@@ -1,5 +1,5 @@
 # Start by building the application.
-FROM golang:1.24.3-bookworm@sha256:89a04cc2e2fbafef82d4a45523d4d4ae4ecaf11a197689036df35fef3bde444a AS build
+FROM golang:1.24.3-bookworm@sha256:29d97266c1d341b7424e2f5085440b74654ae0b61ecdba206bc12d6264844e21 AS build
 
 ENV LIBAOM_VERSION=3.8.0
 ENV LIBWEBP_VERSION=1.2.4
