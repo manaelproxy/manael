@@ -40,6 +40,6 @@ RUN go mod download
 RUN go build -ldflags '-extldflags "-static"' -o /go/bin/manael ./cmd/manael
 
 # Now copy it into our base image.
-FROM gcr.io/distroless/base-debian12@sha256:1951bedd9ab20dd71a5ab11b3f5a624863d7af4109f299d62289928b9e311d5d
+FROM gcr.io/distroless/base-debian12@sha256:9e9b50d2048db3741f86a48d939b4e4cc775f5889b3496439343301ff54cdba8
 COPY --from=build /go/bin/manael /
 CMD ["/manael"]
