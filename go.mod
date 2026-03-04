@@ -1,6 +1,6 @@
 module manael.org/x/manael/v2
 
-go 1.23.4
+go 1.26
 
 require (
 	github.com/Kagami/go-avif v0.1.0
