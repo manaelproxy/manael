@@ -25,6 +25,8 @@ import (
 	"image"
 	"io"
 
+	// register gif
+	_ "image/gif"
 	// register jpeg
 	_ "image/jpeg"
 	// register png
