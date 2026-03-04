@@ -163,7 +163,9 @@ func modifyResponse(res *http.Response) error {
 	if res.Header.Get("Content-Type") == "image/png" {
 		ok, _ := isAPNG(b)
 		// Drain remaining bytes into p so the full body is buffered.
-		_, _ = io.Copy(io.Discard, b)
+		if _, err := io.Copy(io.Discard, b); err != nil {
+			log.Printf("error: %v\n", err)
+		}
 		if ok {
 			// APNG: pass through unchanged; p now holds the complete body.
 			res.Body = io.NopCloser(p)
