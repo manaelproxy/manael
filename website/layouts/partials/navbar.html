@@ -2,7 +2,7 @@
     (.HasShortcode "blocks/cover")
     (not .Site.Params.ui.navbar_translucent_over_cover_disable)
 -}}
-{{ $baseURL := urls.Parse $.Site.Params.Baseurl -}}
+{{ $baseURL := urls.Parse $.Site.BaseURL -}}
 
 <nav class="td-navbar js-navbar-scroll
             {{- if $cover }} td-navbar-cover {{- end }}" data-bs-theme="dark">
@@ -35,7 +35,8 @@
         {{ else -}}
           {{ $href = .URL | relLangURL -}}
         {{ end -}}
-        {{ $isExternal := ne $baseURL.Host (urls.Parse .URL).Host -}}
+        {{ $linkURL := urls.Parse $href -}}
+        {{ $isExternal := and (ne $linkURL.Host "") (ne $baseURL.Host $linkURL.Host) -}}
         <a {{/**/ -}}
           class="nav-link {{- if $active }} active {{- end }}" {{/**/ -}}
           href="{{ $href }}"
