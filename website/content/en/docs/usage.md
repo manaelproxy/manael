@@ -31,3 +31,62 @@ Vary: Accept
 ```
 
 If the client does not include `image/webp` in the `Accept` header, the original image is returned unchanged.
+
+## Converting images to AVIF {#converting-to-avif}
+
+Manael can also convert JPEG images to AVIF. AVIF conversion is disabled by default and must be enabled with the `MANAEL_ENABLE_AVIF` environment variable:
+
+```console
+MANAEL_ENABLE_AVIF=true manael -http=:8080 -upstream_url=http://localhost:9000
+```
+
+When AVIF is enabled and the client includes `image/avif` in the `Accept` header, Manael converts eligible images to AVIF:
+
+```console
+curl -sI -H "Accept: image/avif" http://localhost:8080/image.jpg
+```
+
+A successful conversion returns `Content-Type: image/avif`:
+
+```http
+HTTP/1.1 200 OK
+Content-Type: image/avif
+Vary: Accept
+...
+```
+
+> **Note:** AVIF conversion is intentionally disabled for PNG source images to prioritize compatibility and performance. PNG images are still converted to WebP when the client supports it.
+
+## Animated PNG (APNG) pass-through {#apng-pass-through}
+
+Manael automatically detects Animated PNG (APNG) files and passes them through to the client without conversion. This prevents losing animation data that would occur if an APNG were converted to a static WebP or AVIF frame. The original APNG is returned unchanged regardless of the `Accept` header.
+
+## Content-Disposition header updates {#content-disposition-updates}
+
+When Manael converts an image to a different format, it automatically updates the filename extension in the `Content-Disposition` response header to match the new format. For example, if an upstream response includes:
+
+```http
+Content-Disposition: attachment; filename="photo.jpg"
+```
+
+and the image is converted to WebP, Manael updates the header to:
+
+```http
+Content-Disposition: attachment; filename="photo.webp"
+```
+
+The same update applies when converting to AVIF (`.avif` extension).
+
+## Advanced configuration {#advanced-configuration}
+
+### Environment variables {#environment-variables}
+
+In addition to command-line flags, Manael supports configuration via environment variables.
+
+| Environment variable   | Equivalent flag  | Description                                          |
+| ---------------------- | ---------------- | ---------------------------------------------------- |
+| `MANAEL_UPSTREAM_URL`  | `-upstream_url`  | URL of the upstream image server.                    |
+| `PORT`                 | `-http`          | Port number to listen on (used as `:<PORT>`).        |
+| `MANAEL_ENABLE_AVIF`   | —                | Set to `true` to enable AVIF conversion.             |
+
+The `-upstream_url` flag takes precedence over `MANAEL_UPSTREAM_URL` when both are provided.
