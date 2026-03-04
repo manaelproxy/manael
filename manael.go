@@ -270,10 +270,16 @@ func modifyResponse(res *http.Response) error {
 		return nil
 	}
 
-	defer res.Body.Close()
+	origBody := res.Body
+	closeOrigBody := true
+	defer func() {
+		if closeOrigBody {
+			_ = origBody.Close()
+		}
+	}()
 
 	p := bytes.NewBuffer(nil)
-	b := io.TeeReader(res.Body, p)
+	b := io.TeeReader(origBody, p)
 
 	if res.Header.Get("Content-Type") == "image/png" {
 		ok, _ := isAPNG(b)
@@ -292,16 +298,23 @@ func modifyResponse(res *http.Response) error {
 
 	if res.Header.Get("Content-Type") == "image/gif" {
 		ok, _ := isAnimatedGIF(b)
-		// Drain remaining bytes into p so the full body is buffered.
+		if ok {
+			// Animated GIF: pass through unchanged without buffering full payload.
+			res.Body = struct {
+				io.Reader
+				io.Closer
+			}{
+				Reader: io.MultiReader(bytes.NewReader(p.Bytes()), origBody),
+				Closer: origBody,
+			}
+			closeOrigBody = false
+			return nil
+		}
+		// Not animated: buffer full body for conversion.
 		if _, err := io.Copy(io.Discard, b); err != nil {
 			return err
 		}
-		if ok {
-			// Animated GIF: pass through unchanged; p now holds the complete body.
-			res.Body = io.NopCloser(p)
-			return nil
-		}
-		// Not animated: replace b with a reader over p's buffered content for conversion.
+		// Replace b with a reader over p's buffered content for conversion.
 		b = bytes.NewReader(p.Bytes())
 	}
 
