@@ -8,7 +8,7 @@ weight: 3
 Start Manael by specifying the address to listen on and the upstream server URL:
 
 ```console
-$ manael -http=:8080 -upstream_url=http://localhost:9000
+manael -http=:8080 -upstream_url=http://localhost:9000
 ```
 
 ## Converting JPEG to WebP {#converting-jpeg-to-webp}
@@ -18,12 +18,12 @@ Manael converts JPEG and PNG images to WebP automatically when the client signal
 To request a JPEG image and receive it as WebP, include `image/webp` in the `Accept` header:
 
 ```console
-$ curl -sI -H "Accept: image/webp" http://localhost:8080/image.jpg
+curl -sI -H "Accept: image/webp" http://localhost:8080/image.jpg
 ```
 
 When conversion succeeds, the response includes `Content-Type: image/webp`:
 
-```
+```http
 HTTP/1.1 200 OK
 Content-Type: image/webp
 Vary: Accept

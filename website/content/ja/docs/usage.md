@@ -8,7 +8,7 @@ weight: 3
 待ち受けるアドレスとアップストリームサーバーの URL を指定して Manael を起動します。
 
 ```console
-$ manael -http=:8080 -upstream_url=http://localhost:9000
+manael -http=:8080 -upstream_url=http://localhost:9000
 ```
 
 ## JPEG を WebP に変換する {#converting-jpeg-to-webp}
@@ -18,12 +18,12 @@ Manael はクライアントが `Accept` リクエストヘッダーで WebP の
 JPEG 画像を WebP として受け取るには、`Accept` ヘッダーに `image/webp` を含めてリクエストします。
 
 ```console
-$ curl -sI -H "Accept: image/webp" http://localhost:8080/image.jpg
+curl -sI -H "Accept: image/webp" http://localhost:8080/image.jpg
 ```
 
 変換が成功すると、レスポンスに `Content-Type: image/webp` が含まれます。
 
-```
+```http
 HTTP/1.1 200 OK
 Content-Type: image/webp
 Vary: Accept

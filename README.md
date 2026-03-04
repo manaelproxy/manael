@@ -15,13 +15,13 @@ Manael is a simple HTTP proxy for processing images.
 Start the proxy server:
 
 ```console
-$ manael -http=:8080 -upstream_url=http://localhost:9000
+manael -http=:8080 -upstream_url=http://localhost:9000
 ```
 
 To convert a JPEG image to WebP, send a request with an `Accept: image/webp` header. Manael will automatically convert the image if the upstream server returns a JPEG or PNG:
 
 ```console
-$ curl -sI -H "Accept: image/webp" http://localhost:8080/image.jpg
+curl -sI -H "Accept: image/webp" http://localhost:8080/image.jpg
 ```
 
 The response will have `Content-Type: image/webp` when conversion succeeds.
