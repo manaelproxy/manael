@@ -1,0 +1,37 @@
+baseURL = 'https://manael.org/'
+defaultContentLanguage = 'en'
+defaultContentLanguageInSubdir = false
+enableRobotsTXT = true
+title = 'Manael'
+
+[module]
+  [[module.imports]]
+    path = 'github.com/google/docsy'
+    disable = false
+
+[params]
+  copyright = 'The Manael Authors'
+  github_repo = 'https://github.com/manaelproxy/manael'
+  github_project_repo = 'https://github.com/manaelproxy/manael'
+  [params.ui]
+    sidebar_menu_compact = true
+    navbar_logo = true
+
+[languages]
+  [languages.en]
+    languageName = 'English'
+    contentDir = 'content/en'
+    weight = 1
+    [languages.en.params]
+      description = 'Manael is a simple HTTP proxy for processing images.'
+  [languages.ja]
+    languageName = '日本語'
+    contentDir = 'content/ja'
+    weight = 2
+    [languages.ja.params]
+      description = 'Manael は画像を処理するためのシンプルな HTTP プロキシです。'
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = false

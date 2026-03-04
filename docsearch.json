@@ -1,7 +1,7 @@
 {
   "custom_settings": {
     "separatorsToIndex": "_",
-    "attributesForFaceting": ["language", "version", "type", "docusaurus_tag"],
+    "attributesForFaceting": ["language", "version", "type", "lang"],
     "attributesToRetrieve": [
       "hierarchy",
       "content",
@@ -11,21 +11,21 @@
       "type"
     ]
   },
-  "index_name": "docusaurus",
+  "index_name": "manael",
   "selectors": {
     "lvl0": {
-      "selector": "(//ul[contains(@class,'menu__list')]//a[contains(@class, 'menu__link menu__link--sublist menu__link--active')]/text() | //nav[contains(@class, 'navbar')]//a[contains(@class, 'navbar__link--active')]/text())[last()]",
-      "type": "xpath",
+      "selector": ".td-sidebar-nav .active",
+      "type": "css",
       "global": true,
       "default_value": "Documentation"
     },
-    "lvl1": "header h1",
+    "lvl1": "article h1",
     "lvl2": "article h2",
     "lvl3": "article h3",
     "lvl4": "article h4",
-    "lvl5": "article h5, article td:first-child",
+    "lvl5": "article h5",
     "lvl6": "article h6",
-    "text": "article p, article li, article td:last-child"
+    "text": "article p, article li"
   },
   "sitemap_alternate_links": true,
   "sitemap_urls": ["https://manael.org/sitemap.xml"],

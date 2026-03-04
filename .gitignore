@@ -3,8 +3,10 @@
 /cover/
 /dist/
 /node_modules/
-/website/.docusaurus/
-/website/build/
+/website/.hugo_build.lock
 /website/node_modules/
+/website/public/
+/website/resources/
 
 /yarn-error.log
+website/package-lock.json
