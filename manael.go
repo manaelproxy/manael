@@ -164,7 +164,7 @@ func modifyResponse(res *http.Response) error {
 		ok, _ := isAPNG(b)
 		// Drain remaining bytes into p so the full body is buffered.
 		if _, err := io.Copy(io.Discard, b); err != nil {
-			log.Printf("error: %v\n", err)
+			return err
 		}
 		if ok {
 			// APNG: pass through unchanged; p now holds the complete body.
