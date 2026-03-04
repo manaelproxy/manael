@@ -1,5 +1,6 @@
 ---
-slug: /
+title: Manaelとは
+weight: 1
 ---
 
 # Manaelとは

@@ -1,0 +1,36 @@
+baseURL = 'https://manael.org/'
+defaultContentLanguage = 'en'
+defaultContentLanguageInSubdir = false
+enableRobotsTXT = true
+title = 'Manael'
+
+[module]
+  [[module.imports]]
+    path = 'github.com/alex-shpak/hugo-book'
+
+[params]
+  BookSearch = false
+  BookToC = true
+  BookTheme = 'auto'
+  BookLogo = '/img/manael.png'
+
+[languages]
+  [languages.en]
+    languageName = 'English'
+    contentDir = 'content/en'
+    weight = 1
+  [languages.ja]
+    languageName = '日本語'
+    contentDir = 'content/ja'
+    weight = 2
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = false
+
+[menu]
+  [[menu.after]]
+    name = 'GitHub'
+    url = 'https://github.com/manaelproxy/manael'
+    weight = 1
