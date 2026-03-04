@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.1.0](https://github.com/manaelproxy/manael/compare/v2.0.6...v2.1.0) (2026-03-04)
+
+
+### Features
+
+* add APNG passthrough support ([#1570](https://github.com/manaelproxy/manael/issues/1570)) ([9e2de45](https://github.com/manaelproxy/manael/commit/9e2de45b75a44240c9f71fc957e574a6018a3f2b))
+* convert static GIFs to WebP, pass through animated GIFs ([#1574](https://github.com/manaelproxy/manael/issues/1574)) ([438b633](https://github.com/manaelproxy/manael/commit/438b6330335c591fbd6d10fbd0064bbd398bdf3f))
+* update Content-Disposition filename extension when converting images ([#1571](https://github.com/manaelproxy/manael/issues/1571)) ([f865760](https://github.com/manaelproxy/manael/commit/f865760467fdddea9390654c04c52ae94ea37c21))
+* **website:** replace Docusaurus with Hugo and Docsy ([#1564](https://github.com/manaelproxy/manael/issues/1564)) ([87b40d2](https://github.com/manaelproxy/manael/commit/87b40d2a43136dbf9cf549310b3ea6006bce8318))
+
 ## [2.0.6](https://github.com/manaelproxy/manael/compare/v2.0.5...v2.0.6) (2024-12-08)
 
 
