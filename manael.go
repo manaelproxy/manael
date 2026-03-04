@@ -74,6 +74,92 @@ func isAPNG(r io.Reader) (bool, error) {
 	}
 }
 
+// skipGIFSubBlocks discards GIF sub-block data until the block terminator (0x00).
+func skipGIFSubBlocks(r io.Reader) error {
+	b := make([]byte, 1)
+	for {
+		if _, err := io.ReadFull(r, b); err != nil {
+			return err
+		}
+		if b[0] == 0 {
+			return nil
+		}
+		if _, err := io.CopyN(io.Discard, r, int64(b[0])); err != nil {
+			return err
+		}
+	}
+}
+
+// isAnimatedGIF returns true if r contains an animated GIF stream (more than one image frame).
+func isAnimatedGIF(r io.Reader) (bool, error) {
+	sig := make([]byte, 6)
+	if _, err := io.ReadFull(r, sig); err != nil {
+		return false, err
+	}
+	if string(sig[:3]) != "GIF" {
+		return false, nil
+	}
+
+	// Read Logical Screen Descriptor (7 bytes).
+	lsd := make([]byte, 7)
+	if _, err := io.ReadFull(r, lsd); err != nil {
+		return false, nil
+	}
+
+	// Skip Global Color Table if present.
+	if lsd[4]&0x80 != 0 {
+		size := 3 * (1 << (int(lsd[4]&0x07) + 1))
+		if _, err := io.CopyN(io.Discard, r, int64(size)); err != nil {
+			return false, nil
+		}
+	}
+
+	frames := 0
+	b := make([]byte, 1)
+	for {
+		if _, err := io.ReadFull(r, b); err != nil {
+			break
+		}
+		switch b[0] {
+		case 0x3B: // GIF Trailer
+			return frames > 1, nil
+		case 0x21: // Extension Introducer
+			if _, err := io.ReadFull(r, b); err != nil {
+				return false, nil
+			}
+			if err := skipGIFSubBlocks(r); err != nil {
+				return false, nil
+			}
+		case 0x2C: // Image Descriptor
+			frames++
+			if frames > 1 {
+				return true, nil
+			}
+			// Skip image descriptor fields (9 bytes: left, top, width, height, flags).
+			desc := make([]byte, 9)
+			if _, err := io.ReadFull(r, desc); err != nil {
+				return false, nil
+			}
+			// Skip Local Color Table if present.
+			if desc[8]&0x80 != 0 {
+				size := 3 * (1 << (int(desc[8]&0x07) + 1))
+				if _, err := io.CopyN(io.Discard, r, int64(size)); err != nil {
+					return false, nil
+				}
+			}
+			// Skip LZW minimum code size byte.
+			if _, err := io.ReadFull(r, b); err != nil {
+				return false, nil
+			}
+			// Skip image data sub-blocks.
+			if err := skipGIFSubBlocks(r); err != nil {
+				return false, nil
+			}
+		}
+	}
+	return frames > 1, nil
+}
+
 func setVaryHeader(res *http.Response) {
 	keys := []string{"Accept"}
 	for _, v := range strings.Split(res.Header.Get("Vary"), ",") {
@@ -90,7 +176,7 @@ func setVaryHeader(res *http.Response) {
 func avifEnabled(res *http.Response) bool {
 	contentType := res.Header.Get("Content-Type")
 
-	return os.Getenv("MANAEL_ENABLE_AVIF") == "true" && contentType != "image/png"
+	return os.Getenv("MANAEL_ENABLE_AVIF") == "true" && contentType != "image/png" && contentType != "image/gif"
 }
 
 func scanAcceptHeader(res *http.Response) string {
@@ -124,7 +210,7 @@ func check(res *http.Response) string {
 
 	t := res.Header.Get("Content-Type")
 
-	if t != "image/jpeg" && t != "image/png" {
+	if t != "image/jpeg" && t != "image/png" && t != "image/gif" {
 		return "*/*"
 	}
 
@@ -201,6 +287,21 @@ func modifyResponse(res *http.Response) error {
 			return nil
 		}
 		// Not APNG: replace b with a reader over p's buffered content for conversion.
+		b = bytes.NewReader(p.Bytes())
+	}
+
+	if res.Header.Get("Content-Type") == "image/gif" {
+		ok, _ := isAnimatedGIF(b)
+		// Drain remaining bytes into p so the full body is buffered.
+		if _, err := io.Copy(io.Discard, b); err != nil {
+			return err
+		}
+		if ok {
+			// Animated GIF: pass through unchanged; p now holds the complete body.
+			res.Body = io.NopCloser(p)
+			return nil
+		}
+		// Not animated: replace b with a reader over p's buffered content for conversion.
 		b = bytes.NewReader(p.Bytes())
 	}
 
