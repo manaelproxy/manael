@@ -224,6 +224,20 @@ var convertTests = []struct {
 		"image/gif",
 	},
 	{
+		"image/*,*/*;q=0.8",
+		"/animation.png",
+		http.StatusOK,
+		"image/png",
+		"image/png",
+	},
+	{
+		"image/webp,image/*,*/*;q=0.8",
+		"/animation.png",
+		http.StatusOK,
+		"image/png",
+		"image/png",
+	},
+	{
 		"image/webp,image/*,*/*",
 		"/empty.txt",
 		http.StatusOK,
@@ -249,6 +263,9 @@ func TestNewServeProxy_convert(t *testing.T) {
 	})
 	mux.HandleFunc("/empty.gif", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "testdata/empty.gif")
+	})
+	mux.HandleFunc("/animation.png", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "testdata/animation.png")
 	})
 	mux.HandleFunc("/empty.txt", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "testdata/empty.txt")
