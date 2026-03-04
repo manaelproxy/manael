@@ -3,6 +3,7 @@
 /cover/
 /dist/
 /node_modules/
+/website/node_modules/
 /website/public/
 /website/resources/
 

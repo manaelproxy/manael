@@ -3,8 +3,6 @@ title: Installation Guide
 weight: 2
 ---
 
-# Installation Guide
-
 ## Using Docker {#using-docker}
 
 It is recommended to run Manael with [Docker](https://www.docker.com/). A Docker image for running Manael is published on [Docker Hub](https://hub.docker.com/).

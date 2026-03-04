@@ -14,7 +14,7 @@
   "index_name": "manael",
   "selectors": {
     "lvl0": {
-      "selector": ".book-menu nav > ul > li > a",
+      "selector": ".td-sidebar-nav .active",
       "type": "css",
       "global": true,
       "default_value": "Documentation"

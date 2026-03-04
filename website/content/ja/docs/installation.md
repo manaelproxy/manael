@@ -3,8 +3,6 @@ title: インストールガイド
 weight: 2
 ---
 
-# インストールガイド
-
 ## Docker を使う {#using-docker}
 
 Manael は [Docker](https://www.docker.com/) で動かすことを推奨しています。Manael の Docker イメージは [Docker Hub](https://hub.docker.com/) で公開されています。

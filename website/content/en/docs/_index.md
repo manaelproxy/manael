@@ -1,7 +1,5 @@
 ---
 title: Getting Started
-bookCollapseSection: false
-weight: 10
+linkTitle: Docs
+weight: 20
 ---
-
-# Getting Started

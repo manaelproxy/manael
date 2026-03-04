@@ -1,7 +1,5 @@
 ---
 title: 初めに
-bookCollapseSection: false
-weight: 10
+linkTitle: ドキュメント
+weight: 20
 ---
-
-# 初めに
