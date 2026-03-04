@@ -23,6 +23,7 @@ package manael
 
 import (
 	"bytes"
+	"encoding/binary"
 	"io"
 	"log"
 	"net/http"
@@ -32,6 +33,44 @@ import (
 	"strconv"
 	"strings"
 )
+
+var pngSignature = []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A}
+
+// isAPNG returns true if r contains an APNG (Animated PNG) stream.
+// It detects APNG by scanning PNG chunks for an acTL chunk before the IDAT chunk.
+func isAPNG(r io.Reader) (bool, error) {
+	sig := make([]byte, 8)
+	if _, err := io.ReadFull(r, sig); err != nil {
+		return false, err
+	}
+
+	if !bytes.Equal(sig, pngSignature) {
+		return false, nil
+	}
+
+	header := make([]byte, 8)
+	for {
+		if _, err := io.ReadFull(r, header); err != nil {
+			return false, nil
+		}
+
+		chunkLen := binary.BigEndian.Uint32(header[0:4])
+		chunkType := string(header[4:8])
+
+		if chunkType == "acTL" {
+			return true, nil
+		}
+
+		if chunkType == "IDAT" || chunkType == "IEND" {
+			return false, nil
+		}
+
+		// Skip chunk data and CRC
+		if _, err := io.CopyN(io.Discard, r, int64(chunkLen)+4); err != nil {
+			return false, nil
+		}
+	}
+}
 
 func setVaryHeader(res *http.Response) {
 	keys := []string{"Accept"}
@@ -120,6 +159,19 @@ func modifyResponse(res *http.Response) error {
 
 	p := bytes.NewBuffer(nil)
 	b := io.TeeReader(res.Body, p)
+
+	if res.Header.Get("Content-Type") == "image/png" {
+		ok, _ := isAPNG(b)
+		// Drain remaining bytes into p so the full body is buffered.
+		_, _ = io.Copy(io.Discard, b)
+		if ok {
+			// APNG: pass through unchanged; p now holds the complete body.
+			res.Body = io.NopCloser(p)
+			return nil
+		}
+		// Not APNG: replace b with a reader over p's buffered content for conversion.
+		b = bytes.NewReader(p.Bytes())
+	}
 
 	buf, err := convert(b, typ)
 	if err != nil {
