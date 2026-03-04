@@ -9,3 +9,4 @@
 /website/resources/
 
 /yarn-error.log
+website/package-lock.json
