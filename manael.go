@@ -25,10 +25,12 @@ import (
 	"bytes"
 	"io"
 	"log"
+	"mime"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 )
@@ -106,6 +108,33 @@ func convert(src io.Reader, t string) (*bytes.Buffer, error) {
 	return buf, nil
 }
 
+func updateContentDispositionFilename(res *http.Response, typ string) {
+	cd := res.Header.Get("Content-Disposition")
+	if cd == "" {
+		return
+	}
+
+	var ext string
+	switch typ {
+	case "image/webp":
+		ext = ".webp"
+	case "image/avif":
+		ext = ".avif"
+	default:
+		return
+	}
+
+	disposition, params, err := mime.ParseMediaType(cd)
+	if err != nil {
+		return
+	}
+
+	if filename, ok := params["filename"]; ok {
+		params["filename"] = strings.TrimSuffix(filename, path.Ext(filename)) + ext
+		res.Header.Set("Content-Disposition", mime.FormatMediaType(disposition, params))
+	}
+}
+
 func modifyResponse(res *http.Response) error {
 	res.Header.Set("Server", "Manael")
 
@@ -135,6 +164,8 @@ func modifyResponse(res *http.Response) error {
 
 	res.Header.Set("Content-Type", typ)
 	res.Header.Set("Content-Length", strconv.Itoa(buf.Len()))
+
+	updateContentDispositionFilename(res, typ)
 
 	if res.Header.Get("Accept-Ranges") != "" {
 		res.Header.Del("Accept-Ranges")

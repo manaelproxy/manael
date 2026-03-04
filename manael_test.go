@@ -637,6 +637,87 @@ func TestNewServeProxy_xForwardedFor(t *testing.T) {
 	}
 }
 
+var contentDispositionTests = []struct {
+	name               string
+	accept             string
+	path               string
+	file               string
+	contentDisposition string
+	want               string
+}{
+	{
+		"WebP conversion with inline disposition",
+		"image/webp,image/*,*/*;q=0.8",
+		"/image",
+		"testdata/logo.png",
+		"inline; filename=logo.png",
+		"inline; filename=logo.webp",
+	},
+	{
+		"JPEG to WebP with quoted filename",
+		"image/webp,image/*,*/*;q=0.8",
+		"/image",
+		"testdata/photo.jpeg",
+		`attachment; filename="photo.jpeg"`,
+		"attachment; filename=photo.webp",
+	},
+	{
+		"No conversion when WebP not accepted",
+		"image/*,*/*;q=0.8",
+		"/image",
+		"testdata/logo.png",
+		"inline; filename=logo.png",
+		"inline; filename=logo.png",
+	},
+	{
+		"No Content-Disposition header",
+		"image/webp,image/*,*/*;q=0.8",
+		"/image",
+		"testdata/logo.png",
+		"",
+		"",
+	},
+}
+
+func TestNewServeProxy_contentDisposition(t *testing.T) {
+	for _, tc := range contentDispositionTests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			mux := http.NewServeMux()
+			mux.HandleFunc(tc.path, func(w http.ResponseWriter, r *http.Request) {
+				if tc.contentDisposition != "" {
+					w.Header().Set("Content-Disposition", tc.contentDisposition)
+				}
+				http.ServeFile(w, r, tc.file)
+			})
+
+			ts := httptest.NewServer(mux)
+			defer ts.Close()
+
+			u, err := url.Parse(ts.URL)
+			if err != nil {
+				t.Error(err)
+			}
+
+			p := manael.NewServeProxy(u)
+
+			req := httptest.NewRequest(http.MethodGet, "https://manael.test"+tc.path, nil)
+			req.Header.Set("Accept", tc.accept)
+
+			w := httptest.NewRecorder()
+
+			p.ServeHTTP(w, req)
+
+			resp := w.Result()
+			defer resp.Body.Close()
+
+			if got, want := resp.Header.Get("Content-Disposition"), tc.want; got != want {
+				t.Errorf(`Content-Disposition is %q, want %q`, got, want)
+			}
+		})
+	}
+}
+
 var avifTests = []struct {
 	accept      string
 	path        string
