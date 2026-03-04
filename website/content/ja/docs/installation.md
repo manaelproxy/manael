@@ -18,8 +18,8 @@ Manael を Docker を使って動かす場合は `docker pull manael/manael:late
 まず Manael をインストールする際にダウンロードしたファイルを展開するためのディレクトリを作ります。
 
 ```console
-$ mkdir manael
-$ cd manael
+mkdir manael
+cd manael
 ```
 
 ### 2. ダウンロード {#download}
@@ -27,8 +27,8 @@ $ cd manael
 [リリースページ](https://github.com/manaelproxy/manael/releases)から最新版の Manael (`manael_1.x.y_Linux_x86_64.tar.gz`) をダウンロードして 1. で作ったディレクトリに展開します。
 
 ```console
-$ wget https://github.com/manaelproxy/manael/releases/download/v1.x.y/manael_1.x.y_Linux_x86_64.tar.gz
-$ tar xf manael_1.x.y_Linux_x86_64.tar.gz
+wget https://github.com/manaelproxy/manael/releases/download/v1.x.y/manael_1.x.y_Linux_x86_64.tar.gz
+tar xf manael_1.x.y_Linux_x86_64.tar.gz
 ```
 
 ### 3. インストール {#install}
@@ -36,7 +36,7 @@ $ tar xf manael_1.x.y_Linux_x86_64.tar.gz
 ファイルをコピーするために `install` コマンドを利用します。`cp` コマンドや `mv` コマンドでも同様の作業はできますが、`install` コマンドを使うことによって適切な実行権限が実行ファイルに与えられます。
 
 ```console
-$ sudo install manael /usr/local/bin
+sudo install manael /usr/local/bin
 ```
 
 ## ソースコードからビルド {#build-from-source}
@@ -44,5 +44,5 @@ $ sudo install manael /usr/local/bin
 Manael のソースコードは [GitHub](https://github.com/manaelproxy/manael) にホストされています。Manael は [Go](https://golang.org/) で書かれていて、`go` コマンドを使って簡単にビルドできます。
 
 ```console
-$ go build -o manael cmd/manael/main.go
+go build -o manael cmd/manael/main.go
 ```
