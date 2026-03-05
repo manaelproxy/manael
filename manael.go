@@ -218,14 +218,14 @@ func check(res *http.Response) string {
 }
 
 func convert(src io.Reader, t string) (*bytes.Buffer, error) {
-	img, err := Decode(src)
+	data, err := Decode(src)
 	if err != nil {
 		return nil, err
 	}
 
 	buf := bytes.NewBuffer(nil)
 
-	err = Encode(buf, img, t)
+	err = Encode(buf, data, t)
 	if err != nil {
 		return nil, err
 	}

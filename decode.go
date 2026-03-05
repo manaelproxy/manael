@@ -21,39 +21,10 @@
 package manael
 
 import (
-	"errors"
-	"image"
 	"io"
-
-	// register gif
-	_ "image/gif"
-	// register jpeg
-	_ "image/jpeg"
-	// register png
-	_ "image/png"
 )
 
-// Decode returns an image.Image.
-func Decode(r io.Reader) (image.Image, error) {
-	img, _, err := image.Decode(r)
-	if err != nil {
-		return nil, err
-	}
-
-	switch img.(type) {
-	case *image.Gray, *image.NRGBA, *image.RGBA:
-		return img, nil
-	case *image.CMYK, *image.NRGBA64, *image.Paletted, *image.RGBA64, *image.YCbCr:
-		bounds := img.Bounds()
-		newImg := image.NewRGBA(bounds)
-		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
-			for x := bounds.Min.X; x < bounds.Max.X; x++ {
-				newImg.Set(x, y, img.At(x, y))
-			}
-		}
-
-		return newImg, nil
-	}
-
-	return nil, errors.New("Not supported image format")
+// Decode reads all bytes from r and returns them for further processing.
+func Decode(r io.Reader) ([]byte, error) {
+	return io.ReadAll(r)
 }
