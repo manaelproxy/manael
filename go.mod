@@ -8,4 +8,7 @@ require (
 	github.com/harukasan/go-libwebp v0.0.0-20220408054828-61eedf90d768
 )
 
-require github.com/felixge/httpsnoop v1.0.3 // indirect
+require (
+	github.com/felixge/httpsnoop v1.0.3 // indirect
+	github.com/h2non/bimg v1.1.9 // indirect
+)

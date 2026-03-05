@@ -4,5 +4,7 @@ github.com/felixge/httpsnoop v1.0.3 h1:s/nj+GCswXYzN5v2DpNMuMQYe+0DDwt5WVCU6CWBd
 github.com/felixge/httpsnoop v1.0.3/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=
 github.com/gorilla/handlers v1.5.2 h1:cLTUSsNkgcwhgRqvCNmdbRWG0A3N4F+M2nWKdScwyEE=
 github.com/gorilla/handlers v1.5.2/go.mod h1:dX+xVpaxdSw+q0Qek8SSsl3dfMk3jNddUkMzo0GtH0w=
+github.com/h2non/bimg v1.1.9 h1:WH20Nxko9l/HFm4kZCA3Phbgu2cbHvYzxwxn9YROEGg=
+github.com/h2non/bimg v1.1.9/go.mod h1:R3+UiYwkK4rQl6KVFTOFJHitgLbZXBZNFh2cv3AEbp8=
 github.com/harukasan/go-libwebp v0.0.0-20220408054828-61eedf90d768 h1:6kHMeZ8a/fyiHlsR4fwBWaVh3KSBgsMrupXAA5pChfc=
 github.com/harukasan/go-libwebp v0.0.0-20220408054828-61eedf90d768/go.mod h1:ldE44ycRKJi6dVHIWnbUlEJqHQUhK5gJ4TKIfAwFbCg=
