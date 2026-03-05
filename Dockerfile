@@ -20,6 +20,8 @@ RUN apt-get update && \
 		libexpat1-dev \
 		libjpeg62-turbo-dev \
 		libpng-dev \
+		libpcre2-dev \
+		zlib1g-dev \
 	&& rm -rf /var/lib/apt/lists/*
 
 RUN \
@@ -29,10 +31,9 @@ RUN \
 	tar -xzf libwebp.tar.gz && \
 	rm libwebp.tar.gz && \
 	cd /tmp/src/libwebp-${LIBWEBP_VERSION} && \
-	./configure --prefix=/usr/local && \
+	./configure --prefix=/usr/local --disable-shared --enable-static && \
 	make -j$(nproc) && \
-	make install && \
-	ldconfig
+	make install
 
 RUN \
 	mkdir -p /tmp/src && \
@@ -44,10 +45,9 @@ RUN \
 	cd /tmp/src/aom_build && \
 	cmake /tmp/src/libaom-${LIBAOM_VERSION} \
 		-DCMAKE_INSTALL_PREFIX=/usr/local \
-		-DBUILD_SHARED_LIBS=ON && \
+		-DBUILD_SHARED_LIBS=OFF && \
 	make -j$(nproc) && \
-	make install && \
-	ldconfig
+	make install
 
 RUN \
 	mkdir -p /tmp/src && \
@@ -60,11 +60,11 @@ RUN \
 	cmake .. \
 		-DCMAKE_INSTALL_PREFIX=/usr/local \
 		-DCMAKE_PREFIX_PATH=/usr/local \
+		-DBUILD_SHARED_LIBS=OFF \
 		-DWITH_AOM_ENCODER=ON \
 		-DWITH_AOM_DECODER=ON && \
 	make -j$(nproc) && \
-	make install && \
-	ldconfig
+	make install
 
 RUN \
 	mkdir -p /tmp/src && \
@@ -75,6 +75,7 @@ RUN \
 	cd /tmp/src/vips-${LIBVIPS_VERSION} && \
 	meson setup build \
 		--prefix=/usr/local \
+		--default-library=static \
 		-Dwebp=enabled \
 		-Dheif=enabled \
 		-Djpeg=enabled \
@@ -84,31 +85,20 @@ RUN \
 		-Djpeg-xl=disabled \
 		-Dopenslide=disabled \
 		-Dtiff=disabled \
-		-Dpdfium=disabled && \
+		-Dpdfium=disabled \
+		-Dmodules=disabled && \
 	cd /tmp/src/vips-${LIBVIPS_VERSION}/build && \
 	ninja && \
-	ninja install && \
-	ldconfig
+	ninja install
 
 WORKDIR /go/src/manael
 COPY . .
 
 RUN go mod download
-RUN go build -o /go/bin/manael ./cmd/manael
+RUN CGO_LDFLAGS="$(pkg-config --static --libs vips)" \
+	go build -ldflags '-extldflags "-static"' -o /go/bin/manael ./cmd/manael
 
 # Now copy it into our base image.
-FROM debian:bookworm-slim
-
-RUN apt-get update && \
-	apt-get install -y --no-install-recommends \
-		libglib2.0-0 \
-		libexpat1 \
-		libjpeg62-turbo \
-		libpng16-16 \
-	&& rm -rf /var/lib/apt/lists/*
-
-COPY --from=build /usr/local/lib /usr/local/lib
-RUN ldconfig
-
+FROM gcr.io/distroless/base-debian12@sha256:937c7eaaf6f3f2d38a1f8c4aeff326f0c56e4593ea152e9e8f74d976dde52f56
 COPY --from=build /go/bin/manael /
 CMD ["/manael"]
