@@ -25,7 +25,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"manael.org/x/manael/v2"
+	"manael.org/x/manael/v3"
 )
 
 func ExampleNewServeProxy() {
