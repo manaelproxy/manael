@@ -5,9 +5,9 @@ weight: 2
 
 ## Docker を使う {#using-docker}
 
-Manael は [Docker](https://www.docker.com/) で動かすことを推奨しています。Manael の Docker イメージは [Docker Hub](https://hub.docker.com/) で公開されています。
+Manael は [Docker](https://www.docker.com/) で動かすことを推奨しています。Manael の Docker イメージは [GitHub Container Registry (GHCR)](https://github.com/manaelproxy/manael/pkgs/container/manael) で公開されています。
 
-Manael を Docker を使って動かす場合は `docker pull manael/manael:latest` コマンドで取得してください。Docker を使うことによって既存の環境に不必要なファイルを増やさずに最新版の Manael が使えるようになります。
+Manael を Docker を使って動かす場合は `docker pull ghcr.io/manaelproxy/manael:latest` コマンドで取得してください。Docker を使うことによって既存の環境に不必要なファイルを増やさずに最新版の Manael が使えるようになります。
 
 ## ビルド済みバイナリを使う {#using-a-built-binary}
 
