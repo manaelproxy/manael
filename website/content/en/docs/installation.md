@@ -5,9 +5,9 @@ weight: 2
 
 ## Using Docker {#using-docker}
 
-It is recommended to run Manael with [Docker](https://www.docker.com/). A Docker image for running Manael is published on [Docker Hub](https://hub.docker.com/).
+It is recommended to run Manael with [Docker](https://www.docker.com/). A Docker image for running Manael is published on [GitHub Container Registry (GHCR)](https://github.com/manaelproxy/manael/pkgs/container/manael).
 
-Get the image with `docker pull manael/manael:latest` command before running Manael with Docker. Using Docker eliminates a need to add unnecessary files to your environment.
+Get the image with `docker pull ghcr.io/manaelproxy/manael:latest` command before running Manael with Docker. Using Docker eliminates a need to add unnecessary files to your environment.
 
 ## Using a binary {#using-a-built-binary}
 
