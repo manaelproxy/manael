@@ -23,7 +23,26 @@ package manael
 import (
 	"errors"
 	"io"
+	"os"
+	"strconv"
 )
+
+const defaultMaxImageSize int64 = 20 * 1024 * 1024 // 20 MiB
+
+// maxImageSize returns the maximum allowed image size in bytes for direct
+// calls to Decode. It reads MANAEL_MAX_IMAGE_SIZE from the environment; if
+// unset or invalid, it falls back to defaultMaxImageSize.
+func maxImageSize() int64 {
+	s := os.Getenv("MANAEL_MAX_IMAGE_SIZE")
+	if s == "" {
+		return defaultMaxImageSize
+	}
+	n, err := strconv.ParseInt(s, 10, 64)
+	if err != nil || n <= 0 {
+		return defaultMaxImageSize
+	}
+	return n
+}
 
 // Decode reads all bytes from r and returns them for further processing.
 // It returns an error if the payload exceeds the configured maximum image size.

@@ -30,6 +30,7 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -95,10 +96,21 @@ func main() {
 		os.Exit(1)
 	}
 
+	enableAVIF := os.Getenv("MANAEL_ENABLE_AVIF") == "true"
+
+	var proxyOpts []manael.ProxyOption
+	proxyOpts = append(proxyOpts, manael.WithAVIFEnabled(enableAVIF))
+
+	if s := os.Getenv("MANAEL_MAX_IMAGE_SIZE"); s != "" {
+		if n, err := strconv.ParseInt(s, 10, 64); err == nil && n > 0 {
+			proxyOpts = append(proxyOpts, manael.WithMaxImageSize(n))
+		}
+	}
+
 	otel.SetMeterProvider(noop.NewMeterProvider())
 
 	var handler http.Handler
-	handler = manael.NewServeProxy(upstreamURL)
+	handler = manael.NewServeProxy(upstreamURL, proxyOpts...)
 	handler = otelhttp.NewHandler(handler, "manael-proxy")
 	handler = handlers.CombinedLoggingHandler(os.Stdout, handler)
 
