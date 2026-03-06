@@ -31,6 +31,7 @@ import (
 	"os"
 	"os/signal"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
@@ -107,6 +108,48 @@ func main() {
 	if s := os.Getenv("MANAEL_MAX_IMAGE_SIZE"); s != "" {
 		if n, err := strconv.ParseInt(s, 10, 64); err == nil && n > 0 {
 			proxyOpts = append(proxyOpts, manael.WithMaxImageSize(n))
+		}
+	}
+
+	if s := os.Getenv("MANAEL_MAX_RESIZE_WIDTH"); s != "" {
+		n, err := strconv.Atoi(strings.TrimSpace(s))
+		if err != nil || n <= 0 {
+			slog.Error("invalid MANAEL_MAX_RESIZE_WIDTH",
+				slog.String("error", fmt.Sprintf("must be a positive integer, got %q", s)))
+			os.Exit(1)
+		}
+		proxyOpts = append(proxyOpts, manael.WithMaxResizeWidth(n))
+	}
+
+	if s := os.Getenv("MANAEL_MAX_RESIZE_HEIGHT"); s != "" {
+		n, err := strconv.Atoi(strings.TrimSpace(s))
+		if err != nil || n <= 0 {
+			slog.Error("invalid MANAEL_MAX_RESIZE_HEIGHT",
+				slog.String("error", fmt.Sprintf("must be a positive integer, got %q", s)))
+			os.Exit(1)
+		}
+		proxyOpts = append(proxyOpts, manael.WithMaxResizeHeight(n))
+	}
+
+	if s := os.Getenv("MANAEL_ALLOWED_WIDTHS"); s != "" {
+		widths, err := parseIntList(s)
+		if err != nil {
+			slog.Error("invalid MANAEL_ALLOWED_WIDTHS", slog.String("error", err.Error()))
+			os.Exit(1)
+		}
+		if len(widths) > 0 {
+			proxyOpts = append(proxyOpts, manael.WithAllowedWidths(widths))
+		}
+	}
+
+	if s := os.Getenv("MANAEL_ALLOWED_HEIGHTS"); s != "" {
+		heights, err := parseIntList(s)
+		if err != nil {
+			slog.Error("invalid MANAEL_ALLOWED_HEIGHTS", slog.String("error", err.Error()))
+			os.Exit(1)
+		}
+		if len(heights) > 0 {
+			proxyOpts = append(proxyOpts, manael.WithAllowedHeights(heights))
 		}
 	}
 
@@ -187,4 +230,24 @@ func main() {
 func healthHandler(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write([]byte("OK"))
+}
+
+// parseIntList splits a comma-separated string of positive integers. It
+// returns an error for any token that is not a positive integer so that
+// misconfiguration is caught at startup rather than silently disabling
+// the whitelist safety controls.
+func parseIntList(s string) ([]int, error) {
+	var result []int
+	for _, part := range strings.Split(s, ",") {
+		part = strings.TrimSpace(part)
+		if part == "" {
+			continue
+		}
+		n, err := strconv.Atoi(part)
+		if err != nil || n <= 0 {
+			return nil, fmt.Errorf("must be a positive integer, got %q", part)
+		}
+		result = append(result, n)
+	}
+	return result, nil
 }

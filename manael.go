@@ -23,6 +23,7 @@ package manael
 
 import (
 	"bytes"
+	"context"
 	"encoding/binary"
 	"io"
 	"log/slog"
@@ -35,6 +36,11 @@ import (
 	"strings"
 )
 
+// ctxKey is an unexported type for context keys used in this package.
+type ctxKey int
+
+const resizeCtxKey ctxKey = 0
+
 var pngSignature = []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A}
 
 // ProxyOptions holds configuration for a proxy created by NewServeProxy.
@@ -45,6 +51,18 @@ type ProxyOptions struct {
 	// converted. Images larger than this limit are passed through unchanged.
 	// Defaults to 20 MiB when zero.
 	MaxImageSize int64
+	// MaxResizeWidth is the maximum allowed value for the w query parameter.
+	// A value of 0 means no limit.
+	MaxResizeWidth int
+	// MaxResizeHeight is the maximum allowed value for the h query parameter.
+	// A value of 0 means no limit.
+	MaxResizeHeight int
+	// AllowedWidths is an optional whitelist of permitted values for the w
+	// query parameter. When non-empty, only listed widths are accepted.
+	AllowedWidths []int
+	// AllowedHeights is an optional whitelist of permitted values for the h
+	// query parameter. When non-empty, only listed heights are accepted.
+	AllowedHeights []int
 }
 
 // ProxyOption is a functional option for configuring a proxy.
@@ -63,6 +81,44 @@ func WithAVIFEnabled(enabled bool) ProxyOption {
 func WithMaxImageSize(size int64) ProxyOption {
 	return func(o *ProxyOptions) {
 		o.MaxImageSize = size
+	}
+}
+
+// WithMaxResizeWidth returns a ProxyOption that sets the maximum allowed value
+// for the w query parameter. Requests with a larger width will be rejected with
+// 400 Bad Request. A value of 0 disables the limit.
+func WithMaxResizeWidth(w int) ProxyOption {
+	return func(o *ProxyOptions) {
+		o.MaxResizeWidth = w
+	}
+}
+
+// WithMaxResizeHeight returns a ProxyOption that sets the maximum allowed value
+// for the h query parameter. Requests with a larger height will be rejected
+// with 400 Bad Request. A value of 0 disables the limit.
+func WithMaxResizeHeight(h int) ProxyOption {
+	return func(o *ProxyOptions) {
+		o.MaxResizeHeight = h
+	}
+}
+
+// WithAllowedWidths returns a ProxyOption that restricts the w query parameter
+// to the provided whitelist of pixel values. Requests specifying a width not
+// in the list will be rejected with 400 Bad Request. An empty slice disables
+// the whitelist.
+func WithAllowedWidths(widths []int) ProxyOption {
+	return func(o *ProxyOptions) {
+		o.AllowedWidths = append([]int(nil), widths...)
+	}
+}
+
+// WithAllowedHeights returns a ProxyOption that restricts the h query
+// parameter to the provided whitelist of pixel values. Requests specifying a
+// height not in the list will be rejected with 400 Bad Request. An empty
+// slice disables the whitelist.
+func WithAllowedHeights(heights []int) ProxyOption {
+	return func(o *ProxyOptions) {
+		o.AllowedHeights = append([]int(nil), heights...)
 	}
 }
 
@@ -245,7 +301,7 @@ func check(res *http.Response, opts *ProxyOptions) string {
 	return scanAcceptHeader(res, opts)
 }
 
-func convert(src io.Reader, t string) (*bytes.Buffer, error) {
+func convert(src io.Reader, t string, resize *ResizeOptions) (*bytes.Buffer, error) {
 	data, err := Decode(src)
 	if err != nil {
 		return nil, err
@@ -253,7 +309,7 @@ func convert(src io.Reader, t string) (*bytes.Buffer, error) {
 
 	buf := bytes.NewBuffer(nil)
 
-	err = Encode(buf, data, t)
+	err = Encode(buf, data, t, resize)
 	if err != nil {
 		return nil, err
 	}
@@ -297,6 +353,9 @@ func modifyResponse(res *http.Response, opts *ProxyOptions) error {
 	if typ == "*/*" {
 		return nil
 	}
+
+	// Retrieve resize options stored in the request context by the outer handler.
+	resize, _ := res.Request.Context().Value(resizeCtxKey).(*ResizeOptions)
 
 	maxSize := opts.MaxImageSize
 
@@ -387,7 +446,7 @@ func modifyResponse(res *http.Response, opts *ProxyOptions) error {
 		b = bytes.NewReader(p.Bytes())
 	}
 
-	buf, err := convert(b, typ)
+	buf, err := convert(b, typ, resize)
 	if err != nil {
 		res.Body = struct {
 			io.Reader
@@ -421,7 +480,8 @@ func modifyResponse(res *http.Response, opts *ProxyOptions) error {
 
 // NewServeProxy returns a new reverse-proxy handler for the given upstream URL.
 // Optional ProxyOption values can be used to configure the proxy behaviour,
-// such as enabling AVIF encoding or adjusting the maximum image size.
+// such as enabling AVIF encoding, adjusting the maximum image size, or
+// restricting image resize dimensions.
 func NewServeProxy(u *url.URL, opts ...ProxyOption) http.Handler {
 	options := &ProxyOptions{
 		MaxImageSize: defaultMaxImageSize,
@@ -430,7 +490,7 @@ func NewServeProxy(u *url.URL, opts ...ProxyOption) http.Handler {
 		o(options)
 	}
 
-	return &httputil.ReverseProxy{
+	rp := &httputil.ReverseProxy{
 		Rewrite: func(r *httputil.ProxyRequest) {
 			r.Out.Header["X-Forwarded-For"] = r.In.Header["X-Forwarded-For"]
 
@@ -441,4 +501,27 @@ func NewServeProxy(u *url.URL, opts ...ProxyOption) http.Handler {
 			return modifyResponse(res, options)
 		},
 	}
+
+	return &resizeProxy{proxy: rp, opts: options}
+}
+
+// resizeProxy wraps a ReverseProxy to validate and store resize parameters
+// before forwarding the request upstream.
+type resizeProxy struct {
+	proxy *httputil.ReverseProxy
+	opts  *ProxyOptions
+}
+
+func (s *resizeProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	resize, err := parseResizeParams(r.URL.Query(), s.opts)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if resize != nil {
+		r = r.WithContext(context.WithValue(r.Context(), resizeCtxKey, resize))
+	}
+
+	s.proxy.ServeHTTP(w, r)
 }

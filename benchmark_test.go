@@ -42,7 +42,7 @@ func BenchmarkEncode_PNGToWebP(b *testing.B) {
 	b.ReportAllocs()
 
 	for b.Loop() {
-		if err := manael.Encode(io.Discard, src, "image/webp"); err != nil {
+		if err := manael.Encode(io.Discard, src, "image/webp", nil); err != nil {
 			b.Fatal(err)
 		}
 	}
@@ -58,7 +58,7 @@ func BenchmarkEncode_JPEGToWebP(b *testing.B) {
 	b.ReportAllocs()
 
 	for b.Loop() {
-		if err := manael.Encode(io.Discard, src, "image/webp"); err != nil {
+		if err := manael.Encode(io.Discard, src, "image/webp", nil); err != nil {
 			b.Fatal(err)
 		}
 	}
