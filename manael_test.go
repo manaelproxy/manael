@@ -815,3 +815,151 @@ func TestNewServeProxy_avif(t *testing.T) {
 		}
 	}
 }
+
+var maxImageSizeTests = []struct {
+	name            string
+	accept          string
+	path            string
+	file            string
+	maxSize         string
+	wantContentType string
+	wantFormat      string
+}{
+	{
+		// logo.png is 4090 bytes; limit of 1024 → pass through unchanged.
+		"PNG exceeds limit, pass through",
+		"image/webp,image/*,*/*;q=0.8",
+		"/logo.png",
+		"testdata/logo.png",
+		"1024",
+		"image/png",
+		"image/png",
+	},
+	{
+		// photo.jpeg is ~218 KB; limit of 1024 → pass through unchanged.
+		"JPEG exceeds limit, pass through",
+		"image/webp,image/*,*/*;q=0.8",
+		"/photo.jpeg",
+		"testdata/photo.jpeg",
+		"1024",
+		"image/jpeg",
+		"image/jpeg",
+	},
+	{
+		// logo.png is 4090 bytes; limit of 8192 → converted normally.
+		"PNG within limit, convert",
+		"image/webp,image/*,*/*;q=0.8",
+		"/logo.png",
+		"testdata/logo.png",
+		"8192",
+		"image/webp",
+		"image/webp",
+	},
+}
+
+// TestNewServeProxy_maxImageSize verifies that when MANAEL_MAX_IMAGE_SIZE is set,
+// images whose Content-Length exceeds the limit are passed through unconverted.
+func TestNewServeProxy_maxImageSize(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/logo.png", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "testdata/logo.png")
+	})
+	mux.HandleFunc("/photo.jpeg", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "testdata/photo.jpeg")
+	})
+
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
+
+	u, err := url.Parse(ts.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	p := manael.NewServeProxy(u)
+
+	for _, tc := range maxImageSizeTests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Setenv("MANAEL_MAX_IMAGE_SIZE", tc.maxSize)
+
+			req := httptest.NewRequest(http.MethodGet, "https://manael.test"+tc.path, nil)
+			req.Header.Set("Accept", tc.accept)
+
+			w := httptest.NewRecorder()
+			p.ServeHTTP(w, req)
+
+			resp := w.Result()
+			defer resp.Body.Close()
+
+			if got, want := resp.Header.Get("Content-Type"), tc.wantContentType; got != want {
+				t.Errorf("Content-Type is %s, want %s", got, want)
+			}
+
+			body, err := io.ReadAll(resp.Body)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if got, want := http.DetectContentType(body), tc.wantFormat; got != want {
+				t.Errorf("Detected format is %s, want %s", got, want)
+			}
+		})
+	}
+}
+
+// TestNewServeProxy_maxImageSizeStreaming verifies that oversized images served
+// without a Content-Length header (chunked transfer) are also passed through
+// unconverted when they exceed MANAEL_MAX_IMAGE_SIZE.
+func TestNewServeProxy_maxImageSizeStreaming(t *testing.T) {
+	// logo.png is 4090 bytes; limit of 1024 → pass through unchanged.
+	t.Setenv("MANAEL_MAX_IMAGE_SIZE", "1024")
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/logo.png", func(w http.ResponseWriter, r *http.Request) {
+		data, err := os.ReadFile("testdata/logo.png")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "image/png")
+		// Flush headers before writing the body to force chunked transfer
+		// encoding, which means no Content-Length header is sent.
+		if f, ok := w.(http.Flusher); ok {
+			f.Flush()
+		}
+		w.Write(data) //nolint:errcheck
+	})
+
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
+
+	u, err := url.Parse(ts.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	p := manael.NewServeProxy(u)
+
+	req := httptest.NewRequest(http.MethodGet, "https://manael.test/logo.png", nil)
+	req.Header.Set("Accept", "image/webp,image/*,*/*;q=0.8")
+
+	w := httptest.NewRecorder()
+	p.ServeHTTP(w, req)
+
+	resp := w.Result()
+	defer resp.Body.Close()
+
+	if got, want := resp.Header.Get("Content-Type"), "image/png"; got != want {
+		t.Errorf("Content-Type is %s, want %s", got, want)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if got, want := http.DetectContentType(body), "image/png"; got != want {
+		t.Errorf("Detected format is %s, want %s", got, want)
+	}
+}
