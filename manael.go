@@ -25,7 +25,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"io"
-	"log"
+	"log/slog"
 	"mime"
 	"net/http"
 	"net/http/httputil"
@@ -386,7 +386,10 @@ func modifyResponse(res *http.Response) error {
 			Closer: origBody,
 		}
 		closeOrigBody = false
-		log.Printf("error: %v\n", err)
+		slog.Error("failed to convert image",
+			slog.String("error", err.Error()),
+			slog.String("url", res.Request.URL.String()),
+		)
 
 		return nil
 	}
