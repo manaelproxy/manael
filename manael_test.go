@@ -34,7 +34,7 @@ import (
 	"testing"
 	"time"
 
-	"manael.org/x/manael/v2"
+	"manael.org/x/manael/v3"
 )
 
 var basicTests = []struct {

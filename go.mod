@@ -1,4 +1,4 @@
-module manael.org/x/manael/v2
+module manael.org/x/manael/v3
 
 go 1.24.0
 

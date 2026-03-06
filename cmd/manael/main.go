@@ -41,7 +41,7 @@ import (
 	"go.opentelemetry.io/otel/exporters/prometheus"
 	"go.opentelemetry.io/otel/metric/noop"
 	"go.opentelemetry.io/otel/sdk/metric"
-	"manael.org/x/manael/v2"
+	"manael.org/x/manael/v3"
 )
 
 const (

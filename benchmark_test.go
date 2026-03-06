@@ -29,7 +29,7 @@ import (
 	"os"
 	"testing"
 
-	"manael.org/x/manael/v2"
+	"manael.org/x/manael/v3"
 )
 
 func BenchmarkEncode_PNGToWebP(b *testing.B) {
