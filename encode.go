@@ -29,33 +29,29 @@ import (
 )
 
 // Encode converts the image data in src to the format specified by Content-Type t,
-// writing the result to w. An optional ResizeOptions value may be provided as the
-// fourth argument to resize and/or crop the image in the same bimg pipeline pass
-// before encoding. At most one ResizeOptions value is used; any additional values
-// are ignored.
-func Encode(w io.Writer, src []byte, t string, resize ...*ResizeOptions) error {
+// writing the result to w. resize controls optional resizing/cropping in the same
+// bimg pipeline pass; quality controls per-format encoding quality. Either
+// parameter may be nil to use the defaults.
+func Encode(w io.Writer, src []byte, t string, resize *ResizeOptions, quality *QualityOptions) error {
 	var opts bimg.Options
 
 	switch t {
 	case "image/webp":
 		opts = bimg.Options{
 			Type:    bimg.WEBP,
-			Quality: 90,
+			Quality: quality.forFormat(t, 90),
 		}
 	case "image/avif":
 		opts = bimg.Options{
 			Type:    bimg.AVIF,
-			Quality: 60,
+			Quality: quality.forFormat(t, 60),
 			Speed:   8,
 		}
 	default:
 		return errors.New("unsupported image type")
 	}
 
-	var r *ResizeOptions
-	if len(resize) > 0 {
-		r = resize[0]
-	}
+	r := resize
 
 	if r != nil && (r.Width > 0 || r.Height > 0) {
 		opts.Width = r.Width

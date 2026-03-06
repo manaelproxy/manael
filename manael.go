@@ -39,7 +39,10 @@ import (
 // ctxKey is an unexported type for context keys used in this package.
 type ctxKey int
 
-const resizeCtxKey ctxKey = 0
+const (
+	resizeCtxKey  ctxKey = 0
+	qualityCtxKey ctxKey = 1
+)
 
 var pngSignature = []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A}
 
@@ -63,6 +66,12 @@ type ProxyOptions struct {
 	// AllowedHeights is an optional whitelist of permitted values for the h
 	// query parameter. When non-empty, only listed heights are accepted.
 	AllowedHeights []int
+	// DefaultQuality is the server-level fallback encoding quality (1–100)
+	// used when no q query parameter is present in the request, or when the
+	// request specifies format-specific quality without a universal default.
+	// A value of 0 preserves the built-in per-format defaults (90 for WebP,
+	// 60 for AVIF).
+	DefaultQuality int
 }
 
 // ProxyOption is a functional option for configuring a proxy.
@@ -119,6 +128,18 @@ func WithAllowedWidths(widths []int) ProxyOption {
 func WithAllowedHeights(heights []int) ProxyOption {
 	return func(o *ProxyOptions) {
 		o.AllowedHeights = append([]int(nil), heights...)
+	}
+}
+
+// WithDefaultQuality returns a ProxyOption that sets the server-level fallback
+// encoding quality (1–100). It is used when the request does not supply a q
+// query parameter, or when the request specifies format-specific quality values
+// without a universal default. A value of 0 (the default) preserves the
+// built-in per-format defaults (90 for WebP, 60 for AVIF). Values outside
+// [1, 100] are clamped to the nearest bound.
+func WithDefaultQuality(q int) ProxyOption {
+	return func(o *ProxyOptions) {
+		o.DefaultQuality = clampQuality(q)
 	}
 }
 
@@ -301,7 +322,7 @@ func check(res *http.Response, opts *ProxyOptions) string {
 	return scanAcceptHeader(res, opts)
 }
 
-func convert(src io.Reader, t string, resize *ResizeOptions) (*bytes.Buffer, error) {
+func convert(src io.Reader, t string, resize *ResizeOptions, quality *QualityOptions) (*bytes.Buffer, error) {
 	data, err := Decode(src)
 	if err != nil {
 		return nil, err
@@ -309,7 +330,7 @@ func convert(src io.Reader, t string, resize *ResizeOptions) (*bytes.Buffer, err
 
 	buf := bytes.NewBuffer(nil)
 
-	err = Encode(buf, data, t, resize)
+	err = Encode(buf, data, t, resize, quality)
 	if err != nil {
 		return nil, err
 	}
@@ -354,8 +375,21 @@ func modifyResponse(res *http.Response, opts *ProxyOptions) error {
 		return nil
 	}
 
-	// Retrieve resize options stored in the request context by the outer handler.
+	// Retrieve resize and quality options stored in the request context.
 	resize, _ := res.Request.Context().Value(resizeCtxKey).(*ResizeOptions)
+	quality, _ := res.Request.Context().Value(qualityCtxKey).(*QualityOptions)
+
+	// Apply the server-level default quality when the request does not supply
+	// a universal quality value (but may still have format-specific overrides).
+	if opts.DefaultQuality > 0 {
+		if quality == nil {
+			quality = &QualityOptions{Default: opts.DefaultQuality}
+		} else if quality.Default == 0 {
+			merged := *quality
+			merged.Default = opts.DefaultQuality
+			quality = &merged
+		}
+	}
 
 	maxSize := opts.MaxImageSize
 
@@ -446,7 +480,7 @@ func modifyResponse(res *http.Response, opts *ProxyOptions) error {
 		b = bytes.NewReader(p.Bytes())
 	}
 
-	buf, err := convert(b, typ, resize)
+	buf, err := convert(b, typ, resize, quality)
 	if err != nil {
 		res.Body = struct {
 			io.Reader
@@ -513,7 +547,9 @@ type resizeProxy struct {
 }
 
 func (s *resizeProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	resize, err := parseResizeParams(r.URL.Query(), s.opts)
+	q := r.URL.Query()
+
+	resize, err := parseResizeParams(q, s.opts)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -521,6 +557,10 @@ func (s *resizeProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if resize != nil {
 		r = r.WithContext(context.WithValue(r.Context(), resizeCtxKey, resize))
+	}
+
+	if quality := parseQualityParams(q); quality != nil {
+		r = r.WithContext(context.WithValue(r.Context(), qualityCtxKey, quality))
 	}
 
 	s.proxy.ServeHTTP(w, r)

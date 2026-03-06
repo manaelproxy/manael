@@ -782,7 +782,7 @@ func TestNewServeProxy_avif(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := manael.Encode(io.Discard, testImg, "image/avif"); err != nil {
+	if err := manael.Encode(io.Discard, testImg, "image/avif", nil, nil); err != nil {
 		t.Skipf("AVIF encoding not supported in this environment: %v", err)
 	}
 
@@ -1236,6 +1236,128 @@ func TestNewServeProxy_resizeLimits(t *testing.T) {
 
 			if got, want := resp.StatusCode, tc.wantStatusCode; got != want {
 				t.Errorf("Status Code is %d, want %d", got, want)
+			}
+		})
+	}
+}
+
+var qualityTests = []struct {
+	name            string
+	path            string
+	accept          string
+	opts            []manael.ProxyOption
+	wantStatusCode  int
+	wantContentType string
+}{
+	{
+		name:            "universal quality via q param",
+		path:            "/photo.jpeg?q=80",
+		accept:          "image/webp,image/*,*/*;q=0.8",
+		wantStatusCode:  http.StatusOK,
+		wantContentType: "image/webp",
+	},
+	{
+		name:            "webp-specific quality via q param",
+		path:            "/photo.jpeg?q=webp:70",
+		accept:          "image/webp,image/*,*/*;q=0.8",
+		wantStatusCode:  http.StatusOK,
+		wantContentType: "image/webp",
+	},
+	{
+		name:            "comma-separated format-specific quality",
+		path:            "/photo.jpeg?q=webp:70,avif:50",
+		accept:          "image/webp,image/*,*/*;q=0.8",
+		wantStatusCode:  http.StatusOK,
+		wantContentType: "image/webp",
+	},
+	{
+		name:            "combined universal and format-specific quality",
+		path:            "/photo.jpeg?q=75,webp:65",
+		accept:          "image/webp,image/*,*/*;q=0.8",
+		wantStatusCode:  http.StatusOK,
+		wantContentType: "image/webp",
+	},
+	{
+		name:            "multiple q params",
+		path:            "/photo.jpeg?q=webp:70&q=80",
+		accept:          "image/webp,image/*,*/*;q=0.8",
+		wantStatusCode:  http.StatusOK,
+		wantContentType: "image/webp",
+	},
+	{
+		name:            "out-of-range quality is clamped, not rejected",
+		path:            "/photo.jpeg?q=200",
+		accept:          "image/webp,image/*,*/*;q=0.8",
+		wantStatusCode:  http.StatusOK,
+		wantContentType: "image/webp",
+	},
+	{
+		name:            "invalid q value falls back to default (no error)",
+		path:            "/photo.jpeg?q=notanumber",
+		accept:          "image/webp,image/*,*/*;q=0.8",
+		wantStatusCode:  http.StatusOK,
+		wantContentType: "image/webp",
+	},
+	{
+		name:  "WithDefaultQuality proxy option applied",
+		path:  "/photo.jpeg",
+		accept: "image/webp,image/*,*/*;q=0.8",
+		opts: []manael.ProxyOption{
+			manael.WithDefaultQuality(75),
+		},
+		wantStatusCode:  http.StatusOK,
+		wantContentType: "image/webp",
+	},
+	{
+		name:  "q param overrides WithDefaultQuality",
+		path:  "/photo.jpeg?q=65",
+		accept: "image/webp,image/*,*/*;q=0.8",
+		opts: []manael.ProxyOption{
+			manael.WithDefaultQuality(75),
+		},
+		wantStatusCode:  http.StatusOK,
+		wantContentType: "image/webp",
+	},
+}
+
+// TestNewServeProxy_quality verifies that the q query parameter controls
+// encoding quality and that WithDefaultQuality is respected.
+func TestNewServeProxy_quality(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/photo.jpeg", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "testdata/photo.jpeg")
+	})
+
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
+
+	u, err := url.Parse(ts.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, tc := range qualityTests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			p := manael.NewServeProxy(u, tc.opts...)
+
+			req := httptest.NewRequest(http.MethodGet, "https://manael.test"+tc.path, nil)
+			req.Header.Set("Accept", tc.accept)
+
+			w := httptest.NewRecorder()
+			p.ServeHTTP(w, req)
+
+			resp := w.Result()
+			defer resp.Body.Close()
+
+			if got, want := resp.StatusCode, tc.wantStatusCode; got != want {
+				t.Errorf("Status Code is %d, want %d", got, want)
+			}
+
+			if tc.wantContentType != "" {
+				if got, want := resp.Header.Get("Content-Type"), tc.wantContentType; got != want {
+					t.Errorf("Content-Type is %s, want %s", got, want)
+				}
 			}
 		})
 	}
