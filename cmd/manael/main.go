@@ -109,9 +109,15 @@ func main() {
 
 	otel.SetMeterProvider(noop.NewMeterProvider())
 
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/_health", healthHandler)
+
+	proxyHandler := manael.NewServeProxy(upstreamURL, proxyOpts...)
+	mux.Handle("/", otelhttp.NewHandler(proxyHandler, "manael-proxy"))
+
 	var handler http.Handler
-	handler = manael.NewServeProxy(upstreamURL, proxyOpts...)
-	handler = otelhttp.NewHandler(handler, "manael-proxy")
+	handler = mux
 	handler = handlers.CombinedLoggingHandler(os.Stdout, handler)
 
 	srv := &http.Server{
@@ -144,4 +150,10 @@ func main() {
 	}
 
 	slog.Info("Server exiting")
+}
+
+// healthHandler responds with 200 OK and "OK" for use as a liveness/readiness probe.
+func healthHandler(w http.ResponseWriter, _ *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write([]byte("OK"))
 }
