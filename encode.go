@@ -29,9 +29,11 @@ import (
 )
 
 // Encode converts the image data in src to the format specified by Content-Type t,
-// writing the result to w. If resize is non-nil, the image is resized and/or
-// cropped in the same bimg pipeline pass before encoding.
-func Encode(w io.Writer, src []byte, t string, resize *ResizeOptions) error {
+// writing the result to w. An optional ResizeOptions value may be provided as the
+// fourth argument to resize and/or crop the image in the same bimg pipeline pass
+// before encoding. At most one ResizeOptions value is used; any additional values
+// are ignored.
+func Encode(w io.Writer, src []byte, t string, resize ...*ResizeOptions) error {
 	var opts bimg.Options
 
 	switch t {
@@ -50,10 +52,15 @@ func Encode(w io.Writer, src []byte, t string, resize *ResizeOptions) error {
 		return errors.New("unsupported image type")
 	}
 
-	if resize != nil && (resize.Width > 0 || resize.Height > 0) {
-		opts.Width = resize.Width
-		opts.Height = resize.Height
-		switch resize.Fit {
+	var r *ResizeOptions
+	if len(resize) > 0 {
+		r = resize[0]
+	}
+
+	if r != nil && (r.Width > 0 || r.Height > 0) {
+		opts.Width = r.Width
+		opts.Height = r.Height
+		switch r.Fit {
 		case "cover":
 			// Crop to fill the target dimensions exactly.
 			opts.Crop = true
