@@ -31,6 +31,7 @@ import (
 	"os"
 	"os/signal"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
@@ -107,6 +108,32 @@ func main() {
 	if s := os.Getenv("MANAEL_MAX_IMAGE_SIZE"); s != "" {
 		if n, err := strconv.ParseInt(s, 10, 64); err == nil && n > 0 {
 			proxyOpts = append(proxyOpts, manael.WithMaxImageSize(n))
+		}
+	}
+
+	if s := os.Getenv("MANAEL_MAX_RESIZE_WIDTH"); s != "" {
+		if n, err := strconv.Atoi(s); err == nil && n > 0 {
+			proxyOpts = append(proxyOpts, manael.WithMaxResizeWidth(n))
+		}
+	}
+
+	if s := os.Getenv("MANAEL_MAX_RESIZE_HEIGHT"); s != "" {
+		if n, err := strconv.Atoi(s); err == nil && n > 0 {
+			proxyOpts = append(proxyOpts, manael.WithMaxResizeHeight(n))
+		}
+	}
+
+	if s := os.Getenv("MANAEL_ALLOWED_WIDTHS"); s != "" {
+		widths := parseIntList(s)
+		if len(widths) > 0 {
+			proxyOpts = append(proxyOpts, manael.WithAllowedWidths(widths))
+		}
+	}
+
+	if s := os.Getenv("MANAEL_ALLOWED_HEIGHTS"); s != "" {
+		heights := parseIntList(s)
+		if len(heights) > 0 {
+			proxyOpts = append(proxyOpts, manael.WithAllowedHeights(heights))
 		}
 	}
 
@@ -187,4 +214,17 @@ func main() {
 func healthHandler(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write([]byte("OK"))
+}
+
+// parseIntList splits a comma-separated string of integers and returns the
+// valid positive values. Invalid or non-positive entries are silently ignored.
+func parseIntList(s string) []int {
+	var result []int
+	for _, part := range strings.Split(s, ",") {
+		part = strings.TrimSpace(part)
+		if n, err := strconv.Atoi(part); err == nil && n > 0 {
+			result = append(result, n)
+		}
+	}
+	return result
 }

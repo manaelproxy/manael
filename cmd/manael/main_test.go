@@ -49,3 +49,30 @@ func TestHealthHandler(t *testing.T) {
 		t.Errorf("expected body %q, got %q", "OK", string(body))
 	}
 }
+
+func TestParseIntList(t *testing.T) {
+	tests := []struct {
+		input string
+		want  []int
+	}{
+		{"320,640,1280", []int{320, 640, 1280}},
+		{"240, 480, 720", []int{240, 480, 720}},
+		{"", nil},
+		{"abc,640", []int{640}},
+		{"-1,0,100", []int{100}},
+		{"4000", []int{4000}},
+	}
+
+	for _, tc := range tests {
+		got := parseIntList(tc.input)
+		if len(got) != len(tc.want) {
+			t.Errorf("parseIntList(%q) = %v, want %v", tc.input, got, tc.want)
+			continue
+		}
+		for i := range got {
+			if got[i] != tc.want[i] {
+				t.Errorf("parseIntList(%q)[%d] = %d, want %d", tc.input, i, got[i], tc.want[i])
+			}
+		}
+	}
+}

@@ -29,8 +29,9 @@ import (
 )
 
 // Encode converts the image data in src to the format specified by Content-Type t,
-// writing the result to w.
-func Encode(w io.Writer, src []byte, t string) error {
+// writing the result to w. If resize is non-nil, the image is resized and/or
+// cropped in the same bimg pipeline pass before encoding.
+func Encode(w io.Writer, src []byte, t string, resize *ResizeOptions) error {
 	var opts bimg.Options
 
 	switch t {
@@ -47,6 +48,22 @@ func Encode(w io.Writer, src []byte, t string) error {
 		}
 	default:
 		return errors.New("unsupported image type")
+	}
+
+	if resize != nil && (resize.Width > 0 || resize.Height > 0) {
+		opts.Width = resize.Width
+		opts.Height = resize.Height
+		switch resize.Fit {
+		case "cover":
+			// Crop to fill the target dimensions exactly.
+			opts.Crop = true
+		case "contain":
+			// Scale to fit within the target box; allow upscaling smaller images.
+			opts.Enlarge = true
+		case "scale-down", "":
+			// Scale down to fit within the target box; never upscale.
+			// This is the bimg default when neither Crop nor Enlarge is set.
+		}
 	}
 
 	out, err := bimg.NewImage(src).Process(opts)
