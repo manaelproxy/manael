@@ -43,6 +43,20 @@ sudo install manael /usr/local/bin
 
 The source code is hosted on [GitHub](https://github.com/manaelproxy/manael), and Manael is written in [Go](https://go.dev/). To install Manael, make sure to install Go and [Git](https://git-scm.com/) first, and [copy the repository](https://gist.github.com/natedana/cc71d496b611e70673cab5e8f5a78485).
 
+Manael requires [libvips](https://www.libvips.org/) development headers to build. Install them before running `go build`.
+
+On Debian/Ubuntu:
+
+```console
+sudo apt-get install -y libvips-dev
+```
+
+On macOS (Homebrew):
+
+```console
+brew install vips
+```
+
 ```console
 go build -o manael cmd/manael/main.go
 ```

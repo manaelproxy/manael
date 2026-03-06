@@ -35,7 +35,7 @@ import (
 	"time"
 
 	"github.com/h2non/bimg"
-	"manael.org/x/manael/v2"
+	"manael.org/x/manael/v3"
 )
 
 var basicTests = []struct {
@@ -775,8 +775,15 @@ var avifTests = []struct {
 }
 
 func TestNewServeProxy_avif(t *testing.T) {
-	if os.Getenv("MANAEL_ENABLE_AVIF") != "true" {
-		t.Skip("Skipping test when avif disabled.")
+	t.Setenv("MANAEL_ENABLE_AVIF", "true")
+
+	testImg, err := os.ReadFile("testdata/photo.jpeg")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := manael.Encode(io.Discard, testImg, "image/avif"); err != nil {
+		t.Skipf("AVIF encoding not supported in this environment: %v", err)
 	}
 
 	mux := http.NewServeMux()

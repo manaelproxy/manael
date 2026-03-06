@@ -31,6 +31,11 @@ title = 'Manael'
     [languages.ja.params]
       description = 'Manael は画像を処理するためのシンプルな HTTP プロキシです。'
 
+[[menus.main]]
+  name = "Blog"
+  weight = 30
+  url = "/blog/"
+
 [markup]
   [markup.goldmark]
     [markup.goldmark.renderer]
