@@ -153,6 +153,16 @@ func main() {
 		}
 	}
 
+	if s := os.Getenv("MANAEL_DEFAULT_QUALITY"); s != "" {
+		n, err := strconv.Atoi(strings.TrimSpace(s))
+		if err != nil || n <= 0 {
+			slog.Error("invalid MANAEL_DEFAULT_QUALITY",
+				slog.String("error", fmt.Sprintf("must be a positive integer, got %q", s)))
+			os.Exit(1)
+		}
+		proxyOpts = append(proxyOpts, manael.WithDefaultQuality(n))
+	}
+
 	if metricsPort := os.Getenv("MANAEL_METRICS_PORT"); metricsPort != "" {
 		exporter, err := prometheus.New()
 		if err != nil {
