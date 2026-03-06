@@ -35,9 +35,12 @@ import (
 	"time"
 
 	"github.com/gorilla/handlers"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/prometheus"
 	"go.opentelemetry.io/otel/metric/noop"
+	"go.opentelemetry.io/otel/sdk/metric"
 	"manael.org/x/manael/v2"
 )
 
@@ -107,7 +110,35 @@ func main() {
 		}
 	}
 
-	otel.SetMeterProvider(noop.NewMeterProvider())
+	if metricsPort := os.Getenv("MANAEL_METRICS_PORT"); metricsPort != "" {
+		exporter, err := prometheus.New()
+		if err != nil {
+			slog.Error("failed to initialize prometheus exporter", slog.String("error", err.Error()))
+			os.Exit(1)
+		}
+		provider := metric.NewMeterProvider(metric.WithReader(exporter))
+		otel.SetMeterProvider(provider)
+
+		metricsMux := http.NewServeMux()
+		metricsMux.Handle("/metrics", promhttp.Handler())
+		metricsAddr := ":" + metricsPort
+		metricsSrv := &http.Server{
+			Addr:              metricsAddr,
+			Handler:           metricsMux,
+			ReadHeaderTimeout: 10 * time.Second,
+			ReadTimeout:       10 * time.Second,
+			WriteTimeout:      10 * time.Second,
+			IdleTimeout:       60 * time.Second,
+		}
+		slog.Info("Starting metrics server", slog.String("addr", metricsAddr))
+		go func() {
+			if err := metricsSrv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+				slog.Error("metrics server error", slog.String("addr", metricsAddr), slog.String("error", err.Error()))
+			}
+		}()
+	} else {
+		otel.SetMeterProvider(noop.NewMeterProvider())
+	}
 
 	var handler http.Handler
 	handler = manael.NewServeProxy(upstreamURL, proxyOpts...)
