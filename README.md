@@ -10,6 +10,22 @@ Manael is a simple HTTP proxy for processing images.
 
 - [Download latest binary](https://github.com/manaelproxy/manael/releases/latest)
 
+### Build from source
+
+Building from source requires [libvips](https://www.libvips.org/) development headers in addition to Go and Git.
+
+On Debian/Ubuntu:
+
+```console
+sudo apt-get install -y libvips-dev
+```
+
+On macOS (Homebrew):
+
+```console
+brew install vips
+```
+
 ## Usage
 
 Start the proxy server:
