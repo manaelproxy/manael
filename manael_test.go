@@ -774,9 +774,7 @@ var avifTests = []struct {
 }
 
 func TestNewServeProxy_avif(t *testing.T) {
-	if os.Getenv("MANAEL_ENABLE_AVIF") != "true" {
-		t.Skip("Skipping test when avif disabled.")
-	}
+	t.Setenv("MANAEL_ENABLE_AVIF", "true")
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/logo.png", func(w http.ResponseWriter, r *http.Request) {
