@@ -776,6 +776,15 @@ var avifTests = []struct {
 func TestNewServeProxy_avif(t *testing.T) {
 	t.Setenv("MANAEL_ENABLE_AVIF", "true")
 
+	testImg, err := os.ReadFile("testdata/photo.jpeg")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := manael.Encode(io.Discard, testImg, "image/avif"); err != nil {
+		t.Skipf("AVIF encoding not supported in this environment: %v", err)
+	}
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/logo.png", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "testdata/logo.png")
