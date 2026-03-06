@@ -34,6 +34,9 @@ import (
 	"time"
 
 	"github.com/gorilla/handlers"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/metric/noop"
 	"manael.org/x/manael/v2"
 )
 
@@ -87,8 +90,11 @@ func main() {
 		log.Fatalf("Error: %v", err)
 	}
 
+	otel.SetMeterProvider(noop.NewMeterProvider())
+
 	var handler http.Handler
 	handler = manael.NewServeProxy(upstreamURL)
+	handler = otelhttp.NewHandler(handler, "manael-proxy")
 	handler = handlers.CombinedLoggingHandler(os.Stdout, handler)
 
 	srv := &http.Server{
