@@ -21,12 +21,17 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/gorilla/handlers"
 	"manael.org/x/manael/v2"
@@ -86,7 +91,32 @@ func main() {
 	handler = manael.NewServeProxy(upstreamURL)
 	handler = handlers.CombinedLoggingHandler(os.Stdout, handler)
 
-	if err := http.ListenAndServe(conf.httpAddr, handler); err != nil {
-		log.Fatalf("Error: %v", err)
+	srv := &http.Server{
+		Addr:              conf.httpAddr,
+		Handler:           handler,
+		ReadHeaderTimeout: 10 * time.Second,
 	}
+
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	go func() {
+		log.Printf("Starting server on %s", conf.httpAddr)
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatalf("Error: %v", err)
+		}
+	}()
+
+	<-ctx.Done()
+	stop()
+	log.Println("Shutting down gracefully, press Ctrl+C again to force")
+
+	timeoutCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(timeoutCtx); err != nil {
+		log.Fatalf("Server forced to shutdown: %v", err)
+	}
+
+	log.Println("Server exiting")
 }
