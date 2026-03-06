@@ -17,6 +17,7 @@ FROM debian:bookworm-slim
 RUN apt-get update && \
 	apt-get install -y --no-install-recommends \
 		libvips42 \
+		libheif-plugin-aomenc \
 	&& rm -rf /var/lib/apt/lists/*
 COPY --from=build /go/bin/manael /
 CMD ["/manael"]
