@@ -30,7 +30,6 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"os"
 	"path"
 	"strconv"
 	"strings"
@@ -38,21 +37,33 @@ import (
 
 var pngSignature = []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A}
 
-const defaultMaxImageSize int64 = 20 * 1024 * 1024 // 20 MiB
+// ProxyOptions holds configuration for a proxy created by NewServeProxy.
+type ProxyOptions struct {
+	// EnableAVIF enables AVIF encoding for JPEG images when the client supports it.
+	EnableAVIF bool
+	// MaxImageSize is the maximum upstream image size in bytes that will be
+	// converted. Images larger than this limit are passed through unchanged.
+	// Defaults to 20 MiB when zero.
+	MaxImageSize int64
+}
 
-// maxImageSize returns the maximum allowed upstream image size in bytes.
-// It reads MANAEL_MAX_IMAGE_SIZE from the environment; if unset or invalid,
-// it falls back to defaultMaxImageSize.
-func maxImageSize() int64 {
-	s := os.Getenv("MANAEL_MAX_IMAGE_SIZE")
-	if s == "" {
-		return defaultMaxImageSize
+// ProxyOption is a functional option for configuring a proxy.
+type ProxyOption func(*ProxyOptions)
+
+// WithAVIFEnabled returns a ProxyOption that enables or disables AVIF encoding.
+func WithAVIFEnabled(enabled bool) ProxyOption {
+	return func(o *ProxyOptions) {
+		o.EnableAVIF = enabled
 	}
-	n, err := strconv.ParseInt(s, 10, 64)
-	if err != nil || n <= 0 {
-		return defaultMaxImageSize
+}
+
+// WithMaxImageSize returns a ProxyOption that sets the maximum image size (in
+// bytes) that will be converted. Images whose size exceeds this limit are
+// passed through without conversion.
+func WithMaxImageSize(size int64) ProxyOption {
+	return func(o *ProxyOptions) {
+		o.MaxImageSize = size
 	}
-	return n
 }
 
 // isAPNG returns true if r contains an APNG (Animated PNG) stream.
@@ -190,19 +201,19 @@ func setVaryHeader(res *http.Response) {
 	res.Header.Set("Vary", strings.Join(keys[:], ", "))
 }
 
-func avifEnabled(res *http.Response) bool {
+func avifEnabled(res *http.Response, opts *ProxyOptions) bool {
 	contentType := res.Header.Get("Content-Type")
 
-	return os.Getenv("MANAEL_ENABLE_AVIF") == "true" && contentType != "image/png" && contentType != "image/gif"
+	return opts.EnableAVIF && contentType != "image/png" && contentType != "image/gif"
 }
 
-func scanAcceptHeader(res *http.Response) string {
+func scanAcceptHeader(res *http.Response, opts *ProxyOptions) string {
 	accepts := res.Request.Header.Get("Accept")
 
 	for _, v := range strings.Split(accepts, ",") {
 		t := strings.TrimSpace(v)
 
-		if avifEnabled(res) && strings.HasPrefix(t, "image/avif") {
+		if avifEnabled(res, opts) && strings.HasPrefix(t, "image/avif") {
 			return "image/avif"
 		} else if strings.HasPrefix(t, "image/webp") {
 			return "image/webp"
@@ -212,7 +223,7 @@ func scanAcceptHeader(res *http.Response) string {
 	return "*/*"
 }
 
-func check(res *http.Response) string {
+func check(res *http.Response, opts *ProxyOptions) string {
 	if res.Request.Method != http.MethodGet && res.StatusCode != http.StatusOK && res.StatusCode != http.StatusNotModified {
 		return "*/*"
 	}
@@ -231,7 +242,7 @@ func check(res *http.Response) string {
 		return "*/*"
 	}
 
-	return scanAcceptHeader(res)
+	return scanAcceptHeader(res, opts)
 }
 
 func convert(src io.Reader, t string) (*bytes.Buffer, error) {
@@ -277,17 +288,17 @@ func updateContentDispositionFilename(res *http.Response, typ string) {
 	}
 }
 
-func modifyResponse(res *http.Response) error {
+func modifyResponse(res *http.Response, opts *ProxyOptions) error {
 	res.Header.Set("Server", "Manael")
 
 	setVaryHeader(res)
 
-	typ := check(res)
+	typ := check(res, opts)
 	if typ == "*/*" {
 		return nil
 	}
 
-	maxSize := maxImageSize()
+	maxSize := opts.MaxImageSize
 
 	// If Content-Length is known and exceeds the limit, pass through unchanged.
 	if res.ContentLength > maxSize {
@@ -408,8 +419,17 @@ func modifyResponse(res *http.Response) error {
 	return nil
 }
 
-// NewServeProxy returns a new Proxy given a upstream URL
-func NewServeProxy(u *url.URL) http.Handler {
+// NewServeProxy returns a new reverse-proxy handler for the given upstream URL.
+// Optional ProxyOption values can be used to configure the proxy behaviour,
+// such as enabling AVIF encoding or adjusting the maximum image size.
+func NewServeProxy(u *url.URL, opts ...ProxyOption) http.Handler {
+	options := &ProxyOptions{
+		MaxImageSize: defaultMaxImageSize,
+	}
+	for _, o := range opts {
+		o(options)
+	}
+
 	return &httputil.ReverseProxy{
 		Rewrite: func(r *httputil.ProxyRequest) {
 			r.Out.Header["X-Forwarded-For"] = r.In.Header["X-Forwarded-For"]
@@ -417,6 +437,8 @@ func NewServeProxy(u *url.URL) http.Handler {
 			r.SetXForwarded()
 			r.SetURL(u)
 		},
-		ModifyResponse: modifyResponse,
+		ModifyResponse: func(res *http.Response) error {
+			return modifyResponse(res, options)
+		},
 	}
 }

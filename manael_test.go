@@ -30,6 +30,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
+	"strconv"
 	"testing"
 	"time"
 
@@ -793,7 +794,7 @@ func TestNewServeProxy_avif(t *testing.T) {
 		t.Error(err)
 	}
 
-	p := manael.NewServeProxy(u)
+	p := manael.NewServeProxy(u, manael.WithAVIFEnabled(true))
 
 	for _, tc := range avifTests {
 		req := httptest.NewRequest(http.MethodGet, "https://manael.test"+tc.path, nil)
@@ -857,7 +858,7 @@ var maxImageSizeTests = []struct {
 	},
 }
 
-// TestNewServeProxy_maxImageSize verifies that when MANAEL_MAX_IMAGE_SIZE is set,
+// TestNewServeProxy_maxImageSize verifies that when WithMaxImageSize is set,
 // images whose Content-Length exceeds the limit are passed through unconverted.
 func TestNewServeProxy_maxImageSize(t *testing.T) {
 	mux := http.NewServeMux()
@@ -876,12 +877,15 @@ func TestNewServeProxy_maxImageSize(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p := manael.NewServeProxy(u)
-
 	for _, tc := range maxImageSizeTests {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			t.Setenv("MANAEL_MAX_IMAGE_SIZE", tc.maxSize)
+			maxSize, err := strconv.ParseInt(tc.maxSize, 10, 64)
+			if err != nil {
+				t.Fatalf("invalid maxSize %q: %v", tc.maxSize, err)
+			}
+
+			p := manael.NewServeProxy(u, manael.WithMaxImageSize(maxSize))
 
 			req := httptest.NewRequest(http.MethodGet, "https://manael.test"+tc.path, nil)
 			req.Header.Set("Accept", tc.accept)
@@ -910,11 +914,9 @@ func TestNewServeProxy_maxImageSize(t *testing.T) {
 
 // TestNewServeProxy_maxImageSizeStreaming verifies that oversized images served
 // without a Content-Length header (chunked transfer) are also passed through
-// unconverted when they exceed MANAEL_MAX_IMAGE_SIZE.
+// unconverted when they exceed the configured MaxImageSize.
 func TestNewServeProxy_maxImageSizeStreaming(t *testing.T) {
 	// logo.png is 4090 bytes; limit of 1024 → pass through unchanged.
-	t.Setenv("MANAEL_MAX_IMAGE_SIZE", "1024")
-
 	mux := http.NewServeMux()
 	mux.HandleFunc("/logo.png", func(w http.ResponseWriter, r *http.Request) {
 		data, err := os.ReadFile("testdata/logo.png")
@@ -939,7 +941,7 @@ func TestNewServeProxy_maxImageSizeStreaming(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p := manael.NewServeProxy(u)
+	p := manael.NewServeProxy(u, manael.WithMaxImageSize(1024))
 
 	req := httptest.NewRequest(http.MethodGet, "https://manael.test/logo.png", nil)
 	req.Header.Set("Accept", "image/webp,image/*,*/*;q=0.8")
