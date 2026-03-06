@@ -25,7 +25,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"os"
@@ -54,6 +54,9 @@ type config struct {
 }
 
 func main() {
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
+
 	fs := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 
 	conf := config{}
@@ -62,7 +65,8 @@ func main() {
 	fs.StringVar(&conf.upstreamURL, "upstream_url", "", "Upstream URL for processing images")
 
 	if err := fs.Parse(os.Args[1:]); err != nil {
-		log.Fatalf("Error: %v", err)
+		slog.Error("failed to parse flags", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
 
 	if conf.httpAddr == "" {
@@ -87,7 +91,8 @@ func main() {
 
 	upstreamURL, err := url.Parse(conf.upstreamURL)
 	if err != nil {
-		log.Fatalf("Error: %v", err)
+		slog.Error("failed to parse upstream URL", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
 
 	otel.SetMeterProvider(noop.NewMeterProvider())
@@ -106,23 +111,25 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
+	slog.Info("Starting server", slog.String("addr", conf.httpAddr))
 	go func() {
-		log.Printf("Starting server on %s", conf.httpAddr)
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			log.Fatalf("Error: %v", err)
+			slog.Error("server error", slog.String("error", err.Error()))
+			os.Exit(1)
 		}
 	}()
 
 	<-ctx.Done()
 	stop()
-	log.Println("Shutting down gracefully, press Ctrl+C again to force")
+	slog.Info("Shutting down gracefully, press Ctrl+C again to force")
 
 	timeoutCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	if err := srv.Shutdown(timeoutCtx); err != nil {
-		log.Fatalf("Server forced to shutdown: %v", err)
+		slog.Error("server forced to shutdown", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
 
-	log.Println("Server exiting")
+	slog.Info("Server exiting")
 }
