@@ -49,6 +49,10 @@ jobs:
           go-version: '1.26'
 
       - name: Build binary
+        env:
+          CGO_ENABLED: 1
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
         run: |
           go build -o manael ./cmd/manael
 
@@ -60,4 +64,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload ${{ github.event.release.tag_name }} manael_${{ github.event.release.tag_name }}_${{ matrix.os_label }}_${{ matrix.arch_label }}.tar.gz
+          gh release upload "${{ github.event.release.tag_name }}" \
+            "manael_${{ github.event.release.tag_name }}_${{ matrix.os_label }}_${{ matrix.arch_label }}.tar.gz" \
+            --clobber
