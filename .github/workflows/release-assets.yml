@@ -1,0 +1,63 @@
+name: Release Assets
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-and-upload:
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: write
+
+    strategy:
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            goos: linux
+            goarch: amd64
+            os_label: Linux
+            arch_label: x86_64
+          - runner: ubuntu-24.04-arm
+            goos: linux
+            goarch: arm64
+            os_label: Linux
+            arch_label: arm64
+          - runner: macos-latest
+            goos: darwin
+            goarch: arm64
+            os_label: Darwin
+            arch_label: arm64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libvips-dev
+
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: brew install vips
+
+      - name: Set up Go
+        uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6
+        with:
+          go-version: '1.26'
+
+      - name: Build binary
+        run: |
+          go build -o manael ./cmd/manael
+
+      - name: Create archive
+        run: |
+          tar -czvf manael_${{ github.event.release.tag_name }}_${{ matrix.os_label }}_${{ matrix.arch_label }}.tar.gz manael
+
+      - name: Upload release asset
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${{ github.event.release.tag_name }} manael_${{ github.event.release.tag_name }}_${{ matrix.os_label }}_${{ matrix.arch_label }}.tar.gz
