@@ -49,7 +49,7 @@ func FuzzScanAcceptHeader(f *testing.F) {
 		}
 		res.Header.Set("Content-Type", "image/jpeg")
 
-		_ = scanAcceptHeader(res)
+		_ = scanAcceptHeader(res, &ProxyOptions{})
 	})
 }
 
@@ -89,7 +89,7 @@ func FuzzCheck(f *testing.F) {
 			res.Header.Set("Cache-Control", cacheControl)
 		}
 
-		_ = check(res)
+		_ = check(res, &ProxyOptions{})
 	})
 }
 
