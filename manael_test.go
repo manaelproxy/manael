@@ -34,6 +34,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/h2non/bimg"
 	"manael.org/x/manael/v2"
 )
 
@@ -972,6 +973,8 @@ path            string
 accept          string
 wantStatusCode  int
 wantContentType string
+wantWidth       int
+wantHeight      int
 }{
 {
 name:            "resize width only",
@@ -979,6 +982,8 @@ path:            "/photo.jpeg?w=400",
 accept:          "image/webp,image/*,*/*;q=0.8",
 wantStatusCode:  http.StatusOK,
 wantContentType: "image/webp",
+wantWidth:       400,
+wantHeight:      300,
 },
 {
 name:            "resize height only",
@@ -986,6 +991,8 @@ path:            "/photo.jpeg?h=300",
 accept:          "image/webp,image/*,*/*;q=0.8",
 wantStatusCode:  http.StatusOK,
 wantContentType: "image/webp",
+wantWidth:       400,
+wantHeight:      300,
 },
 {
 name:            "resize width and height with fit=cover",
@@ -993,6 +1000,8 @@ path:            "/photo.jpeg?w=200&h=200&fit=cover",
 accept:          "image/webp,image/*,*/*;q=0.8",
 wantStatusCode:  http.StatusOK,
 wantContentType: "image/webp",
+wantWidth:       200,
+wantHeight:      200,
 },
 {
 name:            "resize width and height with fit=contain",
@@ -1000,6 +1009,8 @@ path:            "/photo.jpeg?w=200&h=200&fit=contain",
 accept:          "image/webp,image/*,*/*;q=0.8",
 wantStatusCode:  http.StatusOK,
 wantContentType: "image/webp",
+wantWidth:       200,
+wantHeight:      150,
 },
 {
 name:            "resize width and height with fit=scale-down",
@@ -1007,6 +1018,8 @@ path:            "/photo.jpeg?w=200&h=200&fit=scale-down",
 accept:          "image/webp,image/*,*/*;q=0.8",
 wantStatusCode:  http.StatusOK,
 wantContentType: "image/webp",
+wantWidth:       200,
+wantHeight:      200,
 },
 {
 name:            "resize PNG image",
@@ -1014,6 +1027,8 @@ path:            "/logo.png?w=128",
 accept:          "image/webp,image/*,*/*;q=0.8",
 wantStatusCode:  http.StatusOK,
 wantContentType: "image/webp",
+wantWidth:       128,
+wantHeight:      128,
 },
 {
 name:           "invalid w parameter (not a number)",
@@ -1072,7 +1087,11 @@ w := httptest.NewRecorder()
 p.ServeHTTP(w, req)
 
 resp := w.Result()
-defer resp.Body.Close()
+body, err := io.ReadAll(resp.Body)
+resp.Body.Close()
+if err != nil {
+t.Fatal(err)
+}
 
 if got, want := resp.StatusCode, tc.wantStatusCode; got != want {
 t.Errorf("Status Code is %d, want %d", got, want)
@@ -1081,6 +1100,19 @@ t.Errorf("Status Code is %d, want %d", got, want)
 if tc.wantContentType != "" {
 if got, want := resp.Header.Get("Content-Type"), tc.wantContentType; got != want {
 t.Errorf("Content-Type is %s, want %s", got, want)
+}
+}
+
+if tc.wantWidth > 0 || tc.wantHeight > 0 {
+size, err := bimg.NewImage(body).Size()
+if err != nil {
+t.Fatalf("failed to get image size: %v", err)
+}
+if tc.wantWidth > 0 && size.Width != tc.wantWidth {
+t.Errorf("Width is %d, want %d", size.Width, tc.wantWidth)
+}
+if tc.wantHeight > 0 && size.Height != tc.wantHeight {
+t.Errorf("Height is %d, want %d", size.Height, tc.wantHeight)
 }
 }
 })

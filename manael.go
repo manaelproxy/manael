@@ -108,7 +108,7 @@ func WithMaxResizeHeight(h int) ProxyOption {
 // the whitelist.
 func WithAllowedWidths(widths []int) ProxyOption {
 	return func(o *ProxyOptions) {
-		o.AllowedWidths = widths
+		o.AllowedWidths = append([]int(nil), widths...)
 	}
 }
 
@@ -118,7 +118,7 @@ func WithAllowedWidths(widths []int) ProxyOption {
 // slice disables the whitelist.
 func WithAllowedHeights(heights []int) ProxyOption {
 	return func(o *ProxyOptions) {
-		o.AllowedHeights = heights
+		o.AllowedHeights = append([]int(nil), heights...)
 	}
 }
 

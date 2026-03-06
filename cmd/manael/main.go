@@ -124,14 +124,22 @@ func main() {
 	}
 
 	if s := os.Getenv("MANAEL_ALLOWED_WIDTHS"); s != "" {
-		widths := parseIntList(s)
+		widths, err := parseIntList(s)
+		if err != nil {
+			slog.Error("invalid MANAEL_ALLOWED_WIDTHS", slog.String("error", err.Error()))
+			os.Exit(1)
+		}
 		if len(widths) > 0 {
 			proxyOpts = append(proxyOpts, manael.WithAllowedWidths(widths))
 		}
 	}
 
 	if s := os.Getenv("MANAEL_ALLOWED_HEIGHTS"); s != "" {
-		heights := parseIntList(s)
+		heights, err := parseIntList(s)
+		if err != nil {
+			slog.Error("invalid MANAEL_ALLOWED_HEIGHTS", slog.String("error", err.Error()))
+			os.Exit(1)
+		}
 		if len(heights) > 0 {
 			proxyOpts = append(proxyOpts, manael.WithAllowedHeights(heights))
 		}
@@ -216,15 +224,22 @@ func healthHandler(w http.ResponseWriter, _ *http.Request) {
 	_, _ = w.Write([]byte("OK"))
 }
 
-// parseIntList splits a comma-separated string of integers and returns the
-// valid positive values. Invalid or non-positive entries are silently ignored.
-func parseIntList(s string) []int {
+// parseIntList splits a comma-separated string of positive integers. It
+// returns an error for any token that is not a positive integer so that
+// misconfiguration is caught at startup rather than silently disabling
+// the whitelist safety controls.
+func parseIntList(s string) ([]int, error) {
 	var result []int
 	for _, part := range strings.Split(s, ",") {
 		part = strings.TrimSpace(part)
-		if n, err := strconv.Atoi(part); err == nil && n > 0 {
-			result = append(result, n)
+		if part == "" {
+			continue
 		}
+		n, err := strconv.Atoi(part)
+		if err != nil || n <= 0 {
+			return nil, fmt.Errorf("must be a positive integer, got %q", part)
+		}
+		result = append(result, n)
 	}
-	return result
+	return result, nil
 }

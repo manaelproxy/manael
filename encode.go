@@ -64,10 +64,11 @@ func Encode(w io.Writer, src []byte, t string, resize ...*ResizeOptions) error {
 		case "cover":
 			// Crop to fill the target dimensions exactly.
 			opts.Crop = true
-		case "contain":
+		case "contain", "":
 			// Scale to fit within the target box; allow upscaling smaller images.
+			// An empty Fit is treated as "contain" per the ResizeOptions documentation.
 			opts.Enlarge = true
-		case "scale-down", "":
+		case "scale-down":
 			// Scale down to fit within the target box; never upscale.
 			// This is the bimg default when neither Crop nor Enlarge is set.
 		}
