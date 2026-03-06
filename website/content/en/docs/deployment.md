@@ -68,6 +68,8 @@ The following manifests deploy Manael as a `Deployment` with a `Service` that ex
 
 ### Deployment and Service {#deployment-and-service}
 
+Save the following manifest to a file named `manael.yaml`:
+
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -116,7 +118,7 @@ spec:
       targetPort: 8080
 ```
 
-Apply the manifests with:
+Apply the manifest with:
 
 ```console
 kubectl apply -f manael.yaml

@@ -68,6 +68,8 @@ gcloud run deploy manael \
 
 ### Deployment と Service {#deployment-and-service}
 
+以下のマニフェストを `manael.yaml` という名前のファイルに保存します。
+
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
