@@ -112,15 +112,23 @@ func main() {
 	}
 
 	if s := os.Getenv("MANAEL_MAX_RESIZE_WIDTH"); s != "" {
-		if n, err := strconv.Atoi(s); err == nil && n > 0 {
-			proxyOpts = append(proxyOpts, manael.WithMaxResizeWidth(n))
+		n, err := strconv.Atoi(strings.TrimSpace(s))
+		if err != nil || n <= 0 {
+			slog.Error("invalid MANAEL_MAX_RESIZE_WIDTH",
+				slog.String("error", fmt.Sprintf("must be a positive integer, got %q", s)))
+			os.Exit(1)
 		}
+		proxyOpts = append(proxyOpts, manael.WithMaxResizeWidth(n))
 	}
 
 	if s := os.Getenv("MANAEL_MAX_RESIZE_HEIGHT"); s != "" {
-		if n, err := strconv.Atoi(s); err == nil && n > 0 {
-			proxyOpts = append(proxyOpts, manael.WithMaxResizeHeight(n))
+		n, err := strconv.Atoi(strings.TrimSpace(s))
+		if err != nil || n <= 0 {
+			slog.Error("invalid MANAEL_MAX_RESIZE_HEIGHT",
+				slog.String("error", fmt.Sprintf("must be a positive integer, got %q", s)))
+			os.Exit(1)
 		}
+		proxyOpts = append(proxyOpts, manael.WithMaxResizeHeight(n))
 	}
 
 	if s := os.Getenv("MANAEL_ALLOWED_WIDTHS"); s != "" {
