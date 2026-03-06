@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Yamagishi Kazutoshi <ykzts@desire.sh>
+// Copyright (c) 2026 Yamagishi Kazutoshi <ykzts@desire.sh>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
