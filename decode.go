@@ -22,38 +22,21 @@ package manael
 
 import (
 	"errors"
-	"image"
 	"io"
-
-	// register gif
-	_ "image/gif"
-	// register jpeg
-	_ "image/jpeg"
-	// register png
-	_ "image/png"
 )
 
-// Decode returns an image.Image.
-func Decode(r io.Reader) (image.Image, error) {
-	img, _, err := image.Decode(r)
+const maxDecodeBytes int64 = 20 << 20 // 20 MiB
+
+// Decode reads all bytes from r and returns them for further processing.
+// It returns an error if the payload exceeds maxDecodeBytes.
+func Decode(r io.Reader) ([]byte, error) {
+	lr := &io.LimitedReader{R: r, N: maxDecodeBytes + 1}
+	data, err := io.ReadAll(lr)
 	if err != nil {
 		return nil, err
 	}
-
-	switch img.(type) {
-	case *image.Gray, *image.NRGBA, *image.RGBA:
-		return img, nil
-	case *image.CMYK, *image.NRGBA64, *image.Paletted, *image.RGBA64, *image.YCbCr:
-		bounds := img.Bounds()
-		newImg := image.NewRGBA(bounds)
-		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
-			for x := bounds.Min.X; x < bounds.Max.X; x++ {
-				newImg.Set(x, y, img.At(x, y))
-			}
-		}
-
-		return newImg, nil
+	if int64(len(data)) > maxDecodeBytes {
+		return nil, errors.New("payload too large")
 	}
-
-	return nil, errors.New("Not supported image format")
+	return data, nil
 }

@@ -21,50 +21,39 @@
 package manael
 
 import (
+	"bytes"
 	"errors"
-	"image"
 	"io"
 
-	"github.com/Kagami/go-avif"
-	"github.com/harukasan/go-libwebp/webp"
+	"github.com/h2non/bimg"
 )
 
-// Encode writes the Image m to w in the format specified by Content-Type t.
-func Encode(w io.Writer, m image.Image, t string) error {
+// Encode converts the image data in src to the format specified by Content-Type t,
+// writing the result to w.
+func Encode(w io.Writer, src []byte, t string) error {
+	var opts bimg.Options
+
 	switch t {
+	case "image/webp":
+		opts = bimg.Options{
+			Type:    bimg.WEBP,
+			Quality: 90,
+		}
 	case "image/avif":
-		opts := avif.Options{
-			Quality: 20,
+		opts = bimg.Options{
+			Type:    bimg.AVIF,
+			Quality: 60,
 			Speed:   8,
 		}
-
-		err := avif.Encode(w, m, &opts)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	case "image/webp":
-		c, err := webp.ConfigPreset(webp.PresetDefault, 90)
-		if err != nil {
-			return err
-		}
-
-		switch img := m.(type) {
-		case *image.Gray:
-			err = webp.EncodeGray(w, img, c)
-			if err != nil {
-				return err
-			}
-		case *image.RGBA, *image.NRGBA:
-			err = webp.EncodeRGBA(w, img, c)
-			if err != nil {
-				return err
-			}
-		}
-
-		return nil
+	default:
+		return errors.New("unsupported image type")
 	}
 
-	return errors.New("Not supported image type")
+	out, err := bimg.NewImage(src).Process(opts)
+	if err != nil {
+		return err
+	}
+
+	_, err = io.Copy(w, bytes.NewReader(out))
+	return err
 }
