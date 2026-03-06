@@ -38,6 +38,23 @@ import (
 
 var pngSignature = []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A}
 
+const defaultMaxImageSize int64 = 20 * 1024 * 1024 // 20 MiB
+
+// maxImageSize returns the maximum allowed upstream image size in bytes.
+// It reads MANAEL_MAX_IMAGE_SIZE from the environment; if unset or invalid,
+// it falls back to defaultMaxImageSize.
+func maxImageSize() int64 {
+	s := os.Getenv("MANAEL_MAX_IMAGE_SIZE")
+	if s == "" {
+		return defaultMaxImageSize
+	}
+	n, err := strconv.ParseInt(s, 10, 64)
+	if err != nil || n <= 0 {
+		return defaultMaxImageSize
+	}
+	return n
+}
+
 // isAPNG returns true if r contains an APNG (Animated PNG) stream.
 // It detects APNG by scanning PNG chunks for an acTL chunk before the IDAT chunk.
 func isAPNG(r io.Reader) (bool, error) {
@@ -270,6 +287,13 @@ func modifyResponse(res *http.Response) error {
 		return nil
 	}
 
+	maxSize := maxImageSize()
+
+	// If Content-Length is known and exceeds the limit, pass through unchanged.
+	if res.ContentLength > maxSize {
+		return nil
+	}
+
 	origBody := res.Body
 	closeOrigBody := true
 	defer func() {
@@ -279,17 +303,39 @@ func modifyResponse(res *http.Response) error {
 	}()
 
 	p := bytes.NewBuffer(nil)
-	b := io.TeeReader(origBody, p)
+	// Read at most maxSize+1 bytes so we can detect oversized streaming responses.
+	limited := io.LimitReader(origBody, maxSize+1)
+	b := io.TeeReader(limited, p)
 
 	if res.Header.Get("Content-Type") == "image/png" {
 		ok, _ := isAPNG(b)
-		// Drain remaining bytes into p so the full body is buffered.
+		// Drain remaining bytes into p so the full read is buffered.
 		if _, err := io.Copy(io.Discard, b); err != nil {
 			return err
 		}
 		if ok {
-			// APNG: pass through unchanged; p now holds the complete body.
-			res.Body = io.NopCloser(p)
+			// APNG: pass through unchanged (animated, no conversion).
+			// Reconstruct with origBody remainder in case body exceeded maxSize.
+			res.Body = struct {
+				io.Reader
+				io.Closer
+			}{
+				Reader: io.MultiReader(bytes.NewReader(p.Bytes()), origBody),
+				Closer: origBody,
+			}
+			closeOrigBody = false
+			return nil
+		}
+		// If oversized, pass through unchanged.
+		if int64(p.Len()) > maxSize {
+			res.Body = struct {
+				io.Reader
+				io.Closer
+			}{
+				Reader: io.MultiReader(bytes.NewReader(p.Bytes()), origBody),
+				Closer: origBody,
+			}
+			closeOrigBody = false
 			return nil
 		}
 		// Not APNG: replace b with a reader over p's buffered content for conversion.
@@ -314,15 +360,32 @@ func modifyResponse(res *http.Response) error {
 		if _, err := io.Copy(io.Discard, b); err != nil {
 			return err
 		}
+		// If oversized, pass through unchanged.
+		if int64(p.Len()) > maxSize {
+			res.Body = struct {
+				io.Reader
+				io.Closer
+			}{
+				Reader: io.MultiReader(bytes.NewReader(p.Bytes()), origBody),
+				Closer: origBody,
+			}
+			closeOrigBody = false
+			return nil
+		}
 		// Replace b with a reader over p's buffered content for conversion.
 		b = bytes.NewReader(p.Bytes())
 	}
 
 	buf, err := convert(b, typ)
 	if err != nil {
-		body := io.MultiReader(p, res.Body)
-
-		res.Body = io.NopCloser(body)
+		res.Body = struct {
+			io.Reader
+			io.Closer
+		}{
+			Reader: io.MultiReader(bytes.NewReader(p.Bytes()), origBody),
+			Closer: origBody,
+		}
+		closeOrigBody = false
 		log.Printf("error: %v\n", err)
 
 		return nil

@@ -25,17 +25,16 @@ import (
 	"io"
 )
 
-const maxDecodeBytes int64 = 20 << 20 // 20 MiB
-
 // Decode reads all bytes from r and returns them for further processing.
-// It returns an error if the payload exceeds maxDecodeBytes.
+// It returns an error if the payload exceeds the configured maximum image size.
 func Decode(r io.Reader) ([]byte, error) {
-	lr := &io.LimitedReader{R: r, N: maxDecodeBytes + 1}
+	limit := maxImageSize()
+	lr := &io.LimitedReader{R: r, N: limit + 1}
 	data, err := io.ReadAll(lr)
 	if err != nil {
 		return nil, err
 	}
-	if int64(len(data)) > maxDecodeBytes {
+	if int64(len(data)) > limit {
 		return nil, errors.New("payload too large")
 	}
 	return data, nil
