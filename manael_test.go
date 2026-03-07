@@ -1373,6 +1373,112 @@ var qualityTests = []struct {
 	},
 }
 
+// TestNewServeProxy_transformParamsNotForwarded verifies that Manael-specific
+// transform query parameters (w, h, fit, q) are not forwarded to the upstream,
+// while unrelated query parameters are preserved.
+func TestNewServeProxy_transformParamsNotForwarded(t *testing.T) {
+	var capturedRawQuery string
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/photo.jpeg", func(w http.ResponseWriter, r *http.Request) {
+		capturedRawQuery = r.URL.RawQuery
+		http.ServeFile(w, r, "testdata/photo.jpeg")
+	})
+
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
+
+	u, err := url.Parse(ts.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		name              string
+		path              string
+		opts              []manael.ProxyOption
+		wantMissingParams []string
+		wantPresentParams map[string]string
+	}{
+		{
+			name:              "resize params are stripped",
+			path:              "/photo.jpeg?w=200&h=100&fit=cover",
+			opts:              []manael.ProxyOption{manael.WithResizeEnabled(true)},
+			wantMissingParams: []string{"w", "h", "fit"},
+		},
+		{
+			name:              "quality param is stripped",
+			path:              "/photo.jpeg?q=80",
+			wantMissingParams: []string{"q"},
+		},
+		{
+			name:              "all transform params stripped together",
+			path:              "/photo.jpeg?w=200&h=100&fit=cover&q=75",
+			opts:              []manael.ProxyOption{manael.WithResizeEnabled(true)},
+			wantMissingParams: []string{"w", "h", "fit", "q"},
+		},
+		{
+			name:              "non-transform params are preserved",
+			path:              "/photo.jpeg?w=200&version=2&token=abc",
+			opts:              []manael.ProxyOption{manael.WithResizeEnabled(true)},
+			wantMissingParams: []string{"w"},
+			wantPresentParams: map[string]string{"version": "2", "token": "abc"},
+		},
+		{
+			name:              "only non-transform params passed unchanged",
+			path:              "/photo.jpeg?foo=bar&baz=qux",
+			wantMissingParams: []string{"w", "h", "fit", "q"},
+			wantPresentParams: map[string]string{"foo": "bar", "baz": "qux"},
+		},
+		{
+			name:              "resize params forwarded when resize is disabled",
+			path:              "/photo.jpeg?w=200&h=100&fit=cover",
+			opts:              []manael.ProxyOption{manael.WithResizeEnabled(false)},
+			wantMissingParams: []string{"q"},
+			wantPresentParams: map[string]string{"w": "200", "h": "100", "fit": "cover"},
+		},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			capturedRawQuery = ""
+
+			p := manael.NewServeProxy(u, tc.opts...)
+
+			req := httptest.NewRequest(http.MethodGet, "https://manael.test"+tc.path, nil)
+			req.Header.Set("Accept", "image/webp,image/*,*/*;q=0.8")
+
+			w := httptest.NewRecorder()
+			p.ServeHTTP(w, req)
+
+			resp := w.Result()
+			defer resp.Body.Close()
+
+			if resp.StatusCode != http.StatusOK {
+				t.Fatalf("unexpected status code %d", resp.StatusCode)
+			}
+
+			upstreamQ, err := url.ParseQuery(capturedRawQuery)
+			if err != nil {
+				t.Fatalf("failed to parse upstream query: %v", err)
+			}
+
+			for _, param := range tc.wantMissingParams {
+				if _, present := upstreamQ[param]; present {
+					t.Errorf("upstream received transform param %q, want it stripped", param)
+				}
+			}
+
+			for param, want := range tc.wantPresentParams {
+				if got := upstreamQ.Get(param); got != want {
+					t.Errorf("upstream param %q = %q, want %q", param, got, want)
+				}
+			}
+		})
+	}
+}
+
 // TestNewServeProxy_quality verifies that the q query parameter controls
 // encoding quality and that WithDefaultQuality is respected.
 func TestNewServeProxy_quality(t *testing.T) {

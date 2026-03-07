@@ -559,6 +559,15 @@ type resizeProxy struct {
 	opts  *ProxyOptions
 }
 
+// resizeQueryParams is the set of query parameter names consumed by Manael
+// for resizing that must be stripped from the outbound upstream URL when
+// resizing is enabled.
+var resizeQueryParams = []string{"w", "h", "fit"}
+
+// qualityQueryParams is the set of query parameter names consumed by Manael
+// for quality control that must always be stripped from the outbound upstream URL.
+var qualityQueryParams = []string{"q"}
+
 func (s *resizeProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 
@@ -572,11 +581,26 @@ func (s *resizeProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if resize != nil {
 			r = r.WithContext(context.WithValue(r.Context(), resizeCtxKey, resize))
 		}
+
+		// Strip resize params only when resizing is enabled and they are consumed.
+		for _, p := range resizeQueryParams {
+			q.Del(p)
+		}
 	}
 
 	if quality := parseQualityParams(q); quality != nil {
 		r = r.WithContext(context.WithValue(r.Context(), qualityCtxKey, quality))
 	}
 
-	s.proxy.ServeHTTP(w, r)
+	// Quality params are always consumed by Manael; strip them before forwarding.
+	for _, p := range qualityQueryParams {
+		q.Del(p)
+	}
+
+	outURL := *r.URL
+	outURL.RawQuery = q.Encode()
+	r2 := r.Clone(r.Context())
+	r2.URL = &outURL
+
+	s.proxy.ServeHTTP(w, r2)
 }
