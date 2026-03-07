@@ -1,6 +1,6 @@
 ---
 title: Usage
-weight: 3
+weight: 20
 ---
 
 ## Starting the proxy {#starting-the-proxy}

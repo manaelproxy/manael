@@ -1,6 +1,6 @@
 ---
 title: Deployment Guide
-weight: 4
+weight: 30
 ---
 
 Manael is distributed as a stateless Docker container, making it straightforward to deploy to modern container orchestration platforms. This guide covers common deployment scenarios.

@@ -1,6 +1,6 @@
 ---
 title: Image Resizing
-weight: 5
+weight: 20
 ---
 
 Manael can resize images on-the-fly using the `w`, `h`, and `fit` query parameters.
