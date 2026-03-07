@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.2](https://github.com/manaelproxy/manael/compare/v3.0.1...v3.0.2) (2026-03-07)
+
+
+### Bug Fixes
+
+* **release:** use draft releases for asset uploads under Immutable Releases ([#1680](https://github.com/manaelproxy/manael/issues/1680)) ([6253764](https://github.com/manaelproxy/manael/commit/6253764a3b2f0605e5de396ed7a4490a2e84956b))
+
 ## [3.0.1](https://github.com/manaelproxy/manael/compare/v3.0.0...v3.0.1) (2026-03-07)
 
 
