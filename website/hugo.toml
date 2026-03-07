@@ -37,6 +37,11 @@ title = 'Manael'
   url = "/about/"
 
 [[menus.main]]
+  name = "Docs"
+  weight = 20
+  url = "/docs/"
+
+[[menus.main]]
   name = "Blog"
   weight = 30
   url = "/blog/"
