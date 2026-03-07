@@ -24,11 +24,11 @@ cd manael
 
 ### 2. ダウンロード {#download}
 
-[リリースページ](https://github.com/manaelproxy/manael/releases)から最新版の Manael (`manael_1.x.y_Linux_x86_64.tar.gz`) をダウンロードして 1. で作ったディレクトリに展開します。
+[リリースページ](https://github.com/manaelproxy/manael/releases)から最新版の Manael (`manael_v3.0.2_Linux_x86_64.tar.gz`) をダウンロードして 1. で作ったディレクトリに展開します。
 
 ```console
-wget https://github.com/manaelproxy/manael/releases/download/v1.x.y/manael_1.x.y_Linux_x86_64.tar.gz
-tar xf manael_1.x.y_Linux_x86_64.tar.gz
+wget https://github.com/manaelproxy/manael/releases/download/v3.0.2/manael_v3.0.2_Linux_x86_64.tar.gz
+tar xf manael_v3.0.2_Linux_x86_64.tar.gz
 ```
 
 ### 3. インストール {#install}

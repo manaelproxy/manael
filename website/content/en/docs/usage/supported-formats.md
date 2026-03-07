@@ -13,7 +13,7 @@ This page describes the image formats that Manael can accept as input and the ou
 | PNG            | WebP                                 | AVIF output is intentionally disabled for PNG      |
 | APNG           | Pass-through (original APNG)         | Conversion is skipped to preserve animation data   |
 | Animated GIF   | Pass-through (original GIF)          | Conversion is skipped to preserve animation data   |
-| Static GIF     | WebP                                 | Added in v2.1.0                                    |
+| Static GIF     | WebP                                 | Added in v3.0.0                                    |
 
 ## Notes {#notes}
 
