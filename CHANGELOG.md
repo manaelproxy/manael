@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/manaelproxy/manael/compare/v3.0.0...v3.0.1) (2026-03-07)
+
+
+### Bug Fixes
+
+* **ci:** fix asset upload failure on immutable release by bundling assets at creation ([#1671](https://github.com/manaelproxy/manael/issues/1671)) ([28d45ca](https://github.com/manaelproxy/manael/commit/28d45ca3552a4f8975eaf7655029d4387f83dcad))
+
 ## [3.0.0](https://github.com/manaelproxy/manael/compare/v2.1.0...v3.0.0) (2026-03-07)
 
 
