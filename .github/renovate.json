@@ -24,12 +24,16 @@
   "lockFileMaintenance": {
     "extends": [":semanticCommitType(build)"]
   },
-  "platformAutomerge": true,
-  "postUpdateOptions": [
-    "gomodTidy",
-    "gomodUpdateImportPaths",
-    "pnpmDedupe"
+  "packageRules": [
+    {
+      "description": "Keep go.mod language version pinned for CI floor",
+      "matchManagers": ["gomod"],
+      "matchDatasources": ["golang-version"],
+      "enabled": false
+    }
   ],
+  "platformAutomerge": true,
+  "postUpdateOptions": ["gomodTidy", "gomodUpdateImportPaths", "pnpmDedupe"],
   "rebaseWhen": "conflicted",
   "reviewers": ["ykzts"]
 }
