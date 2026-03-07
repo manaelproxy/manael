@@ -1082,7 +1082,7 @@ func TestNewServeProxy_resize(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p := manael.NewServeProxy(u)
+	p := manael.NewServeProxy(u, manael.WithResizeEnabled(true))
 
 	for _, tc := range resizeTests {
 		tc := tc
@@ -1223,7 +1223,8 @@ func TestNewServeProxy_resizeLimits(t *testing.T) {
 	for _, tc := range resizeLimitsTests {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			p := manael.NewServeProxy(u, tc.opts...)
+			opts := append([]manael.ProxyOption{manael.WithResizeEnabled(true)}, tc.opts...)
+			p := manael.NewServeProxy(u, opts...)
 
 			req := httptest.NewRequest(http.MethodGet, "https://manael.test"+tc.path, nil)
 			req.Header.Set("Accept", "image/webp,image/*,*/*;q=0.8")
@@ -1236,6 +1237,58 @@ func TestNewServeProxy_resizeLimits(t *testing.T) {
 
 			if got, want := resp.StatusCode, tc.wantStatusCode; got != want {
 				t.Errorf("Status Code is %d, want %d", got, want)
+			}
+		})
+	}
+}
+
+// TestNewServeProxy_resizeDisabled verifies that when resize is not enabled
+// (the default), resize query parameters are silently ignored and invalid
+// resize parameters do not result in a 400 error.
+func TestNewServeProxy_resizeDisabled(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/photo.jpeg", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "testdata/photo.jpeg")
+	})
+
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
+
+	u, err := url.Parse(ts.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// No WithResizeEnabled option — resize is disabled by default.
+	p := manael.NewServeProxy(u)
+
+	tests := []struct {
+		name string
+		path string
+	}{
+		{name: "w param ignored", path: "/photo.jpeg?w=100"},
+		{name: "h param ignored", path: "/photo.jpeg?h=100"},
+		{name: "w and h params ignored", path: "/photo.jpeg?w=200&h=200"},
+		{name: "invalid w param ignored", path: "/photo.jpeg?w=abc"},
+		{name: "negative h param ignored", path: "/photo.jpeg?h=-1"},
+		{name: "invalid fit param ignored", path: "/photo.jpeg?w=200&fit=stretch"},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodGet, "https://manael.test"+tc.path, nil)
+			req.Header.Set("Accept", "image/webp,image/*,*/*;q=0.8")
+
+			w := httptest.NewRecorder()
+			p.ServeHTTP(w, req)
+
+			resp := w.Result()
+			defer resp.Body.Close()
+
+			// Resize params are ignored, so the request should succeed.
+			if got, want := resp.StatusCode, http.StatusOK; got != want {
+				t.Errorf("Status Code is %d, want %d (resize params should be ignored when disabled)", got, want)
 			}
 		})
 	}

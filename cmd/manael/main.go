@@ -101,9 +101,11 @@ func main() {
 	}
 
 	enableAVIF := os.Getenv("MANAEL_ENABLE_AVIF") == "true"
+	enableResize := os.Getenv("MANAEL_ENABLE_RESIZE") == "true"
 
 	var proxyOpts []manael.ProxyOption
 	proxyOpts = append(proxyOpts, manael.WithAVIFEnabled(enableAVIF))
+	proxyOpts = append(proxyOpts, manael.WithResizeEnabled(enableResize))
 
 	if s := os.Getenv("MANAEL_MAX_IMAGE_SIZE"); s != "" {
 		if n, err := strconv.ParseInt(s, 10, 64); err == nil && n > 0 {
