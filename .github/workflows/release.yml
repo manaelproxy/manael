@@ -156,6 +156,7 @@ jobs:
           RELEASE_NOTES: ${{ needs.release-please.outputs.body }}
         run: |
           gh release create "${{ needs.release-please.outputs.tag_name }}" \
+            --verify-tag \
             dist/* \
             --title "Release ${{ needs.release-please.outputs.tag_name }}" \
             --notes "$RELEASE_NOTES"
