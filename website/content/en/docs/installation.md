@@ -24,7 +24,7 @@ cd manael
 
 ### 2. Download {#download}
 
-Download a Manael v3 release (`manael_v3.x.y_Linux_x86_64.tar.gz`) from the [release page](https://github.com/manaelproxy/manael/releases) on GitHub. Then, extract the downloaded file to the directory created in step 1.
+Download the latest Manael release from the [release page](https://github.com/manaelproxy/manael/releases) on GitHub. Then, extract the downloaded file to the directory created in step 1.
 
 ```console
 wget https://github.com/manaelproxy/manael/releases/download/v3.x.y/manael_v3.x.y_Linux_x86_64.tar.gz
