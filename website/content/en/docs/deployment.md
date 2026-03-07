@@ -12,7 +12,7 @@ The following `docker-compose.yml` shows how to run Manael alongside a local ima
 ```yaml
 services:
   manael:
-    image: ghcr.io/manaelproxy/manael:v2.1.0
+    image: ghcr.io/manaelproxy/manael:3
     ports:
       - "8080:8080"
     environment:
@@ -43,7 +43,7 @@ Deploy Manael to Cloud Run with the `gcloud` CLI:
 
 ```console
 gcloud run deploy manael \
-  --image ghcr.io/manaelproxy/manael:v2.1.0 \
+  --image ghcr.io/manaelproxy/manael:3 \
   --region us-central1 \
   --platform managed \
   --allow-unauthenticated \
@@ -89,7 +89,7 @@ spec:
     spec:
       containers:
         - name: manael
-          image: ghcr.io/manaelproxy/manael:v2.1.0
+          image: ghcr.io/manaelproxy/manael:3
           ports:
             - containerPort: 8080
           env:
