@@ -1,6 +1,6 @@
 ---
 title: Supported Formats
-weight: 4
+weight: 10
 ---
 
 This page describes the image formats that Manael can accept as input and the output formats it produces.

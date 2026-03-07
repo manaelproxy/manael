@@ -1,6 +1,6 @@
 ---
 title: Installation Guide
-weight: 2
+weight: 10
 ---
 
 ## Using Docker {#using-docker}

@@ -1,6 +1,6 @@
 ---
 title: FAQ
-weight: 5
+weight: 90
 ---
 
 ## Why doesn't Manael convert PNGs to AVIF? {#png-avif}

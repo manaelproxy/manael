@@ -1,6 +1,6 @@
 ---
 title: Production Guide
-weight: 5
+weight: 40
 ---
 
 This guide covers best practices for running Manael safely and efficiently in production environments.

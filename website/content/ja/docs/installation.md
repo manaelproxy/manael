@@ -1,6 +1,6 @@
 ---
 title: インストールガイド
-weight: 2
+weight: 10
 ---
 
 ## Docker を使う {#using-docker}

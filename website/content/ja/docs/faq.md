@@ -1,6 +1,6 @@
 ---
 title: よくある質問
-weight: 5
+weight: 90
 ---
 
 ## Manael はなぜ PNG を AVIF に変換しないのですか? {#png-avif}

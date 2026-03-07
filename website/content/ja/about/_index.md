@@ -1,5 +1,6 @@
 ---
 title: Manaelとは
+linkTitle: About
 weight: 1
 ---
 

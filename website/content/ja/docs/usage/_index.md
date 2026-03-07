@@ -1,6 +1,6 @@
 ---
 title: 使い方
-weight: 3
+weight: 20
 ---
 
 ## プロキシを起動する {#starting-the-proxy}
