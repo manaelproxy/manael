@@ -8,6 +8,8 @@
 /website/public/
 /website/resources/
 
+/go.work.sum
+
 /yarn-error.log
 website/package-lock.json
 /manael
