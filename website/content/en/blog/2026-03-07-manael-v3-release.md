@@ -39,7 +39,7 @@ When resizing is disabled, `w` and `h` parameters are silently ignored, keeping 
 
 You can now control the compression quality of the output image on a per-request basis using the `q` query parameter:
 
-```
+```text
 https://example.com/image.jpg?w=800&q=75
 ```
 
@@ -49,4 +49,4 @@ A server-level default quality can also be configured with the `MANAEL_DEFAULT_Q
 
 ## Get Started
 
-Update to Manael v3.0 today and take advantage of faster image processing, flexible resizing, and dynamic quality control. For the full list of changes, see the [CHANGELOG](https://github.com/manaelproxy/manael/blob/main/CHANGELOG.md).
+Update to Manael v3.0 today and take advantage of faster image processing, flexible resizing, and dynamic quality control. For the full list of changes, see the [CHANGELOG](https://github.com/manaelproxy/manael/releases/tag/v3.0.0).

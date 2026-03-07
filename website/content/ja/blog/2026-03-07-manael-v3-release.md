@@ -39,7 +39,7 @@ MANAEL_ENABLE_RESIZE=true
 
 `q` クエリパラメータを使用することで、リクエストごとに出力画像の圧縮クオリティを動的に制御できるようになりました。
 
-```
+```text
 https://example.com/image.jpg?w=800&q=75
 ```
 
@@ -49,4 +49,4 @@ https://example.com/image.jpg?w=800&q=75
 
 ## さっそく試してみましょう
 
-Manael v3.0 にアップデートして、より高速な画像処理、柔軟なリサイズ機能、動的なクオリティ制御をご活用ください。変更の全一覧については [CHANGELOG](https://github.com/manaelproxy/manael/blob/main/CHANGELOG.md) をご参照ください。
+Manael v3.0 にアップデートして、より高速な画像処理、柔軟なリサイズ機能、動的なクオリティ制御をご活用ください。変更の全一覧については [CHANGELOG](https://github.com/manaelproxy/manael/releases/tag/v3.0.0) をご参照ください。
