@@ -1,4 +1,5 @@
 {
+  "draft": true,
   "packages": {
     ".": {
       "release-type": "go"

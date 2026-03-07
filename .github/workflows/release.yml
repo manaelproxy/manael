@@ -25,7 +25,6 @@ jobs:
         uses: googleapis/release-please-action@16a9c90856f42705d54a6fda1823352bdc62cf38 # v4
         with:
           token: ${{ steps.generate_token.outputs.token }}
-          skip-github-release: true
 
   docker:
     needs: release-please
@@ -150,13 +149,10 @@ jobs:
           path: dist
           pattern: assets-*
           merge-multiple: true
-      - name: Create release
+      - name: Upload assets and Publish Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_NOTES: ${{ needs.release-please.outputs.body }}
         run: |
-          gh release create "${{ needs.release-please.outputs.tag_name }}" \
-            --verify-tag \
-            dist/* \
-            --title "Release ${{ needs.release-please.outputs.tag_name }}" \
-            --notes "$RELEASE_NOTES"
+          set -e
+          gh release upload "${{ needs.release-please.outputs.tag_name }}" dist/* --clobber
+          gh release edit "${{ needs.release-please.outputs.tag_name }}" --draft=false
