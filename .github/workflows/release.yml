@@ -130,7 +130,7 @@ jobs:
           tar -czvf manael_${{ needs.release-please.outputs.tag_name }}_${{ matrix.os_label }}_${{ matrix.arch_label }}.tar.gz manael
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: assets-${{ matrix.os_label }}-${{ matrix.arch_label }}
           path: manael_*.tar.gz
@@ -145,7 +145,7 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Download all assets
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           path: dist
           pattern: assets-*
