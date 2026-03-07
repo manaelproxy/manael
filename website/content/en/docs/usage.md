@@ -57,6 +57,30 @@ Vary: Accept
 
 > **Note:** AVIF conversion is intentionally disabled for PNG source images to prioritize compatibility and performance. PNG images are still converted to WebP when the client supports it.
 
+## On-the-fly image resizing {#image-resizing}
+
+Manael can resize images on-the-fly using the `w`, `h`, and `fit` query parameters. Resizing is disabled by default and must be enabled with the `MANAEL_ENABLE_RESIZE` environment variable:
+
+```console
+MANAEL_ENABLE_RESIZE=true manael -http=:8080 -upstream_url=http://localhost:9000
+```
+
+When resizing is enabled, clients can request a specific size by appending query parameters to the image URL:
+
+```console
+curl -sI -H "Accept: image/webp" "http://localhost:8080/image.jpg?w=800&h=600&fit=cover"
+```
+
+| Parameter | Description |
+| --------- | ----------- |
+| `w`       | Target width in pixels (positive integer). |
+| `h`       | Target height in pixels (positive integer). |
+| `fit`     | Resize mode: `cover`, `contain`, or `scale-down`. Defaults to `contain`. |
+
+When `MANAEL_ENABLE_RESIZE` is not set to `true`, resize parameters (`w`, `h`, `fit`) are silently ignored and the image is converted without resizing.
+
+> **Note:** Image resizing is a CPU- and memory-intensive operation. Enable it only when needed and consider setting `MANAEL_MAX_RESIZE_WIDTH` and `MANAEL_MAX_RESIZE_HEIGHT` to limit resource usage.
+
 ## Animated PNG (APNG) pass-through {#apng-pass-through}
 
 Manael automatically detects Animated PNG (APNG) files and passes them through to the client without conversion. This prevents losing animation data that would occur if an APNG were converted to a static WebP or AVIF frame. The original APNG is returned unchanged regardless of the `Accept` header.
@@ -88,5 +112,6 @@ In addition to command-line flags, Manael supports configuration via environment
 | `MANAEL_UPSTREAM_URL`  | `-upstream_url`  | URL of the upstream image server.                    |
 | `PORT`                 | `-http`          | Port number to listen on (used as `:<PORT>`).        |
 | `MANAEL_ENABLE_AVIF`   | —                | Set to `true` to enable AVIF conversion.             |
+| `MANAEL_ENABLE_RESIZE` | —                | Set to `true` to enable on-the-fly image resizing via `w`, `h`, and `fit` query parameters. |
 
 The `-upstream_url` flag takes precedence over `MANAEL_UPSTREAM_URL` when both are provided.

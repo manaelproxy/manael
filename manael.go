@@ -50,6 +50,9 @@ var pngSignature = []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A}
 type ProxyOptions struct {
 	// EnableAVIF enables AVIF encoding for JPEG images when the client supports it.
 	EnableAVIF bool
+	// EnableResize enables on-the-fly image resizing via the w, h, and fit
+	// query parameters. Disabled by default; set to true to opt in.
+	EnableResize bool
 	// MaxImageSize is the maximum upstream image size in bytes that will be
 	// converted. Images larger than this limit are passed through unchanged.
 	// Defaults to 20 MiB when zero.
@@ -81,6 +84,16 @@ type ProxyOption func(*ProxyOptions)
 func WithAVIFEnabled(enabled bool) ProxyOption {
 	return func(o *ProxyOptions) {
 		o.EnableAVIF = enabled
+	}
+}
+
+// WithResizeEnabled returns a ProxyOption that enables or disables on-the-fly
+// image resizing via the w, h, and fit query parameters. Resizing is disabled
+// by default; pass true to opt in. When disabled, resize query parameters are
+// silently ignored and the original-size image is converted as usual.
+func WithResizeEnabled(enabled bool) ProxyOption {
+	return func(o *ProxyOptions) {
+		o.EnableResize = enabled
 	}
 }
 
@@ -549,14 +562,16 @@ type resizeProxy struct {
 func (s *resizeProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 
-	resize, err := parseResizeParams(q, s.opts)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+	if s.opts.EnableResize {
+		resize, err := parseResizeParams(q, s.opts)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 
-	if resize != nil {
-		r = r.WithContext(context.WithValue(r.Context(), resizeCtxKey, resize))
+		if resize != nil {
+			r = r.WithContext(context.WithValue(r.Context(), resizeCtxKey, resize))
+		}
 	}
 
 	if quality := parseQualityParams(q); quality != nil {
