@@ -136,7 +136,7 @@ jobs:
           path: manael_*.tar.gz
 
   publish-release:
-    needs: [release-please, release-assets]
+    needs: [release-please, release-assets, docker]
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     runs-on: ubuntu-24.04
     permissions:
