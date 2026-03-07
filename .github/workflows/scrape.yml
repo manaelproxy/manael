@@ -3,6 +3,7 @@ name: DocSearch Scraper
 on:
   schedule:
     - cron: '53 1 * * *'
+  workflow_dispatch:
 
 jobs:
   scrape:
