@@ -27,9 +27,15 @@
   "packageRules": [
     {
       "description": "Keep go.mod language version pinned for CI floor",
-      "matchManagers": ["gomod"],
+      "enabled": false,
       "matchDatasources": ["golang-version"],
-      "enabled": false
+      "matchManagers": ["gomod"]
+    },
+    {
+      "description": "Restrict go.opentelemetry.io/** to minor version updates only",
+      "enabled": false,
+      "matchPackageNames": ["go.opentelemetry.io/{/,}**"],
+      "matchUpdateTypes": ["major", "minor"]
     }
   ],
   "platformAutomerge": true,
