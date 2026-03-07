@@ -2,6 +2,7 @@
 title: About
 linkTitle: About
 weight: 1
+type: docs
 ---
 
 Manael is an open-source, high-performance HTTP proxy for on-the-fly image processing.

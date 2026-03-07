@@ -2,6 +2,7 @@
 title: Manaelとは
 linkTitle: About
 weight: 1
+type: docs
 ---
 
 Manael は、オンザフライで画像処理を行うオープンソースの高性能な HTTP プロキシサーバーです。
