@@ -13,7 +13,9 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Get DocSearch configuration
         id: docsearch-config
-        run: echo "::set-output name=json::$(cat docsearch.json | jq -r tostring)"
+        run: |
+          CONFIG=$(cat docsearch.json | jq -r tostring)
+          echo "json=$CONFIG" >> "$GITHUB_OUTPUT"
       - name: Pull DocSearch Scraper
         run: docker pull algolia/docsearch-scraper:latest
       - name: Run DocSearch Scraper
