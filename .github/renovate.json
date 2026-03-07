@@ -30,6 +30,12 @@
       "matchManagers": ["gomod"],
       "matchDatasources": ["golang-version"],
       "enabled": false
+    },
+    {
+      "description": "Restrict go.opentelemetry.io/** to minor version updates only",
+      "matchPackagePrefixes": ["go.opentelemetry.io/"],
+      "matchUpdateTypes": ["major", "patch"],
+      "enabled": false
     }
   ],
   "platformAutomerge": true,
