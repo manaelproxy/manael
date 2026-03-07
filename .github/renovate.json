@@ -33,9 +33,9 @@
     },
     {
       "description": "Restrict go.opentelemetry.io/** to minor version updates only",
-      "matchPackagePrefixes": ["go.opentelemetry.io/"],
       "matchUpdateTypes": ["major", "patch"],
-      "enabled": false
+      "enabled": false,
+      "matchPackageNames": ["go.opentelemetry.io/{/,}**"]
     }
   ],
   "platformAutomerge": true,
