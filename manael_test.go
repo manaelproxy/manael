@@ -1430,6 +1430,13 @@ func TestNewServeProxy_transformParamsNotForwarded(t *testing.T) {
 			wantMissingParams: []string{"w", "h", "fit", "q"},
 			wantPresentParams: map[string]string{"foo": "bar", "baz": "qux"},
 		},
+		{
+			name:              "resize params forwarded when resize is disabled",
+			path:              "/photo.jpeg?w=200&h=100&fit=cover",
+			opts:              []manael.ProxyOption{manael.WithResizeEnabled(false)},
+			wantMissingParams: []string{"q"},
+			wantPresentParams: map[string]string{"w": "200", "h": "100", "fit": "cover"},
+		},
 	}
 
 	for _, tc := range tests {
