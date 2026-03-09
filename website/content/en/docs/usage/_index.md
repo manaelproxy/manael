@@ -18,7 +18,7 @@ Manael converts JPEG and PNG images to WebP automatically when the client signal
 To request a JPEG image and receive it as WebP, include `image/webp` in the `Accept` header:
 
 ```console
-curl -sI -H "Accept: image/webp" http://localhost:8080/image.jpg
+curl -sI -X GET -H "Accept: image/webp" http://localhost:8080/image.jpg
 ```
 
 When conversion succeeds, the response includes `Content-Type: image/webp`:
@@ -32,6 +32,8 @@ Vary: Accept
 
 If the client does not include `image/webp` in the `Accept` header, the original image is returned unchanged.
 
+> **Note:** Manael only converts images for `GET` requests. `HEAD` requests (and other HTTP methods) are passed through to the upstream server unchanged. When testing from the command line, use `curl -sI -X GET` to fetch the headers of a converted image.
+
 ## Converting images to AVIF {#converting-to-avif}
 
 Manael can also convert JPEG images to AVIF. AVIF conversion is disabled by default and must be enabled with the `MANAEL_ENABLE_AVIF` environment variable:
@@ -43,7 +45,7 @@ MANAEL_ENABLE_AVIF=true manael -http=:8080 -upstream_url=http://localhost:9000
 When AVIF is enabled and the client includes `image/avif` in the `Accept` header, Manael converts eligible images to AVIF:
 
 ```console
-curl -sI -H "Accept: image/avif" http://localhost:8080/image.jpg
+curl -sI -X GET -H "Accept: image/avif" http://localhost:8080/image.jpg
 ```
 
 A successful conversion returns `Content-Type: image/avif`:
@@ -68,7 +70,7 @@ MANAEL_ENABLE_RESIZE=true manael -http=:8080 -upstream_url=http://localhost:9000
 When resizing is enabled, clients can request a specific size by appending query parameters to the image URL:
 
 ```console
-curl -sI -H "Accept: image/webp" "http://localhost:8080/image.jpg?w=800&h=600&fit=cover"
+curl -sI -X GET -H "Accept: image/webp" "http://localhost:8080/image.jpg?w=800&h=600&fit=cover"
 ```
 
 | Parameter | Description |

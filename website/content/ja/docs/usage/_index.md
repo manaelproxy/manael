@@ -18,7 +18,7 @@ Manael はクライアントが `Accept` リクエストヘッダーで WebP の
 JPEG 画像を WebP として受け取るには、`Accept` ヘッダーに `image/webp` を含めてリクエストします。
 
 ```console
-curl -sI -H "Accept: image/webp" http://localhost:8080/image.jpg
+curl -sI -X GET -H "Accept: image/webp" http://localhost:8080/image.jpg
 ```
 
 変換が成功すると、レスポンスに `Content-Type: image/webp` が含まれます。
@@ -32,6 +32,8 @@ Vary: Accept
 
 クライアントが `Accept` ヘッダーに `image/webp` を含めない場合、元の画像がそのまま返されます。
 
+> **注意:** Manaelは `GET` リクエストに対してのみ画像変換を行います。`HEAD` リクエスト（およびその他のHTTPメソッド）は変換されず、アップストリームのレスポンスがそのままクライアントへ返されます。コマンドラインからテストを行う場合は `curl -sI -X GET` を使用してヘッダーを確認してください。
+
 ## 画像を AVIF に変換する {#converting-to-avif}
 
 Manael は JPEG 画像を AVIF に変換することもできます。AVIF 変換はデフォルトで無効になっており、`MANAEL_ENABLE_AVIF` 環境変数で有効にする必要があります。
@@ -43,7 +45,7 @@ MANAEL_ENABLE_AVIF=true manael -http=:8080 -upstream_url=http://localhost:9000
 AVIF が有効で、クライアントが `Accept` ヘッダーに `image/avif` を含めている場合、Manael は対象画像を AVIF に変換します。
 
 ```console
-curl -sI -H "Accept: image/avif" http://localhost:8080/image.jpg
+curl -sI -X GET -H "Accept: image/avif" http://localhost:8080/image.jpg
 ```
 
 変換が成功すると、`Content-Type: image/avif` が返されます。
@@ -68,7 +70,7 @@ MANAEL_ENABLE_RESIZE=true manael -http=:8080 -upstream_url=http://localhost:9000
 リサイズが有効な場合、クライアントは画像 URL にクエリパラメーターを追加することで特定のサイズを指定できます。
 
 ```console
-curl -sI -H "Accept: image/webp" "http://localhost:8080/image.jpg?w=800&h=600&fit=cover"
+curl -sI -X GET -H "Accept: image/webp" "http://localhost:8080/image.jpg?w=800&h=600&fit=cover"
 ```
 
 | パラメーター | 説明 |
