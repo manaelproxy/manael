@@ -93,6 +93,30 @@ func FuzzCheck(f *testing.F) {
 	})
 }
 
+// FuzzSetVaryHeader verifies that setVaryHeader does not panic for any value
+// of the Vary response header.
+func FuzzSetVaryHeader(f *testing.F) {
+	f.Add("Accept")
+	f.Add("Accept, Accept-Encoding")
+	f.Add("")
+	f.Add("Accept-Encoding, Accept-Language")
+
+	f.Fuzz(func(t *testing.T, vary string) {
+		res := &http.Response{
+			Header: make(http.Header),
+		}
+		if vary != "" {
+			res.Header.Set("Vary", vary)
+		}
+
+		setVaryHeader(res)
+
+		if got := res.Header.Get("Vary"); got == "" {
+			t.Error("Vary header should not be empty after setVaryHeader")
+		}
+	})
+}
+
 // FuzzIsAPNG verifies that isAPNG does not panic for any byte sequence.
 func FuzzIsAPNG(f *testing.F) {
 	// Valid PNG signature with no APNG marker.
@@ -147,29 +171,5 @@ func FuzzIsAnimatedGIF(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, data []byte) {
 		_, _ = isAnimatedGIF(bytes.NewReader(data))
-	})
-}
-
-// FuzzSetVaryHeader verifies that setVaryHeader does not panic for any value
-// of the Vary response header.
-func FuzzSetVaryHeader(f *testing.F) {
-	f.Add("Accept")
-	f.Add("Accept, Accept-Encoding")
-	f.Add("")
-	f.Add("Accept-Encoding, Accept-Language")
-
-	f.Fuzz(func(t *testing.T, vary string) {
-		res := &http.Response{
-			Header: make(http.Header),
-		}
-		if vary != "" {
-			res.Header.Set("Vary", vary)
-		}
-
-		setVaryHeader(res)
-
-		if got := res.Header.Get("Vary"); got == "" {
-			t.Error("Vary header should not be empty after setVaryHeader")
-		}
 	})
 }
