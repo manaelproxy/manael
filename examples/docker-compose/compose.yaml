@@ -1,0 +1,18 @@
+services:
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - manael
+    restart: unless-stopped
+
+  manael:
+    image: ghcr.io/manaelproxy/manael:latest
+    env_file:
+      - .env
+    expose:
+      - "8080"
+    restart: unless-stopped

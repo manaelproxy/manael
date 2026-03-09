@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: manael
+  labels:
+    app: manael
+spec:
+  selector:
+    app: manael
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+  type: ClusterIP
