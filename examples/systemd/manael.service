@@ -1,0 +1,26 @@
+[Unit]
+Description=Manael image-transforming proxy
+Documentation=https://github.com/manaelproxy/manael
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=manael
+Group=manael
+EnvironmentFile=/etc/manael/manael.env
+ExecStart=/usr/local/bin/manael
+Restart=on-failure
+RestartSec=5s
+
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+
+[Install]
+WantedBy=multi-user.target
