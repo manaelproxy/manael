@@ -21,6 +21,7 @@
 package manael
 
 import (
+	"bytes"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -113,5 +114,62 @@ func FuzzSetVaryHeader(f *testing.F) {
 		if got := res.Header.Get("Vary"); got == "" {
 			t.Error("Vary header should not be empty after setVaryHeader")
 		}
+	})
+}
+
+// FuzzIsAPNG verifies that isAPNG does not panic for any byte sequence.
+func FuzzIsAPNG(f *testing.F) {
+	// Valid PNG signature with no APNG marker.
+	f.Add([]byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A})
+	// Empty input.
+	f.Add([]byte{})
+	// Not a PNG.
+	f.Add([]byte("GIF89a"))
+	// PNG signature followed by truncated chunk header.
+	f.Add([]byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00})
+	// PNG signature with IDAT chunk type.
+	f.Add([]byte{
+		0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
+		0x00, 0x00, 0x00, 0x00, 'I', 'D', 'A', 'T',
+	})
+
+	f.Fuzz(func(t *testing.T, data []byte) {
+		_, _ = isAPNG(bytes.NewReader(data))
+	})
+}
+
+// FuzzIsAnimatedGIF verifies that isAnimatedGIF does not panic for any byte
+// sequence.
+func FuzzIsAnimatedGIF(f *testing.F) {
+	// Valid GIF89a header only.
+	f.Add([]byte("GIF89a"))
+	// Empty input.
+	f.Add([]byte{})
+	// Not a GIF.
+	f.Add([]byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A})
+	// GIF header with minimal logical screen descriptor (no global color table).
+	f.Add([]byte{
+		'G', 'I', 'F', '8', '9', 'a',
+		0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
+	})
+	// GIF with trailer byte only.
+	f.Add([]byte{
+		'G', 'I', 'F', '8', '9', 'a',
+		0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
+		0x3B,
+	})
+	// GIF with one image descriptor.
+	f.Add([]byte{
+		'G', 'I', 'F', '8', '9', 'a',
+		0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
+		0x2C,
+		0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00,
+		0x02,
+		0x00,
+		0x3B,
+	})
+
+	f.Fuzz(func(t *testing.T, data []byte) {
+		_, _ = isAnimatedGIF(bytes.NewReader(data))
 	})
 }
