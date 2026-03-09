@@ -63,7 +63,7 @@ func scanAcceptHeader(res *http.Response, opts *ProxyOptions) string {
 }
 
 func check(res *http.Response, opts *ProxyOptions) string {
-	if res.Request.Method != http.MethodGet && res.StatusCode != http.StatusOK && res.StatusCode != http.StatusNotModified {
+	if res.Request.Method != http.MethodGet || (res.StatusCode != http.StatusOK && res.StatusCode != http.StatusNotModified) {
 		return "*/*"
 	}
 
