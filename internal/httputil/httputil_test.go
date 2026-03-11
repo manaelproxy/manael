@@ -77,6 +77,76 @@ func TestSetVaryHeader(t *testing.T) {
 	}
 }
 
+func TestUpdateContentDispositionFilename(t *testing.T) {
+	tests := []struct {
+		name    string
+		cd      string
+		typ     string
+		wantCD  string
+	}{
+		{
+			name:   "empty Content-Disposition",
+			cd:     "",
+			typ:    "image/webp",
+			wantCD: "",
+		},
+		{
+			name:   "attachment with jpeg filename converted to webp",
+			cd:     `attachment; filename="photo.jpg"`,
+			typ:    "image/webp",
+			wantCD: `attachment; filename="photo.webp"`,
+		},
+		{
+			name:   "attachment with jpeg filename converted to avif",
+			cd:     `attachment; filename="photo.jpg"`,
+			typ:    "image/avif",
+			wantCD: `attachment; filename="photo.avif"`,
+		},
+		{
+			name:   "attachment with png filename converted to webp",
+			cd:     `attachment; filename="image.png"`,
+			typ:    "image/webp",
+			wantCD: `attachment; filename="image.webp"`,
+		},
+		{
+			name:   "unknown type leaves header unchanged",
+			cd:     `attachment; filename="photo.jpg"`,
+			typ:    "image/jpeg",
+			wantCD: `attachment; filename="photo.jpg"`,
+		},
+		{
+			name:   "no filename param leaves header unchanged",
+			cd:     "attachment",
+			typ:    "image/webp",
+			wantCD: "attachment",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			res := &http.Response{
+				Header: make(http.Header),
+			}
+			if tt.cd != "" {
+				res.Header.Set("Content-Disposition", tt.cd)
+			}
+
+			UpdateContentDispositionFilename(res, tt.typ)
+
+			got := res.Header.Get("Content-Disposition")
+			if tt.wantCD == "" {
+				if got != "" {
+					t.Errorf("UpdateContentDispositionFilename() set Content-Disposition = %q, want empty", got)
+				}
+				return
+			}
+			if got == "" {
+				t.Fatalf("UpdateContentDispositionFilename() Content-Disposition is empty, want %q", tt.wantCD)
+			}
+		})
+	}
+}
+
 func TestScanAcceptHeader(t *testing.T) {
 	tests := []struct {
 		name        string
