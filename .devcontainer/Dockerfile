@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/go:2.0.8-1.25-bookworm@sha256:65af278fcedeef06eb6b672ad4a95c95cf0849cb82d4852ff014719fe6cdf262
+FROM mcr.microsoft.com/devcontainers/go:2.1.1-1.25-bookworm@sha256:2765adcd37710f2e24c67837cf9c88ae1d88708f405c15a88b307711268db63e
 
 # Workaround for devcontainers/images#1797:
 # stale Yarn APT source can cause "apt-get update" to fail with NO_PUBKEY.
