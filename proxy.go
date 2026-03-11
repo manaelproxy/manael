@@ -64,7 +64,7 @@ func modifyResponse(res *http.Response, opts *ProxyOptions) error {
 
 	manaelhttputil.SetVaryHeader(res)
 
-	typ := check(res, opts)
+	typ := manaelhttputil.Check(res, opts.EnableAVIF)
 	if typ == "*/*" {
 		return nil
 	}

@@ -22,6 +22,7 @@ package httputil
 
 import (
 	"net/http"
+	"net/http/httptest"
 	"testing"
 )
 
@@ -74,4 +75,223 @@ func TestSetVaryHeader(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestScanAcceptHeader(t *testing.T) {
+	tests := []struct {
+		name        string
+		accept      string
+		contentType string
+		enableAVIF  bool
+		want        string
+	}{
+		{
+			name:        "webp accepted",
+			accept:      "image/webp,image/*,*/*;q=0.8",
+			contentType: "image/jpeg",
+			want:        "image/webp",
+		},
+		{
+			name:        "avif accepted with avif enabled",
+			accept:      "image/avif,image/webp,*/*",
+			contentType: "image/jpeg",
+			enableAVIF:  true,
+			want:        "image/avif",
+		},
+		{
+			name:        "avif accepted but avif disabled",
+			accept:      "image/avif,image/webp,*/*",
+			contentType: "image/jpeg",
+			enableAVIF:  false,
+			want:        "image/webp",
+		},
+		{
+			name:        "no compatible format",
+			accept:      "text/html,*/*;q=0.8",
+			contentType: "image/jpeg",
+			want:        "*/*",
+		},
+		{
+			name:        "empty accept",
+			accept:      "",
+			contentType: "image/jpeg",
+			want:        "*/*",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			req.Header.Set("Accept", tt.accept)
+
+			res := &http.Response{
+				Request: req,
+				Header:  make(http.Header),
+			}
+			res.Header.Set("Content-Type", tt.contentType)
+
+			got := ScanAcceptHeader(res, tt.enableAVIF)
+			if got != tt.want {
+				t.Errorf("ScanAcceptHeader() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestCheck(t *testing.T) {
+	tests := []struct {
+		name         string
+		method       string
+		statusCode   int
+		contentType  string
+		cacheControl string
+		accept       string
+		enableAVIF   bool
+		want         string
+	}{
+		{
+			name:        "jpeg with webp accepted",
+			method:      http.MethodGet,
+			statusCode:  http.StatusOK,
+			contentType: "image/jpeg",
+			accept:      "image/webp,*/*;q=0.8",
+			want:        "image/webp",
+		},
+		{
+			name:        "non-GET method",
+			method:      http.MethodPost,
+			statusCode:  http.StatusOK,
+			contentType: "image/jpeg",
+			accept:      "image/webp",
+			want:        "*/*",
+		},
+		{
+			name:        "non-OK status",
+			method:      http.MethodGet,
+			statusCode:  http.StatusNotFound,
+			contentType: "image/jpeg",
+			accept:      "image/webp",
+			want:        "*/*",
+		},
+		{
+			name:         "no-transform cache control",
+			method:       http.MethodGet,
+			statusCode:   http.StatusOK,
+			contentType:  "image/jpeg",
+			cacheControl: "no-transform",
+			accept:       "image/webp",
+			want:         "*/*",
+		},
+		{
+			name:        "non-image content type",
+			method:      http.MethodGet,
+			statusCode:  http.StatusOK,
+			contentType: "text/html",
+			accept:      "*/*",
+			want:        "*/*",
+		},
+		{
+			name:       "304 not modified is allowed",
+			method:     http.MethodGet,
+			statusCode: http.StatusNotModified,
+			contentType: "image/jpeg",
+			accept:     "image/webp",
+			want:       "image/webp",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			reqHeader := make(http.Header)
+			reqHeader.Set("Accept", tt.accept)
+
+			req := &http.Request{
+				Method: tt.method,
+				Header: reqHeader,
+			}
+
+			res := &http.Response{
+				Request:    req,
+				StatusCode: tt.statusCode,
+				Header:     make(http.Header),
+			}
+			if tt.contentType != "" {
+				res.Header.Set("Content-Type", tt.contentType)
+			}
+			if tt.cacheControl != "" {
+				res.Header.Set("Cache-Control", tt.cacheControl)
+			}
+
+			got := Check(res, tt.enableAVIF)
+			if got != tt.want {
+				t.Errorf("Check() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+// FuzzScanAcceptHeader verifies that ScanAcceptHeader does not panic for any
+// value of the Accept request header.
+func FuzzScanAcceptHeader(f *testing.F) {
+	f.Add("image/webp,image/*,*/*;q=0.8")
+	f.Add("image/avif,image/webp,*/*")
+	f.Add("image/avif,image/webp,image/apng,image/*,*/*;q=0.8")
+	f.Add("*/*")
+	f.Add("")
+	f.Add("image/webp")
+	f.Add("image/avif")
+	f.Add("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+
+	f.Fuzz(func(t *testing.T, acceptHeader string) {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set("Accept", acceptHeader)
+
+		res := &http.Response{
+			Request: req,
+			Header:  make(http.Header),
+		}
+		res.Header.Set("Content-Type", "image/jpeg")
+
+		_ = ScanAcceptHeader(res, false)
+	})
+}
+
+// FuzzCheck verifies that Check does not panic for any combination of request
+// method, response status, Content-Type, Cache-Control, and Accept headers.
+// The http.Request is constructed directly (not via httptest.NewRequest) so
+// that the fuzzer can supply arbitrary method strings without triggering the
+// validation performed by http.NewRequest.
+func FuzzCheck(f *testing.F) {
+	f.Add(http.MethodGet, http.StatusOK, "image/jpeg", "", "image/webp,*/*;q=0.8")
+	f.Add(http.MethodGet, http.StatusOK, "image/png", "", "image/webp,*/*;q=0.8")
+	f.Add(http.MethodGet, http.StatusOK, "image/gif", "", "image/webp,*/*;q=0.8")
+	f.Add(http.MethodGet, http.StatusOK, "image/jpeg", "no-transform", "image/webp")
+	f.Add(http.MethodGet, http.StatusOK, "text/html", "", "*/*")
+	f.Add(http.MethodPost, http.StatusOK, "image/jpeg", "", "image/webp")
+	f.Add(http.MethodGet, http.StatusNotFound, "image/jpeg", "", "image/webp")
+	f.Add(http.MethodGet, http.StatusOK, "", "", "")
+
+	f.Fuzz(func(t *testing.T, method string, statusCode int, contentType, cacheControl, acceptHeader string) {
+		reqHeader := make(http.Header)
+		reqHeader.Set("Accept", acceptHeader)
+
+		req := &http.Request{
+			Method: method,
+			Header: reqHeader,
+		}
+
+		res := &http.Response{
+			Request:    req,
+			StatusCode: statusCode,
+			Header:     make(http.Header),
+		}
+		if contentType != "" {
+			res.Header.Set("Content-Type", contentType)
+		}
+		if cacheControl != "" {
+			res.Header.Set("Cache-Control", cacheControl)
+		}
+
+		_ = Check(res, false)
+	})
 }

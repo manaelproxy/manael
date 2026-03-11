@@ -71,3 +71,53 @@ func UpdateContentDispositionFilename(res *http.Response, typ string) {
 		res.Header.Set("Content-Disposition", mime.FormatMediaType(disposition, params))
 	}
 }
+
+func avifEnabled(res *http.Response, enableAVIF bool) bool {
+	contentType := res.Header.Get("Content-Type")
+
+	return enableAVIF && contentType != "image/png" && contentType != "image/gif"
+}
+
+// ScanAcceptHeader inspects the Accept request header and returns the best
+// matching image MIME type ("image/avif", "image/webp", or "*/*").
+// enableAVIF controls whether AVIF is a candidate output format.
+func ScanAcceptHeader(res *http.Response, enableAVIF bool) string {
+	accepts := res.Request.Header.Get("Accept")
+
+	for _, v := range strings.Split(accepts, ",") {
+		t := strings.TrimSpace(v)
+
+		if avifEnabled(res, enableAVIF) && strings.HasPrefix(t, "image/avif") {
+			return "image/avif"
+		} else if strings.HasPrefix(t, "image/webp") {
+			return "image/webp"
+		}
+	}
+
+	return "*/*"
+}
+
+// Check inspects the response and returns the target image MIME type to
+// convert to, or "*/*" if the response should be passed through unchanged.
+// enableAVIF controls whether AVIF is a candidate output format.
+func Check(res *http.Response, enableAVIF bool) string {
+	if res.Request.Method != http.MethodGet || (res.StatusCode != http.StatusOK && res.StatusCode != http.StatusNotModified) {
+		return "*/*"
+	}
+
+	if s := res.Header.Get("Cache-Control"); s != "" {
+		for _, v := range strings.Split(s, ",") {
+			if strings.TrimSpace(v) == "no-transform" {
+				return "*/*"
+			}
+		}
+	}
+
+	t := res.Header.Get("Content-Type")
+
+	if t != "image/jpeg" && t != "image/png" && t != "image/gif" {
+		return "*/*"
+	}
+
+	return ScanAcceptHeader(res, enableAVIF)
+}
