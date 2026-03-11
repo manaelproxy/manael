@@ -208,7 +208,7 @@ func TestScanAcceptHeader(t *testing.T) {
 	}
 }
 
-func TestCheck(t *testing.T) {
+func TestSelectOutputType(t *testing.T) {
 	tests := []struct {
 		name         string
 		method       string
@@ -292,9 +292,9 @@ func TestCheck(t *testing.T) {
 				res.Header.Set("Cache-Control", tt.cacheControl)
 			}
 
-			got := Check(res, tt.enableAVIF)
+			got := SelectOutputType(res, tt.enableAVIF)
 			if got != tt.want {
-				t.Errorf("Check() = %q, want %q", got, tt.want)
+				t.Errorf("SelectOutputType() = %q, want %q", got, tt.want)
 			}
 		})
 	}
@@ -326,12 +326,12 @@ func FuzzScanAcceptHeader(f *testing.F) {
 	})
 }
 
-// FuzzCheck verifies that Check does not panic for any combination of request
+// FuzzSelectOutputType verifies that SelectOutputType does not panic for any combination of request
 // method, response status, Content-Type, Cache-Control, and Accept headers.
 // The http.Request is constructed directly (not via httptest.NewRequest) so
 // that the fuzzer can supply arbitrary method strings without triggering the
 // validation performed by http.NewRequest.
-func FuzzCheck(f *testing.F) {
+func FuzzSelectOutputType(f *testing.F) {
 	f.Add(http.MethodGet, http.StatusOK, "image/jpeg", "", "image/webp,*/*;q=0.8")
 	f.Add(http.MethodGet, http.StatusOK, "image/png", "", "image/webp,*/*;q=0.8")
 	f.Add(http.MethodGet, http.StatusOK, "image/gif", "", "image/webp,*/*;q=0.8")
@@ -362,6 +362,6 @@ func FuzzCheck(f *testing.F) {
 			res.Header.Set("Cache-Control", cacheControl)
 		}
 
-		_ = Check(res, false)
+		_ = SelectOutputType(res, false)
 	})
 }

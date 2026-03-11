@@ -97,10 +97,10 @@ func ScanAcceptHeader(res *http.Response, enableAVIF bool) string {
 	return "*/*"
 }
 
-// Check inspects the response and returns the target image MIME type to
-// convert to, or "*/*" if the response should be passed through unchanged.
+// SelectOutputType inspects the response and returns the target image MIME type
+// to convert to, or "*/*" if the response should be passed through unchanged.
 // enableAVIF controls whether AVIF is a candidate output format.
-func Check(res *http.Response, enableAVIF bool) string {
+func SelectOutputType(res *http.Response, enableAVIF bool) string {
 	if res.Request.Method != http.MethodGet || (res.StatusCode != http.StatusOK && res.StatusCode != http.StatusNotModified) {
 		return "*/*"
 	}
