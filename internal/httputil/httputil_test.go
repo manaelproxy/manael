@@ -84,10 +84,10 @@ func TestSetVaryHeader(t *testing.T) {
 
 func TestUpdateContentDispositionFilename(t *testing.T) {
 	tests := []struct {
-		name    string
-		cd      string
-		typ     string
-		wantCD  string
+		name   string
+		cd     string
+		typ    string
+		wantCD string
 	}{
 		{
 			name:   "empty Content-Disposition",
@@ -266,12 +266,12 @@ func TestSelectOutputType(t *testing.T) {
 			want:        "*/*",
 		},
 		{
-			name:       "304 not modified is allowed",
-			method:     http.MethodGet,
-			statusCode: http.StatusNotModified,
+			name:        "304 not modified is allowed",
+			method:      http.MethodGet,
+			statusCode:  http.StatusNotModified,
 			contentType: "image/jpeg",
-			accept:     "image/webp",
-			want:       "image/webp",
+			accept:      "image/webp",
+			want:        "image/webp",
 		},
 	}
 
@@ -304,5 +304,3 @@ func TestSelectOutputType(t *testing.T) {
 		})
 	}
 }
-
-

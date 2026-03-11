@@ -121,7 +121,7 @@ func BenchmarkNewServeProxy(b *testing.B) {
 				p.ServeHTTP(w, req)
 
 				resp := w.Result()
-				io.Copy(io.Discard, resp.Body)
+				_, _ = io.Copy(io.Discard, resp.Body)
 				resp.Body.Close()
 			}
 		})

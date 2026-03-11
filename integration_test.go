@@ -51,9 +51,9 @@ func isWebP(b []byte) bool {
 }
 
 const (
-	nginxAlias  = "upstream"
-	manaelPort  = "8080/tcp"
-	nginxPort   = "80/tcp"
+	nginxAlias = "upstream"
+	manaelPort = "8080/tcp"
+	nginxPort  = "80/tcp"
 )
 
 // setupContainers starts an Nginx container (upstream) and a Manael container

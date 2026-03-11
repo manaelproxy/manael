@@ -409,8 +409,8 @@ var qualityTests = []struct {
 		wantContentType: "image/webp",
 	},
 	{
-		name:  "WithDefaultQuality proxy option applied",
-		path:  "/photo.jpeg",
+		name:   "WithDefaultQuality proxy option applied",
+		path:   "/photo.jpeg",
 		accept: "image/webp,image/*,*/*;q=0.8",
 		opts: []manael.ProxyOption{
 			manael.WithDefaultQuality(75),
@@ -419,8 +419,8 @@ var qualityTests = []struct {
 		wantContentType: "image/webp",
 	},
 	{
-		name:  "q param overrides WithDefaultQuality",
-		path:  "/photo.jpeg?q=65",
+		name:   "q param overrides WithDefaultQuality",
+		path:   "/photo.jpeg?q=65",
 		accept: "image/webp,image/*,*/*;q=0.8",
 		opts: []manael.ProxyOption{
 			manael.WithDefaultQuality(75),
