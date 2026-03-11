@@ -94,19 +94,19 @@ func TestUpdateContentDispositionFilename(t *testing.T) {
 			name:   "attachment with jpeg filename converted to webp",
 			cd:     `attachment; filename="photo.jpg"`,
 			typ:    "image/webp",
-			wantCD: `attachment; filename="photo.webp"`,
+			wantCD: `attachment; filename=photo.webp`,
 		},
 		{
 			name:   "attachment with jpeg filename converted to avif",
 			cd:     `attachment; filename="photo.jpg"`,
 			typ:    "image/avif",
-			wantCD: `attachment; filename="photo.avif"`,
+			wantCD: `attachment; filename=photo.avif`,
 		},
 		{
 			name:   "attachment with png filename converted to webp",
 			cd:     `attachment; filename="image.png"`,
 			typ:    "image/webp",
-			wantCD: `attachment; filename="image.webp"`,
+			wantCD: `attachment; filename=image.webp`,
 		},
 		{
 			name:   "unknown type leaves header unchanged",
@@ -140,8 +140,8 @@ func TestUpdateContentDispositionFilename(t *testing.T) {
 				}
 				return
 			}
-			if got == "" {
-				t.Fatalf("UpdateContentDispositionFilename() Content-Disposition is empty, want %q", tt.wantCD)
+			if got != tt.wantCD {
+				t.Errorf("UpdateContentDispositionFilename() = %q, want %q", got, tt.wantCD)
 			}
 		})
 	}
