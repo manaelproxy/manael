@@ -18,7 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package manael
+// Package httputil provides HTTP header manipulation utilities.
+package httputil
 
 import (
 	"mime"
@@ -27,7 +28,9 @@ import (
 	"strings"
 )
 
-func setVaryHeader(res *http.Response) {
+// SetVaryHeader ensures that the Vary response header includes "Accept"
+// while preserving any other existing Vary values.
+func SetVaryHeader(res *http.Response) {
 	keys := []string{"Accept"}
 	for _, v := range strings.Split(res.Header.Get("Vary"), ",") {
 		v = strings.TrimSpace(v)
@@ -40,51 +43,9 @@ func setVaryHeader(res *http.Response) {
 	res.Header.Set("Vary", strings.Join(keys[:], ", "))
 }
 
-func avifEnabled(res *http.Response, opts *ProxyOptions) bool {
-	contentType := res.Header.Get("Content-Type")
-
-	return opts.EnableAVIF && contentType != "image/png" && contentType != "image/gif"
-}
-
-func scanAcceptHeader(res *http.Response, opts *ProxyOptions) string {
-	accepts := res.Request.Header.Get("Accept")
-
-	for _, v := range strings.Split(accepts, ",") {
-		t := strings.TrimSpace(v)
-
-		if avifEnabled(res, opts) && strings.HasPrefix(t, "image/avif") {
-			return "image/avif"
-		} else if strings.HasPrefix(t, "image/webp") {
-			return "image/webp"
-		}
-	}
-
-	return "*/*"
-}
-
-func check(res *http.Response, opts *ProxyOptions) string {
-	if res.Request.Method != http.MethodGet || (res.StatusCode != http.StatusOK && res.StatusCode != http.StatusNotModified) {
-		return "*/*"
-	}
-
-	if s := res.Header.Get("Cache-Control"); s != "" {
-		for _, v := range strings.Split(s, ",") {
-			if strings.TrimSpace(v) == "no-transform" {
-				return "*/*"
-			}
-		}
-	}
-
-	t := res.Header.Get("Content-Type")
-
-	if t != "image/jpeg" && t != "image/png" && t != "image/gif" {
-		return "*/*"
-	}
-
-	return scanAcceptHeader(res, opts)
-}
-
-func updateContentDispositionFilename(res *http.Response, typ string) {
+// UpdateContentDispositionFilename updates the filename in the
+// Content-Disposition header to match the new image type's extension.
+func UpdateContentDispositionFilename(res *http.Response, typ string) {
 	cd := res.Header.Get("Content-Disposition")
 	if cd == "" {
 		return
@@ -109,4 +70,54 @@ func updateContentDispositionFilename(res *http.Response, typ string) {
 		params["filename"] = strings.TrimSuffix(filename, path.Ext(filename)) + ext
 		res.Header.Set("Content-Disposition", mime.FormatMediaType(disposition, params))
 	}
+}
+
+func avifEnabled(res *http.Response, enableAVIF bool) bool {
+	contentType := res.Header.Get("Content-Type")
+
+	return enableAVIF && contentType != "image/png" && contentType != "image/gif"
+}
+
+// ScanAcceptHeader inspects the Accept request header and returns the best
+// matching image MIME type ("image/avif", "image/webp", or "*/*").
+// enableAVIF controls whether AVIF is a candidate output format.
+func ScanAcceptHeader(res *http.Response, enableAVIF bool) string {
+	accepts := res.Request.Header.Get("Accept")
+
+	for _, v := range strings.Split(accepts, ",") {
+		t := strings.TrimSpace(v)
+
+		if avifEnabled(res, enableAVIF) && strings.HasPrefix(t, "image/avif") {
+			return "image/avif"
+		} else if strings.HasPrefix(t, "image/webp") {
+			return "image/webp"
+		}
+	}
+
+	return "*/*"
+}
+
+// SelectOutputType inspects the response and returns the target image MIME type
+// to convert to, or "*/*" if the response should be passed through unchanged.
+// enableAVIF controls whether AVIF is a candidate output format.
+func SelectOutputType(res *http.Response, enableAVIF bool) string {
+	if res.Request.Method != http.MethodGet || (res.StatusCode != http.StatusOK && res.StatusCode != http.StatusNotModified) {
+		return "*/*"
+	}
+
+	if s := res.Header.Get("Cache-Control"); s != "" {
+		for _, v := range strings.Split(s, ",") {
+			if strings.TrimSpace(v) == "no-transform" {
+				return "*/*"
+			}
+		}
+	}
+
+	t := res.Header.Get("Content-Type")
+
+	if t != "image/jpeg" && t != "image/png" && t != "image/gif" {
+		return "*/*"
+	}
+
+	return ScanAcceptHeader(res, enableAVIF)
 }

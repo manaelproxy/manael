@@ -18,7 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package manael
+// Package format provides image format detection utilities.
+package format
 
 import (
 	"bytes"
@@ -28,9 +29,9 @@ import (
 
 var pngSignature = []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A}
 
-// isAPNG returns true if r contains an APNG (Animated PNG) stream.
+// IsAPNG returns true if r contains an APNG (Animated PNG) stream.
 // It detects APNG by scanning PNG chunks for an acTL chunk before the IDAT chunk.
-func isAPNG(r io.Reader) (bool, error) {
+func IsAPNG(r io.Reader) (bool, error) {
 	sig := make([]byte, 8)
 	if _, err := io.ReadFull(r, sig); err != nil {
 		return false, err
@@ -80,8 +81,8 @@ func skipGIFSubBlocks(r io.Reader) error {
 	}
 }
 
-// isAnimatedGIF returns true if r contains an animated GIF stream (more than one image frame).
-func isAnimatedGIF(r io.Reader) (bool, error) {
+// IsAnimatedGIF returns true if r contains an animated GIF stream (more than one image frame).
+func IsAnimatedGIF(r io.Reader) (bool, error) {
 	sig := make([]byte, 6)
 	if _, err := io.ReadFull(r, sig); err != nil {
 		return false, err

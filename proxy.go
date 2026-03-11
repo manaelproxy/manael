@@ -30,6 +30,9 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"strconv"
+
+	"manael.org/x/manael/v3/internal/format"
+	manaelhttputil "manael.org/x/manael/v3/internal/httputil"
 )
 
 // ctxKey is an unexported type for context keys used in this package.
@@ -59,9 +62,9 @@ func convert(src io.Reader, t string, resize *ResizeOptions, quality *QualityOpt
 func modifyResponse(res *http.Response, opts *ProxyOptions) error {
 	res.Header.Set("Server", "Manael")
 
-	setVaryHeader(res)
+	manaelhttputil.SetVaryHeader(res)
 
-	typ := check(res, opts)
+	typ := manaelhttputil.SelectOutputType(res, opts.EnableAVIF)
 	if typ == "*/*" {
 		return nil
 	}
@@ -103,7 +106,7 @@ func modifyResponse(res *http.Response, opts *ProxyOptions) error {
 	b := io.TeeReader(limited, p)
 
 	if res.Header.Get("Content-Type") == "image/png" {
-		ok, _ := isAPNG(b)
+		ok, _ := format.IsAPNG(b)
 		// Drain remaining bytes into p so the full read is buffered.
 		if _, err := io.Copy(io.Discard, b); err != nil {
 			return err
@@ -138,7 +141,7 @@ func modifyResponse(res *http.Response, opts *ProxyOptions) error {
 	}
 
 	if res.Header.Get("Content-Type") == "image/gif" {
-		ok, _ := isAnimatedGIF(b)
+		ok, _ := format.IsAnimatedGIF(b)
 		if ok {
 			// Animated GIF: pass through unchanged without buffering full payload.
 			res.Body = struct {
@@ -194,7 +197,7 @@ func modifyResponse(res *http.Response, opts *ProxyOptions) error {
 	res.Header.Set("Content-Type", typ)
 	res.Header.Set("Content-Length", strconv.Itoa(buf.Len()))
 
-	updateContentDispositionFilename(res, typ)
+	manaelhttputil.UpdateContentDispositionFilename(res, typ)
 
 	if res.Header.Get("Accept-Ranges") != "" {
 		res.Header.Del("Accept-Ranges")
