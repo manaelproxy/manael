@@ -18,53 +18,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package manael
+package httputil
 
 import (
 	"net/http"
-	"strings"
+	"testing"
 )
 
-func avifEnabled(res *http.Response, opts *ProxyOptions) bool {
-	contentType := res.Header.Get("Content-Type")
+// FuzzSetVaryHeader verifies that SetVaryHeader does not panic for any value
+// of the Vary response header.
+func FuzzSetVaryHeader(f *testing.F) {
+	f.Add("Accept")
+	f.Add("Accept, Accept-Encoding")
+	f.Add("")
+	f.Add("Accept-Encoding, Accept-Language")
 
-	return opts.EnableAVIF && contentType != "image/png" && contentType != "image/gif"
-}
-
-func scanAcceptHeader(res *http.Response, opts *ProxyOptions) string {
-	accepts := res.Request.Header.Get("Accept")
-
-	for _, v := range strings.Split(accepts, ",") {
-		t := strings.TrimSpace(v)
-
-		if avifEnabled(res, opts) && strings.HasPrefix(t, "image/avif") {
-			return "image/avif"
-		} else if strings.HasPrefix(t, "image/webp") {
-			return "image/webp"
+	f.Fuzz(func(t *testing.T, vary string) {
+		res := &http.Response{
+			Header: make(http.Header),
 		}
-	}
-
-	return "*/*"
-}
-
-func check(res *http.Response, opts *ProxyOptions) string {
-	if res.Request.Method != http.MethodGet || (res.StatusCode != http.StatusOK && res.StatusCode != http.StatusNotModified) {
-		return "*/*"
-	}
-
-	if s := res.Header.Get("Cache-Control"); s != "" {
-		for _, v := range strings.Split(s, ",") {
-			if strings.TrimSpace(v) == "no-transform" {
-				return "*/*"
-			}
+		if vary != "" {
+			res.Header.Set("Vary", vary)
 		}
-	}
 
-	t := res.Header.Get("Content-Type")
+		SetVaryHeader(res)
 
-	if t != "image/jpeg" && t != "image/png" && t != "image/gif" {
-		return "*/*"
-	}
-
-	return scanAcceptHeader(res, opts)
+		if got := res.Header.Get("Vary"); got == "" {
+			t.Error("Vary header should not be empty after SetVaryHeader")
+		}
+	})
 }
