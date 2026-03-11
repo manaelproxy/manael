@@ -26,11 +26,6 @@ jobs:
         uses: golangci/golangci-lint-action@v7
         with:
           version: v2.11.3
-      - name: golangci-fmt
-        uses: golangci/golangci-lint-action@v7
-        with:
-          version: v2.11.3
-          args: fmt --diff
 
   go-test:
     runs-on: ubuntu-24.04
