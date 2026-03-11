@@ -23,6 +23,7 @@ package httputil
 import (
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -70,8 +71,12 @@ func TestSetVaryHeader(t *testing.T) {
 
 			SetVaryHeader(res)
 
-			if got := res.Header.Get("Vary"); got == "" {
-				t.Error("Vary header should not be empty after SetVaryHeader")
+			got := res.Header.Get("Vary")
+			if got == "" {
+				t.Fatal("Vary header should not be empty after SetVaryHeader")
+			}
+			if !strings.Contains(got, tt.wantIn) {
+				t.Errorf("SetVaryHeader() = %q, want to contain %q", got, tt.wantIn)
 			}
 		})
 	}
