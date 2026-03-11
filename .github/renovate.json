@@ -36,6 +36,12 @@
       "enabled": false,
       "matchPackageNames": ["go.opentelemetry.io/{/,}**"],
       "matchUpdateTypes": ["major", "minor"]
+    },
+    {
+      "description": "Restrict github.com/testcontainers/testcontainers-go to patch updates only",
+      "enabled": false,
+      "matchPackageNames": ["github.com/testcontainers/testcontainers-go"],
+      "matchUpdateTypes": ["major", "minor"]
     }
   ],
   "platformAutomerge": true,
