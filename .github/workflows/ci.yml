@@ -23,11 +23,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libvips-dev
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v7
         with:
           version: v2.11.3
       - name: golangci-fmt
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v7
         with:
           version: v2.11.3
           args: fmt --diff
