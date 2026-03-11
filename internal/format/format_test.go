@@ -25,59 +25,105 @@ import (
 	"testing"
 )
 
-// FuzzIsAPNG verifies that IsAPNG does not panic for any byte sequence.
-func FuzzIsAPNG(f *testing.F) {
-	// Valid PNG signature with no APNG marker.
-	f.Add([]byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A})
-	// Empty input.
-	f.Add([]byte{})
-	// Not a PNG.
-	f.Add([]byte("GIF89a"))
-	// PNG signature followed by truncated chunk header.
-	f.Add([]byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00})
-	// PNG signature with IDAT chunk type.
-	f.Add([]byte{
-		0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
-		0x00, 0x00, 0x00, 0x00, 'I', 'D', 'A', 'T',
-	})
+func TestIsAPNG(t *testing.T) {
+	tests := []struct {
+		name    string
+		data    []byte
+		want    bool
+		wantErr bool
+	}{
+		{
+			name:    "empty input",
+			data:    []byte{},
+			wantErr: true,
+		},
+		{
+			name: "not a PNG",
+			data: []byte{'G', 'I', 'F', '8', '9', 'a', 0x00, 0x00},
+		},
+		{
+			name: "PNG signature only, no chunks",
+			data: []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A},
+		},
+		{
+			name: "PNG with truncated chunk header",
+			data: []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00},
+		},
+		{
+			name: "PNG with IDAT chunk (no acTL)",
+			data: []byte{
+				0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
+				0x00, 0x00, 0x00, 0x00, 'I', 'D', 'A', 'T',
+			},
+		},
+	}
 
-	f.Fuzz(func(t *testing.T, data []byte) {
-		_, _ = IsAPNG(bytes.NewReader(data))
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := IsAPNG(bytes.NewReader(tt.data))
+			if (err != nil) != tt.wantErr {
+				t.Errorf("IsAPNG() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("IsAPNG() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
 
-// FuzzIsAnimatedGIF verifies that IsAnimatedGIF does not panic for any byte
-// sequence.
-func FuzzIsAnimatedGIF(f *testing.F) {
-	// Valid GIF89a header only.
-	f.Add([]byte("GIF89a"))
-	// Empty input.
-	f.Add([]byte{})
-	// Not a GIF.
-	f.Add([]byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A})
-	// GIF header with minimal logical screen descriptor (no global color table).
-	f.Add([]byte{
-		'G', 'I', 'F', '8', '9', 'a',
-		0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
-	})
-	// GIF with trailer byte only.
-	f.Add([]byte{
-		'G', 'I', 'F', '8', '9', 'a',
-		0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
-		0x3B,
-	})
-	// GIF with one image descriptor.
-	f.Add([]byte{
-		'G', 'I', 'F', '8', '9', 'a',
-		0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
-		0x2C,
-		0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00,
-		0x02,
-		0x00,
-		0x3B,
-	})
+func TestIsAnimatedGIF(t *testing.T) {
+	tests := []struct {
+		name    string
+		data    []byte
+		want    bool
+		wantErr bool
+	}{
+		{
+			name:    "empty input",
+			data:    []byte{},
+			wantErr: true,
+		},
+		{
+			name: "not a GIF",
+			data: []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A},
+		},
+		{
+			name: "GIF header only",
+			data: []byte("GIF89a"),
+		},
+		{
+			name: "GIF with no frames (trailer only)",
+			data: []byte{
+				'G', 'I', 'F', '8', '9', 'a',
+				0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
+				0x3B,
+			},
+		},
+		{
+			name: "GIF with one frame",
+			data: []byte{
+				'G', 'I', 'F', '8', '9', 'a',
+				0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
+				0x2C,
+				0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00,
+				0x02,
+				0x00,
+				0x3B,
+			},
+		},
+	}
 
-	f.Fuzz(func(t *testing.T, data []byte) {
-		_, _ = IsAnimatedGIF(bytes.NewReader(data))
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := IsAnimatedGIF(bytes.NewReader(tt.data))
+			if (err != nil) != tt.wantErr {
+				t.Errorf("IsAnimatedGIF() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("IsAnimatedGIF() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

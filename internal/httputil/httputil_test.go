@@ -25,26 +25,53 @@ import (
 	"testing"
 )
 
-// FuzzSetVaryHeader verifies that SetVaryHeader does not panic for any value
-// of the Vary response header.
-func FuzzSetVaryHeader(f *testing.F) {
-	f.Add("Accept")
-	f.Add("Accept, Accept-Encoding")
-	f.Add("")
-	f.Add("Accept-Encoding, Accept-Language")
+func TestSetVaryHeader(t *testing.T) {
+	tests := []struct {
+		name   string
+		vary   string
+		wantIn string
+	}{
+		{
+			name:   "empty Vary header",
+			vary:   "",
+			wantIn: "Accept",
+		},
+		{
+			name:   "Vary already contains Accept",
+			vary:   "Accept",
+			wantIn: "Accept",
+		},
+		{
+			name:   "Vary contains other value",
+			vary:   "Accept-Encoding",
+			wantIn: "Accept",
+		},
+		{
+			name:   "Vary contains Accept and other value",
+			vary:   "Accept, Accept-Encoding",
+			wantIn: "Accept",
+		},
+		{
+			name:   "Vary contains Accept-Language",
+			vary:   "Accept-Encoding, Accept-Language",
+			wantIn: "Accept",
+		},
+	}
 
-	f.Fuzz(func(t *testing.T, vary string) {
-		res := &http.Response{
-			Header: make(http.Header),
-		}
-		if vary != "" {
-			res.Header.Set("Vary", vary)
-		}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			res := &http.Response{
+				Header: make(http.Header),
+			}
+			if tt.vary != "" {
+				res.Header.Set("Vary", tt.vary)
+			}
 
-		SetVaryHeader(res)
+			SetVaryHeader(res)
 
-		if got := res.Header.Get("Vary"); got == "" {
-			t.Error("Vary header should not be empty after SetVaryHeader")
-		}
-	})
+			if got := res.Header.Get("Vary"); got == "" {
+				t.Error("Vary header should not be empty after SetVaryHeader")
+			}
+		})
+	}
 }
