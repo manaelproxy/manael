@@ -632,7 +632,7 @@ var xForwardedForTests = []struct {
 func TestNewServeProxy_xForwardedFor(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/xff.txt", func(w http.ResponseWriter, r *http.Request) {
-		io.WriteString(w, r.Header.Get("X-Forwarded-For"))
+		_, _ = io.WriteString(w, r.Header.Get("X-Forwarded-For"))
 	})
 
 	ts := httptest.NewServer(mux)

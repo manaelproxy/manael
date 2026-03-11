@@ -1,0 +1,18 @@
+version: "2"
+
+linters:
+  enable:
+    - errcheck
+    - govet
+    - staticcheck
+  default: none
+  exclusions:
+    rules:
+      - linters:
+          - errcheck
+        text: "Body.Close"
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
