@@ -192,10 +192,32 @@ func modifyResponse(res *http.Response, opts *ProxyOptions) error {
 		return nil
 	}
 
-	res.Body = io.NopCloser(buf)
+	outData := buf.Bytes()
+	if opts.PostProcessor != nil {
+		processed, err := opts.PostProcessor(outData)
+		if err != nil {
+			res.Body = struct {
+				io.Reader
+				io.Closer
+			}{
+				Reader: io.MultiReader(bytes.NewReader(p.Bytes()), origBody),
+				Closer: origBody,
+			}
+			closeOrigBody = false
+			slog.Error("post-processor failed",
+				slog.String("error", err.Error()),
+				slog.String("url", res.Request.URL.String()),
+			)
+
+			return nil
+		}
+		outData = processed
+	}
+
+	res.Body = io.NopCloser(bytes.NewReader(outData))
 
 	res.Header.Set("Content-Type", typ)
-	res.Header.Set("Content-Length", strconv.Itoa(buf.Len()))
+	res.Header.Set("Content-Length", strconv.Itoa(len(outData)))
 
 	manaelhttputil.UpdateContentDispositionFilename(res, typ)
 
