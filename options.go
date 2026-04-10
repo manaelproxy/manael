@@ -49,6 +49,12 @@ type ProxyOptions struct {
 	// A value of 0 preserves the built-in per-format defaults (90 for WebP,
 	// 60 for AVIF).
 	DefaultQuality int
+	// PostProcessor is an optional hook invoked with the converted image bytes
+	// after a successful format conversion. The function may inspect, modify,
+	// or replace the byte slice (e.g. to cache it or apply a watermark) and
+	// must return the final bytes to be sent to the client. If PostProcessor
+	// returns an error the original unconverted response is passed through.
+	PostProcessor func(data []byte) ([]byte, error)
 }
 
 // ProxyOption is a functional option for configuring a proxy.
@@ -127,5 +133,17 @@ func WithAllowedHeights(heights []int) ProxyOption {
 func WithDefaultQuality(q int) ProxyOption {
 	return func(o *ProxyOptions) {
 		o.DefaultQuality = clampQuality(q)
+	}
+}
+
+// WithPostProcessor returns a ProxyOption that registers a hook to be invoked
+// with the converted image bytes after a successful format conversion. The hook
+// may inspect, modify, or replace the byte slice (e.g. to cache the result or
+// apply a watermark) and must return the final bytes to send to the client. If
+// the hook returns an error the original unconverted response is passed through
+// unchanged.
+func WithPostProcessor(f func(data []byte) ([]byte, error)) ProxyOption {
+	return func(o *ProxyOptions) {
+		o.PostProcessor = f
 	}
 }

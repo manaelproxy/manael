@@ -21,10 +21,12 @@
 package manael_test
 
 import (
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strconv"
 	"testing"
 
 	"github.com/h2non/bimg"
@@ -469,4 +471,107 @@ func TestNewServeProxy_quality(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestNewServeProxy_postProcessor verifies that the PostProcessor hook is
+// invoked after conversion and that its output is sent to the client.
+func TestNewServeProxy_postProcessor(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/photo.jpeg", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "testdata/photo.jpeg")
+	})
+
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
+
+	u, err := url.Parse(ts.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Run("hook is called and output is used", func(t *testing.T) {
+		called := false
+		sentinel := []byte("processed")
+
+		p := manael.NewServeProxy(u, manael.WithPostProcessor(func(data []byte) ([]byte, error) {
+			called = true
+			return sentinel, nil
+		}))
+
+		req := httptest.NewRequest(http.MethodGet, "https://manael.test/photo.jpeg", nil)
+		req.Header.Set("Accept", "image/webp,image/*,*/*;q=0.8")
+
+		w := httptest.NewRecorder()
+		p.ServeHTTP(w, req)
+
+		resp := w.Result()
+		body, err := io.ReadAll(resp.Body)
+		resp.Body.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if !called {
+			t.Error("PostProcessor was not called")
+		}
+
+		if got, want := resp.StatusCode, http.StatusOK; got != want {
+			t.Errorf("Status Code is %d, want %d", got, want)
+		}
+
+		if string(body) != string(sentinel) {
+			t.Errorf("body = %q, want %q", body, sentinel)
+		}
+
+		if got, want := resp.Header.Get("Content-Length"), strconv.Itoa(len(sentinel)); got != want {
+			t.Errorf("Content-Length is %s, want %s", got, want)
+		}
+	})
+
+	t.Run("hook error falls back to original response", func(t *testing.T) {
+		p := manael.NewServeProxy(u, manael.WithPostProcessor(func(data []byte) ([]byte, error) {
+			return nil, errors.New("post-processor error")
+		}))
+
+		req := httptest.NewRequest(http.MethodGet, "https://manael.test/photo.jpeg", nil)
+		req.Header.Set("Accept", "image/webp,image/*,*/*;q=0.8")
+
+		w := httptest.NewRecorder()
+		p.ServeHTTP(w, req)
+
+		resp := w.Result()
+		defer resp.Body.Close()
+
+		if got, want := resp.StatusCode, http.StatusOK; got != want {
+			t.Errorf("Status Code is %d, want %d", got, want)
+		}
+
+		// On post-processor error, the original (unconverted) content type is served.
+		if got := resp.Header.Get("Content-Type"); got != "image/jpeg" {
+			t.Errorf("Content-Type is %s, want image/jpeg (fallback to original)", got)
+		}
+	})
+
+	t.Run("hook not called when no conversion happens", func(t *testing.T) {
+		called := false
+
+		// Use a client that does not accept WebP so no conversion happens.
+		p := manael.NewServeProxy(u, manael.WithPostProcessor(func(data []byte) ([]byte, error) {
+			called = true
+			return data, nil
+		}))
+
+		req := httptest.NewRequest(http.MethodGet, "https://manael.test/photo.jpeg", nil)
+		// No Accept header → no conversion.
+
+		w := httptest.NewRecorder()
+		p.ServeHTTP(w, req)
+
+		resp := w.Result()
+		defer resp.Body.Close()
+
+		if called {
+			t.Error("PostProcessor should not be called when no conversion occurs")
+		}
+	})
 }
