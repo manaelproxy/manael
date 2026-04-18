@@ -1,4 +1,4 @@
-export async function onRequest(context) {
+export const onRequest = (context) => {
   const { request } = context;
   const url = new URL(request.url);
 
@@ -22,4 +22,4 @@ export async function onRequest(context) {
   return new Response(html, {
     headers: { "Content-Type": "text/html; charset=utf-8" },
   });
-}
+};

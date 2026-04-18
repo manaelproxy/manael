@@ -23,10 +23,10 @@ When resizing is enabled, append `w` and/or `h` query parameters to the image UR
 curl -sI -H "Accept: image/webp" "http://localhost:8080/image.jpg?w=800&h=600"
 ```
 
-| Parameter | Description |
-| --------- | ----------- |
-| `w`       | Target width in pixels (positive integer). |
-| `h`       | Target height in pixels (positive integer). |
+| Parameter | Description                                                              |
+| --------- | ------------------------------------------------------------------------ |
+| `w`       | Target width in pixels (positive integer).                               |
+| `h`       | Target height in pixels (positive integer).                              |
 | `fit`     | Resize mode: `cover`, `contain`, or `scale-down`. Defaults to `contain`. |
 
 ## Aspect ratio {#aspect-ratio}
@@ -36,9 +36,9 @@ Manael preserves the aspect ratio of the original image when only one dimension 
 - **Width only (`?w=300`):** The image is scaled so that its width equals 300 px. The height is adjusted automatically to maintain the original aspect ratio.
 - **Height only (`?h=300`):** The image is scaled so that its height equals 300 px. The width is adjusted automatically to maintain the original aspect ratio.
 - **Both dimensions (`?w=300&h=300`):** The behavior is controlled by the `fit` parameter:
-  - `contain` (default): The image is scaled to fit within the target box while preserving the aspect ratio. The resulting image may be smaller than the requested dimensions.
-  - `cover`: The image is scaled and cropped to fill the entire target box while preserving the aspect ratio.
-  - `scale-down`: Like `contain`, but the image is never enlarged beyond its original dimensions.
+    - `contain` (default): The image is scaled to fit within the target box while preserving the aspect ratio. The resulting image may be smaller than the requested dimensions.
+    - `cover`: The image is scaled and cropped to fill the entire target box while preserving the aspect ratio.
+    - `scale-down`: Like `contain`, but the image is never enlarged beyond its original dimensions.
 
 ## Security limits {#security-limits}
 

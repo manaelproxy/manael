@@ -1,20 +1,22 @@
 {
+  "name": "manael",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "pnpm --filter @manael/website build",
+    "format": "ultracite fix",
+    "format-check": "ultracite check",
+    "prepare": "is-ci || husky"
+  },
   "devDependencies": {
     "@commitlint/cli": "20.5.0",
     "@commitlint/config-conventional": "20.5.0",
-    "@inabagumi/prettier-config": "3.0.0",
     "husky": "9.1.7",
     "is-ci": "4.1.0",
     "lint-staged": "16.4.0",
-    "prettier": "3.8.3"
+    "oxfmt": "0.45.0",
+    "oxlint": "1.60.0",
+    "ultracite": "7.6.0"
   },
-  "packageManager": "pnpm@10.33.0",
-  "prettier": "@inabagumi/prettier-config",
-  "private": true,
-  "scripts": {
-    "build": "pnpm --filter @manael/website build",
-    "format": "prettier --write './**/*.{json,yml}'",
-    "format-check": "prettier -c './**/*.{json,yml}'",
-    "prepare": "is-ci || husky"
-  }
+  "packageManager": "pnpm@10.33.0"
 }

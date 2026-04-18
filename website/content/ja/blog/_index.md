@@ -2,7 +2,7 @@
 title: ブログ
 linkTitle: ブログ
 cascade:
-  type: docs
+    type: docs
 ---
 
 # Manael ブログ
