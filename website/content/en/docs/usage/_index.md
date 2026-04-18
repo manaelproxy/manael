@@ -12,4 +12,4 @@ Use the pages below depending on what you want to do:
 - [Supported Formats](supported-formats/) for input and output format compatibility.
 - [Image Resizing](image-resizing/) for `w`, `h`, and `fit` query parameters.
 - [Quality Control](quality-control/) for the `q` query parameter and default encoding quality.
-- [Configuration](configuration/) for environment-variable based runtime configuration.
+- [Configuration](configuration/) for environment-variable-based runtime configuration.

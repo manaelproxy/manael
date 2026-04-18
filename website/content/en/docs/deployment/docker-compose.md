@@ -14,7 +14,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - MANAEL_UPSTREAM_URL=http://origin:9000
+      - MANAEL_UPSTREAM_URL=http://origin
       - MANAEL_ENABLE_AVIF=true
     depends_on:
       - origin

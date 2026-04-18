@@ -49,7 +49,7 @@ Vary: Accept
 ...
 ```
 
-AVIF conversion is intentionally disabled for PNG source images to prioritize compatibility and performance. PNG images are still converted to WebP when the client supports it.
+AVIF conversion is intentionally disabled for PNGs to prioritize compatibility and performance. PNGs are still converted to WebP when the client supports it.
 
 ## Request method behavior {#request-method-behavior}
 
