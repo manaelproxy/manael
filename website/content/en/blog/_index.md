@@ -2,7 +2,7 @@
 title: Blog
 linkTitle: Blog
 cascade:
-  type: docs
+    type: docs
 ---
 
 # Manael Blog

@@ -35,12 +35,12 @@ curl -sI -H "Accept: image/avif,image/webp" "http://localhost:8080/image.jpg?q=w
 curl -sI -H "Accept: image/webp" "http://localhost:8080/image.jpg?q=70,webp:85"
 ```
 
-| Syntax | Description |
-| ------ | ----------- |
-| `?q=80` | Universal quality applied to any output format. |
-| `?q=webp:75` | Quality applied only when the image is converted to WebP. |
-| `?q=avif:50` | Quality applied only when the image is converted to AVIF. |
-| `?q=webp:80,avif:50` | Format-specific values combined in one parameter. |
+| Syntax               | Description                                               |
+| -------------------- | --------------------------------------------------------- |
+| `?q=80`              | Universal quality applied to any output format.           |
+| `?q=webp:75`         | Quality applied only when the image is converted to WebP. |
+| `?q=avif:50`         | Quality applied only when the image is converted to AVIF. |
+| `?q=webp:80,avif:50` | Format-specific values combined in one parameter.         |
 
 ## Default behavior {#default-behavior}
 

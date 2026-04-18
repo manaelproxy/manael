@@ -18,12 +18,12 @@ gcloud run deploy manael \
   --cpu 1
 ```
 
-| Flag | Description |
-| --- | --- |
-| `--image` | The Manael container image from GHCR. |
-| `--set-env-vars` | Comma-separated `KEY=VALUE` pairs for environment variables. |
-| `--memory` | Memory allocated per container instance. Increase to `2Gi` if you experience OOM kills with AVIF. |
-| `--cpu` | Number of vCPUs per container instance. |
-| `--allow-unauthenticated` | Allows public access. Remove this flag if you want to restrict access. |
+| Flag                      | Description                                                                                       |
+| ------------------------- | ------------------------------------------------------------------------------------------------- |
+| `--image`                 | The Manael container image from GHCR.                                                             |
+| `--set-env-vars`          | Comma-separated `KEY=VALUE` pairs for environment variables.                                      |
+| `--memory`                | Memory allocated per container instance. Increase to `2Gi` if you experience OOM kills with AVIF. |
+| `--cpu`                   | Number of vCPUs per container instance.                                                           |
+| `--allow-unauthenticated` | Allows public access. Remove this flag if you want to restrict access.                            |
 
 After deployment, Cloud Run prints the service URL. Place a CDN or Cloud CDN in front of that URL to cache the converted images.

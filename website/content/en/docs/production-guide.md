@@ -29,12 +29,12 @@ For a single image URL, a correctly configured CDN will maintain distinct cache 
 
 Most CDNs respect the `Vary` header by default, but some require explicit configuration. Verify the following for your CDN:
 
-| CDN | Action required |
-| --- | --- |
-| Cloudflare | Enable **Polish** or configure a Cache Rule that respects `Vary: Accept`. |
-| Fastly | Respect `Vary` headers by default; no additional configuration needed. |
-| Amazon CloudFront | Create a **Cache Policy** that includes `Accept` in the list of allowed headers. |
-| Google Cloud CDN | Enable **cache-mode** `CACHE_ALL_STATIC` and ensure `Vary` headers are forwarded. |
+| CDN               | Action required                                                                   |
+| ----------------- | --------------------------------------------------------------------------------- |
+| Cloudflare        | Enable **Polish** or configure a Cache Rule that respects `Vary: Accept`.         |
+| Fastly            | Respect `Vary` headers by default; no additional configuration needed.            |
+| Amazon CloudFront | Create a **Cache Policy** that includes `Accept` in the list of allowed headers.  |
+| Google Cloud CDN  | Enable **cache-mode** `CACHE_ALL_STATIC` and ensure `Vary` headers are forwarded. |
 
 Always test your CDN configuration by requesting the same URL with different `Accept` headers and confirming that each variant is cached independently.
 
@@ -61,12 +61,12 @@ Always set resource `requests` and `limits` in your `Deployment` manifest:
 
 ```yaml
 resources:
-  requests:
-    cpu: "250m"
-    memory: "256Mi"
-  limits:
-    cpu: "1000m"
-    memory: "1Gi"
+    requests:
+        cpu: "250m"
+        memory: "256Mi"
+    limits:
+        cpu: "1000m"
+        memory: "1Gi"
 ```
 
 Increase the memory limit to `2Gi` when AVIF conversion (`MANAEL_ENABLE_AVIF=true`) is enabled under sustained traffic. Prefer horizontal scaling (increasing `replicas`) over increasing per-pod limits.
@@ -77,8 +77,8 @@ Set `cpu` and `memory` in your task definition:
 
 ```json
 {
-  "cpu": "1024",
-  "memory": "1024"
+    "cpu": "1024",
+    "memory": "1024"
 }
 ```
 

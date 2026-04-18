@@ -9,20 +9,20 @@ The following `docker-compose.yml` shows how to run Manael alongside a local ima
 
 ```yaml
 services:
-  manael:
-    image: ghcr.io/manaelproxy/manael:3
-    ports:
-      - "8080:8080"
-    environment:
-      - MANAEL_UPSTREAM_URL=http://origin
-      - MANAEL_ENABLE_AVIF=true
-    depends_on:
-      - origin
+    manael:
+        image: ghcr.io/manaelproxy/manael:3
+        ports:
+            - "8080:8080"
+        environment:
+            - MANAEL_UPSTREAM_URL=http://origin
+            - MANAEL_ENABLE_AVIF=true
+        depends_on:
+            - origin
 
-  origin:
-    image: nginx:alpine
-    volumes:
-      - ./images:/usr/share/nginx/html:ro
+    origin:
+        image: nginx:alpine
+        volumes:
+            - ./images:/usr/share/nginx/html:ro
 ```
 
 Start the stack with:

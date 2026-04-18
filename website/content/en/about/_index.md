@@ -13,9 +13,9 @@ Manael solves this problem by processing images in real-time.
 
 ### Key Concepts
 
-* **On-the-fly Optimization:** Manael dynamically converts original images (such as large JPEGs or PNGs) into next-generation formats like WebP and AVIF the moment they are requested.
-* **Smart Content Negotiation:** By analyzing the `Accept` header of the incoming HTTP request, Manael automatically determines and serves the best image format supported by the user's browser, while seamlessly falling back to the original format for older clients.
-* **Stateless by Design:** Manael does not store or cache any images itself. It acts purely as a processing layer. This makes it incredibly lightweight and easy to scale horizontally in containerized environments like Kubernetes or Cloud Run.
+- **On-the-fly Optimization:** Manael dynamically converts original images (such as large JPEGs or PNGs) into next-generation formats like WebP and AVIF the moment they are requested.
+- **Smart Content Negotiation:** By analyzing the `Accept` header of the incoming HTTP request, Manael automatically determines and serves the best image format supported by the user's browser, while seamlessly falling back to the original format for older clients.
+- **Stateless by Design:** Manael does not store or cache any images itself. It acts purely as a processing layer. This makes it incredibly lightweight and easy to scale horizontally in containerized environments like Kubernetes or Cloud Run.
 
 ### Architecture
 

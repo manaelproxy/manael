@@ -18,10 +18,10 @@ The official Docker image includes libvips out of the box and requires no additi
 
 Manael v3.0 introduces on-the-fly image resizing via new query parameters:
 
-| Parameter | Description                | Example   |
-|-----------|----------------------------|-----------|
-| `w`       | Target width in pixels     | `?w=800`  |
-| `h`       | Target height in pixels    | `?h=600`  |
+| Parameter | Description             | Example  |
+| --------- | ----------------------- | -------- |
+| `w`       | Target width in pixels  | `?w=800` |
+| `h`       | Target height in pixels | `?h=600` |
 
 You can use `w` and `h` individually or combine them to control how the image is scaled.
 
