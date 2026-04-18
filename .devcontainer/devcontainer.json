@@ -17,7 +17,7 @@
   "customizations": {
     "vscode": {
       "settings": {},
-      "extensions": ["EditorConfig.EditorConfig"]
+      "extensions": ["EditorConfig.EditorConfig", "oxc.oxc-vscode"]
     }
   },
 
