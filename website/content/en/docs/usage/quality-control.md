@@ -1,6 +1,6 @@
 ---
 title: Quality Control
-weight: 30
+weight: 50
 ---
 
 Manael allows clients to control the encoding quality of converted images via the `q` query parameter.

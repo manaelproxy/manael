@@ -10,14 +10,22 @@ title = 'Manael'
     disable = false
 
 [params]
-  copyright = 'The Manael Authors'
   github_repo = 'https://github.com/manaelproxy/manael'
   github_project_repo = 'https://github.com/manaelproxy/manael'
   github_branch = 'main'
   github_subdir = 'website'
+  [params.copyright]
+    authors = 'The Manael Authors'
+    from_year = 2017
   [params.ui]
-    sidebar_menu_compact = true
+    sidebar_menu_compact = false
     navbar_logo = true
+    sidebar_search_disable = true
+    showLightDarkModeMenu = true
+  [params.search.algolia]
+    appId = "ZX7VYOHRJ3"
+    apiKey = "43f66f766ffb77ee2280608d793ab235"
+    indexName = "docusaurus"
 
 [languages]
   [languages.en]

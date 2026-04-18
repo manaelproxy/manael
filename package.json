@@ -1,12 +1,12 @@
 {
   "devDependencies": {
-    "@commitlint/cli": "^20.0.0",
-    "@commitlint/config-conventional": "^20.0.0",
-    "@inabagumi/prettier-config": "^3.0.0",
-    "husky": "^9.1.7",
-    "is-ci": "^4.1.0",
-    "lint-staged": "^16.0.0",
-    "prettier": "^3.4.2"
+    "@commitlint/cli": "20.5.0",
+    "@commitlint/config-conventional": "20.5.0",
+    "@inabagumi/prettier-config": "3.0.0",
+    "husky": "9.1.7",
+    "is-ci": "4.1.0",
+    "lint-staged": "16.4.0",
+    "prettier": "3.8.3"
   },
   "packageManager": "pnpm@10.33.0",
   "prettier": "@inabagumi/prettier-config",
