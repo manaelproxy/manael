@@ -4,6 +4,7 @@
 /dist/
 /node_modules/
 /website/.hugo_build.lock
+/website/.wrangler/
 /website/node_modules/
 /website/public/
 /website/resources/
