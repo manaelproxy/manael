@@ -5,7 +5,7 @@
     "build": "hugo --minify",
     "dev": "hugo --watch",
     "generate-types": "wrangler types",
-    "type-check": "generate-types && tsc --noEmit"
+    "type-check": "pnpm run generate-types && tsc --noEmit"
   },
   "devDependencies": {
     "autoprefixer": "10.5.0",
