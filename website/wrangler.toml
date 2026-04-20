@@ -1,0 +1,18 @@
+"$schema" = "./node_modules/wrangler/config-schema.json"
+
+name = 'manael-website'
+main = './src/index.ts'
+compatibility_date = '2026-04-20'
+
+[build]
+command = 'pnpm build'
+
+[assets]
+directory = './public'
+not_found_handling = '404-page'
+binding = 'ASSETS'
+
+[vars]
+HUGO_VERSION = '0.160.1'
+NODE_VERSION = '24.15.0'
+PNPM_VERSION = '10.33.0'
