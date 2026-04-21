@@ -16,7 +16,7 @@ export default {
     if (url.pathname === MODULE_ROOT_PATH || url.pathname.startsWith(`${MODULE_ROOT_PATH}/`)) {
       const path = url.pathname;
       const relativePath = path.slice(MODULE_ROOT_PATH.length);
-      const version = relativePath.split("/").find((segment) => segment.length > 0);
+      const version = relativePath.startsWith("/") ? relativePath.slice(1).split("/", 1)[0] : "";
       const hasMajorVersion = !!version && MAJOR_VERSION_PATH_RE.test(version);
       const modulePrefix = hasMajorVersion
         ? `manael.org${MODULE_ROOT_PATH}/${version}`
