@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.1](https://github.com/manaelproxy/manael/compare/v3.1.0...v3.1.1) (2026-04-22)
+
+
+### Bug Fixes
+
+* **website:** route /x/manael through worker before assets ([#1752](https://github.com/manaelproxy/manael/issues/1752)) ([efa04e6](https://github.com/manaelproxy/manael/commit/efa04e6d87f7c7dd551bb7c7242d9fe9a9260249))
+
 ## [3.1.0](https://github.com/manaelproxy/manael/compare/v3.0.3...v3.1.0) (2026-04-18)
 
 ### Features
