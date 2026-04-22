@@ -1,5 +1,5 @@
 # Start by building the application.
-FROM golang:1.26.2-bookworm@sha256:e1b367ff64fba58a08544465ad6574a619be7517f9a517ff982374d1fd1085fa AS build
+FROM golang:1.26.2-bookworm@sha256:f27f072d9c2ae7a23cf2e56b4fd202b87cebed2658d3f7a0cd2ce35fa3480f51 AS build
 
 RUN apt-get update && \
 	apt-get install -y --no-install-recommends \
