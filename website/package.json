@@ -11,6 +11,6 @@
     "autoprefixer": "10.5.0",
     "postcss": "8.5.10",
     "postcss-cli": "11.0.1",
-    "wrangler": "4.84.1"
+    "wrangler": "4.85.0"
   }
 }
