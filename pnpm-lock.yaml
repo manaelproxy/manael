@@ -30,8 +30,8 @@ importers:
         specifier: 1.63.0
         version: 1.63.0
       ultracite:
-        specifier: 7.6.4
-        version: 7.6.4(oxfmt@0.48.0)(oxlint@1.63.0)
+        specifier: 7.6.5
+        version: 7.6.5(oxfmt@0.48.0)(oxlint@1.63.0)
 
   website:
     devDependencies:
@@ -1433,8 +1433,8 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  ultracite@7.6.4:
-    resolution: {integrity: sha512-RDkZoCpMDLrtoyscFMa4wQA6TnHTXHwPyrbHDjqptND45iCTWVR46PfeROHQY5BWYnEgyx1kYasrURVYkknvNg==}
+  ultracite@7.6.5:
+    resolution: {integrity: sha512-q68Ht5cTvjzmyDvhwZUPfxWLpcwioG5e5ODrVxBAbc0qWEn5hD3+CT1Tgq8FEFEypjKVote01inkG1nDOE9hmw==}
     hasBin: true
     peerDependencies:
       oxfmt: '>=0.1.0'
@@ -2680,7 +2680,7 @@ snapshots:
 
   typescript@6.0.3: {}
 
-  ultracite@7.6.4(oxfmt@0.48.0)(oxlint@1.63.0):
+  ultracite@7.6.5(oxfmt@0.48.0)(oxlint@1.63.0):
     dependencies:
       '@clack/prompts': 1.3.0
       commander: 14.0.3
