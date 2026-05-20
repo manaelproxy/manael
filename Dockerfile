@@ -13,7 +13,7 @@ RUN go mod download
 RUN go build -o /go/bin/manael ./cmd/manael
 
 # Now copy it into our base image.
-FROM debian:bookworm-slim@sha256:f9c6a2fd2ddbc23e336b6257a5245e31f996953ef06cd13a59fa0a1df2d5c252
+FROM debian:bookworm-slim@sha256:0104b334637a5f19aa9c983a91b54c89887c0984081f2068983107a6f6c21eeb
 RUN apt-get update && \
 	apt-get install -y --no-install-recommends \
 		ca-certificates \
