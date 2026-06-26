@@ -8,7 +8,7 @@
     "type-check": "pnpm run generate-types && tsc --noEmit"
   },
   "devDependencies": {
-    "autoprefixer": "10.5.0",
+    "autoprefixer": "10.5.1",
     "postcss": "8.5.15",
     "postcss-cli": "11.0.1",
     "wrangler": "4.104.0"
