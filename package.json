@@ -9,8 +9,8 @@
     "prepare": "is-ci || husky"
   },
   "devDependencies": {
-    "@commitlint/cli": "20.5.3",
-    "@commitlint/config-conventional": "20.5.3",
+    "@commitlint/cli": "21.2.0",
+    "@commitlint/config-conventional": "21.2.0",
     "husky": "9.1.7",
     "is-ci": "4.1.0",
     "lint-staged": "16.4.0",
