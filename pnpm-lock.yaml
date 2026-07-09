@@ -30,8 +30,8 @@ importers:
         specifier: 1.72.0
         version: 1.72.0
       ultracite:
-        specifier: 7.9.0
-        version: 7.9.0(eslint@10.6.0(jiti@2.6.1))(oxfmt@0.57.0)(oxlint@1.72.0)(typescript@6.0.3)
+        specifier: 7.9.2
+        version: 7.9.2(eslint@10.6.0(jiti@2.6.1))(oxfmt@0.57.0)(oxlint@1.72.0)(typescript@6.0.3)
 
   website:
     devDependencies:
@@ -1685,8 +1685,8 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  ultracite@7.9.0:
-    resolution: {integrity: sha512-Lkh6MXuX/vI89jeDIaEiOifI1BVXEJmk6e+igKRGAzdp5jKzeFa5d5A0tpJmHGCxXzd42jVwNpcs7jqm87IfNg==}
+  ultracite@7.9.2:
+    resolution: {integrity: sha512-NIMZCputZguuj09RcfTD6S9hsYbl8NNF5jplMs7au0R2xsLEnTIkyt+evg7Bd/reBzO+zBl/GbmmykUPbPJEEw==}
     hasBin: true
     peerDependencies:
       oxfmt: '>=0.1.0'
@@ -3206,7 +3206,7 @@ snapshots:
 
   typescript@6.0.3: {}
 
-  ultracite@7.9.0(eslint@10.6.0(jiti@2.6.1))(oxfmt@0.57.0)(oxlint@1.72.0)(typescript@6.0.3):
+  ultracite@7.9.2(eslint@10.6.0(jiti@2.6.1))(oxfmt@0.57.0)(oxlint@1.72.0)(typescript@6.0.3):
     dependencies:
       '@clack/prompts': 1.6.0
       '@typescript-eslint/utils': 8.63.0(eslint@10.6.0(jiti@2.6.1))(typescript@6.0.3)
