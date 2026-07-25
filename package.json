@@ -15,7 +15,7 @@
     "is-ci": "4.1.0",
     "lint-staged": "17.1.0",
     "oxfmt": "0.60.0",
-    "oxlint": "1.74.0",
+    "oxlint": "1.75.0",
     "ultracite": "7.9.4"
   },
   "packageManager": "pnpm@10.34.5"
