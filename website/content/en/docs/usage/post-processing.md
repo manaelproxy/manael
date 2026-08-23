@@ -41,11 +41,28 @@ proxy := manael.NewServeProxy(upstreamURL,
 
 When both hooks are configured, `WithRequestPostProcessor` takes precedence and `WithPostProcessor` is not called.
 
+## Response headers for the final payload {#response-headers}
+
+`WithResponseHeaderProcessor` receives the inbound request, response headers, and final converted bytes. Use it to add metadata that depends on the final payload, such as an `ETag`, a cache policy, or an audit header. It cannot replace the payload.
+
+Manael calls this hook after it has selected the final bytes and set `Content-Type`, `Content-Length`, and `Content-Disposition` for them.
+
+```go
+proxy := manael.NewServeProxy(upstreamURL,
+	manael.WithResponseHeaderProcessor(func(r *http.Request, header http.Header, data []byte) error {
+		header.Set("ETag", `"`+strconv.FormatInt(int64(len(data)), 10)+`"`)
+		header.Set("Cache-Control", "private, max-age=60")
+		return nil
+	}),
+)
+```
+
 ## Common use cases {#use-cases}
 
 - Store converted images in an external cache.
 - Add application-specific response processing after format conversion.
 - Integrate with downstream systems that need the final converted payload.
+- Set response metadata derived from the final converted payload.
 
 ## Error handling {#error-handling}
 
@@ -57,3 +74,4 @@ If the hook returns an error, Manael logs the failure and falls back to the orig
 - The hook runs after format conversion, so it sees the final converted payload.
 - If no conversion happens for the request, the hook is skipped.
 - If request-scoped state is needed, use `WithRequestPostProcessor`.
+- Use `WithResponseHeaderProcessor` when custom response headers depend on the final payload.

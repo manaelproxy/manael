@@ -41,11 +41,28 @@ proxy := manael.NewServeProxy(upstreamURL,
 
 両方のフックを設定した場合は `WithRequestPostProcessor` が優先され、`WithPostProcessor` は呼び出されません。
 
+## 最終ペイロードのレスポンスヘッダー {#response-headers}
+
+`WithResponseHeaderProcessor` は、受信したリクエスト、レスポンスヘッダー、および最終的な変換済みバイト列を受け取ります。`ETag`、キャッシュポリシー、監査用ヘッダーなど、最終ペイロードに依存するメタデータを追加する場合に使用します。このフックでペイロードを置き換えることはできません。
+
+Manael は最終バイト列を決定し、それに対応する `Content-Type`、`Content-Length`、`Content-Disposition` を設定した後に、このフックを呼び出します。
+
+```go
+proxy := manael.NewServeProxy(upstreamURL,
+	manael.WithResponseHeaderProcessor(func(r *http.Request, header http.Header, data []byte) error {
+		header.Set("ETag", `"`+strconv.FormatInt(int64(len(data)), 10)+`"`)
+		header.Set("Cache-Control", "private, max-age=60")
+		return nil
+	}),
+)
+```
+
 ## 主なユースケース {#use-cases}
 
 - 変換済み画像を外部キャッシュへ保存する。
 - フォーマット変換後にアプリケーション固有の後処理を行う。
 - 最終的な変換結果を必要とする下流システムへ連携する。
+- 最終的な変換済みペイロードから導出したレスポンスメタデータを設定する。
 
 ## エラーハンドリング {#error-handling}
 
@@ -57,3 +74,4 @@ proxy := manael.NewServeProxy(upstreamURL,
 - フックはフォーマット変換後に実行されるため、最終的な変換済みペイロードを扱います。
 - リクエストで変換が発生しなかった場合、フックは実行されません。
 - リクエスト単位の状態が必要な場合は `WithRequestPostProcessor` を使用します。
+- 最終ペイロードに依存する独自のレスポンスヘッダーには `WithResponseHeaderProcessor` を使用します。
