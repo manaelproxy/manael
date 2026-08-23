@@ -3,3 +3,11 @@ packages:
   - website
 
 preferSymlinkedExecutables: true
+
+minimumReleaseAgeExclude:
+  - baseline-browser-mapping@2.11.18
+  - fast-uri@3.1.6
+
+allowBuilds:
+  esbuild: true
+  workerd: true
