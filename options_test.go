@@ -552,6 +552,63 @@ func TestNewServeProxy_postProcessor(t *testing.T) {
 		}
 	})
 
+	t.Run("request hook receives inbound request", func(t *testing.T) {
+		var gotRequest *http.Request
+		sentinel := []byte("request processed")
+
+		p := manael.NewServeProxy(u, manael.WithRequestPostProcessor(func(r *http.Request, data []byte) ([]byte, error) {
+			gotRequest = r
+			return sentinel, nil
+		}))
+
+		req := httptest.NewRequest(http.MethodGet, "https://manael.test/photo.jpeg?cache=key", nil)
+		req.Header.Set("Accept", "image/webp,image/*,*/*;q=0.8")
+
+		w := httptest.NewRecorder()
+		p.ServeHTTP(w, req)
+
+		if gotRequest == nil {
+			t.Fatal("RequestPostProcessor was not called")
+		}
+		if got, want := gotRequest.URL.Path, req.URL.Path; got != want {
+			t.Errorf("request path = %q, want %q", got, want)
+		}
+		if got, want := gotRequest.URL.RawQuery, req.URL.RawQuery; got != want {
+			t.Errorf("request query = %q, want %q", got, want)
+		}
+		if got, want := w.Body.Bytes(), sentinel; string(got) != string(want) {
+			t.Errorf("body = %q, want %q", got, want)
+		}
+	})
+
+	t.Run("request hook takes precedence over post processor", func(t *testing.T) {
+		postProcessorCalled := false
+		requestSentinel := []byte("request processed")
+
+		p := manael.NewServeProxy(u,
+			manael.WithPostProcessor(func(data []byte) ([]byte, error) {
+				postProcessorCalled = true
+				return []byte("post processed"), nil
+			}),
+			manael.WithRequestPostProcessor(func(r *http.Request, data []byte) ([]byte, error) {
+				return requestSentinel, nil
+			}),
+		)
+
+		req := httptest.NewRequest(http.MethodGet, "https://manael.test/photo.jpeg", nil)
+		req.Header.Set("Accept", "image/webp,image/*,*/*;q=0.8")
+
+		w := httptest.NewRecorder()
+		p.ServeHTTP(w, req)
+
+		if postProcessorCalled {
+			t.Error("PostProcessor was called despite RequestPostProcessor being configured")
+		}
+		if got, want := w.Body.Bytes(), requestSentinel; string(got) != string(want) {
+			t.Errorf("body = %q, want %q", got, want)
+		}
+	})
+
 	t.Run("hook not called when no conversion happens", func(t *testing.T) {
 		called := false
 

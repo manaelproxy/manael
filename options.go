@@ -20,6 +20,8 @@
 
 package manael
 
+import "net/http"
+
 // ProxyOptions holds configuration for a proxy created by NewServeProxy.
 type ProxyOptions struct {
 	// EnableAVIF enables AVIF encoding for JPEG images when the client supports it.
@@ -55,6 +57,11 @@ type ProxyOptions struct {
 	// must return the final bytes to be sent to the client. If PostProcessor
 	// returns an error the original unconverted response is passed through.
 	PostProcessor func(data []byte) ([]byte, error)
+	// RequestPostProcessor is an optional hook invoked with the inbound request
+	// and converted image bytes after a successful format conversion. When set,
+	// it takes precedence over PostProcessor. If RequestPostProcessor returns an
+	// error the original unconverted response is passed through.
+	RequestPostProcessor func(r *http.Request, data []byte) ([]byte, error)
 }
 
 // ProxyOption is a functional option for configuring a proxy.
@@ -145,5 +152,17 @@ func WithDefaultQuality(q int) ProxyOption {
 func WithPostProcessor(f func(data []byte) ([]byte, error)) ProxyOption {
 	return func(o *ProxyOptions) {
 		o.PostProcessor = f
+	}
+}
+
+// WithRequestPostProcessor returns a ProxyOption that registers a hook to be
+// invoked with the inbound request and converted image bytes after a successful
+// format conversion. The hook may inspect request-scoped state and modify or
+// replace the byte slice. If the hook returns an error the original
+// unconverted response is passed through unchanged. This hook takes precedence
+// over a PostProcessor configured with WithPostProcessor.
+func WithRequestPostProcessor(f func(r *http.Request, data []byte) ([]byte, error)) ProxyOption {
+	return func(o *ProxyOptions) {
+		o.RequestPostProcessor = f
 	}
 }

@@ -3,7 +3,7 @@ title: ポストプロセッサーフック
 weight: 55
 ---
 
-Manael v3.1 では、画像変換の後段で独自処理を差し込める Go API フックが追加されました。Manael をライブラリとして組み込み、変換済みバイト列を送信前に確認、キャッシュ、置換、加工したい場合は `WithPostProcessor` を使用します。
+Manael v3.1 では、画像変換の後段で独自処理を差し込める Go API フックが追加されました。Manael をライブラリとして組み込み、変換済みバイト列を送信前に確認、キャッシュ、置換、加工したい場合は `WithPostProcessor` を使用します。リクエスト単位の状態も必要な場合は `WithRequestPostProcessor` を使用します。
 
 ## フックが実行されるタイミング {#when-it-runs}
 
@@ -25,6 +25,22 @@ proxy := manael.NewServeProxy(upstreamURL,
 )
 ```
 
+## リクエスト対応の処理 {#request-aware-processing}
+
+`WithRequestPostProcessor` は、変換済みバイト列とともにリクエストを受け取ります。リクエスト URL やヘッダーからキャッシュキーを作成する場合や、呼び出し元に応じた処理を行う場合に使用してください。
+
+```go
+proxy := manael.NewServeProxy(upstreamURL,
+	manael.WithRequestPostProcessor(func(r *http.Request, data []byte) ([]byte, error) {
+		cacheKey := r.URL.String() + ":" + r.Header.Get("Accept")
+		_ = cacheKey // キャッシュなどのリクエスト単位の処理に使用します。
+		return data, nil
+	}),
+)
+```
+
+両方のフックを設定した場合は `WithRequestPostProcessor` が優先され、`WithPostProcessor` は呼び出されません。
+
 ## 主なユースケース {#use-cases}
 
 - 変換済み画像を外部キャッシュへ保存する。
@@ -40,3 +56,4 @@ proxy := manael.NewServeProxy(upstreamURL,
 - このフックはコマンドラインオプションや環境変数ではなく、Go ライブラリ向け API です。
 - フックはフォーマット変換後に実行されるため、最終的な変換済みペイロードを扱います。
 - リクエストで変換が発生しなかった場合、フックは実行されません。
+- リクエスト単位の状態が必要な場合は `WithRequestPostProcessor` を使用します。
