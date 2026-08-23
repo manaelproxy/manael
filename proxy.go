@@ -193,8 +193,13 @@ func modifyResponse(res *http.Response, opts *ProxyOptions) error {
 	}
 
 	outData := buf.Bytes()
-	if opts.PostProcessor != nil {
-		processed, err := opts.PostProcessor(outData)
+	if opts.RequestPostProcessor != nil || opts.PostProcessor != nil {
+		var processed []byte
+		if opts.RequestPostProcessor != nil {
+			processed, err = opts.RequestPostProcessor(res.Request, outData)
+		} else {
+			processed, err = opts.PostProcessor(outData)
+		}
 		if err != nil {
 			res.Body = struct {
 				io.Reader

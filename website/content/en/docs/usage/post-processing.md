@@ -3,7 +3,7 @@ title: Post-processing Hook
 weight: 55
 ---
 
-Manael v3.1 adds a Go API hook for custom processing after image conversion. Use `WithPostProcessor` when you embed Manael as a library and need to inspect, cache, replace, or augment the converted bytes before they are sent to the client.
+Manael v3.1 adds Go API hooks for custom processing after image conversion. Use `WithPostProcessor` when you embed Manael as a library and need to inspect, cache, replace, or augment the converted bytes before they are sent to the client. Use `WithRequestPostProcessor` when that processing also needs request-scoped state.
 
 ## When the hook runs {#when-it-runs}
 
@@ -25,6 +25,22 @@ proxy := manael.NewServeProxy(upstreamURL,
 )
 ```
 
+## Request-aware processing {#request-aware-processing}
+
+`WithRequestPostProcessor` receives the request together with the converted bytes. Use it to derive a cache key from the request URL or headers, or to apply processing that depends on the caller.
+
+```go
+proxy := manael.NewServeProxy(upstreamURL,
+	manael.WithRequestPostProcessor(func(r *http.Request, data []byte) ([]byte, error) {
+		cacheKey := r.URL.String() + ":" + r.Header.Get("Accept")
+		_ = cacheKey // Use the key with your cache or other request-scoped logic.
+		return data, nil
+	}),
+)
+```
+
+When both hooks are configured, `WithRequestPostProcessor` takes precedence and `WithPostProcessor` is not called.
+
 ## Common use cases {#use-cases}
 
 - Store converted images in an external cache.
@@ -40,3 +56,4 @@ If the hook returns an error, Manael logs the failure and falls back to the orig
 - The hook is a library API, not a command-line option or environment variable.
 - The hook runs after format conversion, so it sees the final converted payload.
 - If no conversion happens for the request, the hook is skipped.
+- If request-scoped state is needed, use `WithRequestPostProcessor`.
