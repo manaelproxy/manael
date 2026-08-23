@@ -4,9 +4,10 @@ defaultContentLanguageInSubdir = false
 enableRobotsTXT = true
 title = 'Manael'
 
-[module]
+
+min = "0.160.1"
 [[module.imports]]
-path = 'github.com/google/docsy'
+path = 'github.com/google/docsy/theme'
 disable = false
 
 [params]
@@ -29,13 +30,13 @@ indexName = "docusaurus"
 
 [languages]
 [languages.en]
-languageName = 'English'
+label = 'English'
 contentDir = 'content/en'
 weight = 1
 [languages.en.params]
 description = 'Manael is a simple HTTP proxy for processing images.'
 [languages.ja]
-languageName = '日本語'
+label = '日本語'
 contentDir = 'content/ja'
 weight = 2
 [languages.ja.params]
@@ -55,6 +56,12 @@ url = "/docs/"
 name = "Blog"
 weight = 30
 url = "/blog/"
+
+[security]
+allowContent = ['^text/markdown$', '^text/html$']
+
+[security.node.permissions]
+allowRead = [".", "../node_modules"]
 
 [markup]
 [markup.goldmark]

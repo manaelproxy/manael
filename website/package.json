@@ -1,6 +1,7 @@
 {
   "name": "@manael/website",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "hugo --minify",
     "dev": "hugo --watch",
@@ -8,7 +9,9 @@
     "type-check": "pnpm run generate-types && tsc --noEmit"
   },
   "devDependencies": {
+    "@fortawesome/fontawesome-free": "6.7.2",
     "autoprefixer": "10.5.4",
+    "bootstrap": "5.3.8",
     "postcss": "8.5.23",
     "postcss-cli": "11.0.1",
     "wrangler": "4.114.0"
