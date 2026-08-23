@@ -1,5 +1,18 @@
 # Changelog
 
+## [3.2.0](https://github.com/manaelproxy/manael/compare/v3.1.1...v3.2.0) (2026-08-23)
+
+
+### Features
+
+* add response header processor ([#1962](https://github.com/manaelproxy/manael/issues/1962)) ([5b823a4](https://github.com/manaelproxy/manael/commit/5b823a4ca0eeb565b1ac97b089d32d80eab50fef))
+* pass request to post processor ([#1960](https://github.com/manaelproxy/manael/issues/1960)) ([d0bc891](https://github.com/manaelproxy/manael/commit/d0bc891e1c3fb670bb9ddeb8050952a18784b410))
+
+
+### Bug Fixes
+
+* **website:** restore Docsy theme ([#1955](https://github.com/manaelproxy/manael/issues/1955)) ([c9c0a6e](https://github.com/manaelproxy/manael/commit/c9c0a6e6ea3bed84c05f6461d537b1e200a8782a))
+
 ## [3.1.1](https://github.com/manaelproxy/manael/compare/v3.1.0...v3.1.1) (2026-04-22)
 
 
