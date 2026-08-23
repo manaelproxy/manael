@@ -3,3 +3,7 @@ packages:
   - website
 
 preferSymlinkedExecutables: true
+
+allowBuilds:
+  esbuild: true
+  workerd: true
