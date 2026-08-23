@@ -26,6 +26,11 @@
   },
   "packageRules": [
     {
+      "description": "Keep @fortawesome/fontawesome-free on v6 because Docksy does not support v7 yet",
+      "matchPackageNames": ["@fortawesome/fontawesome-free"],
+      "allowedVersions": "<7"
+    },
+    {
       "description": "Keep go.mod language version pinned for CI floor",
       "enabled": false,
       "matchDatasources": ["golang-version"],
