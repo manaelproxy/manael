@@ -632,3 +632,88 @@ func TestNewServeProxy_postProcessor(t *testing.T) {
 		}
 	})
 }
+
+// TestNewServeProxy_responseHeaderProcessor verifies that the response-header
+// hook receives the final payload after Manael has set its payload headers.
+func TestNewServeProxy_responseHeaderProcessor(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/photo.jpeg", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Disposition", `attachment; filename="photo.jpeg"`)
+		http.ServeFile(w, r, "testdata/photo.jpeg")
+	})
+
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
+
+	u, err := url.Parse(ts.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Run("can set headers for final payload", func(t *testing.T) {
+		final := []byte("final payload")
+		called := false
+		p := manael.NewServeProxy(u,
+			manael.WithPostProcessor(func([]byte) ([]byte, error) { return final, nil }),
+			manael.WithResponseHeaderProcessor(func(r *http.Request, header http.Header, data []byte) error {
+				called = true
+				if got, want := r.URL.Query().Get("cache"), "key"; got != want {
+					t.Errorf("request query = %q, want %q", got, want)
+				}
+				if got, want := string(data), string(final); got != want {
+					t.Errorf("data = %q, want %q", got, want)
+				}
+				if got, want := header.Get("Content-Type"), "image/webp"; got != want {
+					t.Errorf("Content-Type = %q, want %q", got, want)
+				}
+				if got, want := header.Get("Content-Length"), strconv.Itoa(len(final)); got != want {
+					t.Errorf("Content-Length = %q, want %q", got, want)
+				}
+				if got, want := header.Get("Content-Disposition"), `attachment; filename=photo.webp`; got != want {
+					t.Errorf("Content-Disposition = %q, want %q", got, want)
+				}
+				header.Set("ETag", `"final"`)
+				return nil
+			}),
+		)
+
+		req := httptest.NewRequest(http.MethodGet, "https://manael.test/photo.jpeg?cache=key", nil)
+		req.Header.Set("Accept", "image/webp")
+		w := httptest.NewRecorder()
+		p.ServeHTTP(w, req)
+
+		if !called {
+			t.Error("ResponseHeaderProcessor was not called")
+		}
+		if got, want := w.Body.Bytes(), final; string(got) != string(want) {
+			t.Errorf("body = %q, want %q", got, want)
+		}
+		if got, want := w.Header().Get("ETag"), `"final"`; got != want {
+			t.Errorf("ETag = %q, want %q", got, want)
+		}
+		if got, want := w.Header().Get("Content-Length"), strconv.Itoa(len(final)); got != want {
+			t.Errorf("Content-Length = %q, want %q", got, want)
+		}
+	})
+
+	t.Run("hook error falls back to original response", func(t *testing.T) {
+		p := manael.NewServeProxy(u, manael.WithResponseHeaderProcessor(func(_ *http.Request, header http.Header, _ []byte) error {
+			header.Set("ETag", `"should-not-be-sent"`)
+			return errors.New("response-header processor error")
+		}))
+
+		req := httptest.NewRequest(http.MethodGet, "https://manael.test/photo.jpeg", nil)
+		req.Header.Set("Accept", "image/webp")
+		w := httptest.NewRecorder()
+		p.ServeHTTP(w, req)
+
+		resp := w.Result()
+		defer resp.Body.Close()
+		if got, want := resp.Header.Get("Content-Type"), "image/jpeg"; got != want {
+			t.Errorf("Content-Type = %q, want %q", got, want)
+		}
+		if got := resp.Header.Get("ETag"); got != "" {
+			t.Errorf("ETag = %q, want empty", got)
+		}
+	})
+}

@@ -62,6 +62,12 @@ type ProxyOptions struct {
 	// it takes precedence over PostProcessor. If RequestPostProcessor returns an
 	// error the original unconverted response is passed through.
 	RequestPostProcessor func(r *http.Request, data []byte) ([]byte, error)
+	// ResponseHeaderProcessor is an optional hook invoked after the final
+	// converted image bytes and their payload-dependent response headers have
+	// been set. It may use the inbound request and final bytes to add or update
+	// response headers. If ResponseHeaderProcessor returns an error the original
+	// unconverted response is passed through.
+	ResponseHeaderProcessor func(r *http.Request, header http.Header, data []byte) error
 }
 
 // ProxyOption is a functional option for configuring a proxy.
@@ -164,5 +170,16 @@ func WithPostProcessor(f func(data []byte) ([]byte, error)) ProxyOption {
 func WithRequestPostProcessor(f func(r *http.Request, data []byte) ([]byte, error)) ProxyOption {
 	return func(o *ProxyOptions) {
 		o.RequestPostProcessor = f
+	}
+}
+
+// WithResponseHeaderProcessor returns a ProxyOption that registers a hook to
+// be invoked after the final converted image bytes and their payload-dependent
+// response headers have been set. The hook may inspect the inbound request and
+// final bytes, and add or update response headers. If the hook returns an error
+// the original unconverted response is passed through unchanged.
+func WithResponseHeaderProcessor(f func(r *http.Request, header http.Header, data []byte) error) ProxyOption {
+	return func(o *ProxyOptions) {
+		o.ResponseHeaderProcessor = f
 	}
 }

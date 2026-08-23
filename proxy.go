@@ -219,6 +219,7 @@ func modifyResponse(res *http.Response, opts *ProxyOptions) error {
 		outData = processed
 	}
 
+	originalHeader := res.Header.Clone()
 	res.Body = io.NopCloser(bytes.NewReader(outData))
 
 	res.Header.Set("Content-Type", typ)
@@ -228,6 +229,26 @@ func modifyResponse(res *http.Response, opts *ProxyOptions) error {
 
 	if res.Header.Get("Accept-Ranges") != "" {
 		res.Header.Del("Accept-Ranges")
+	}
+
+	if opts.ResponseHeaderProcessor != nil {
+		if err := opts.ResponseHeaderProcessor(res.Request, res.Header, outData); err != nil {
+			res.Body = struct {
+				io.Reader
+				io.Closer
+			}{
+				Reader: io.MultiReader(bytes.NewReader(p.Bytes()), origBody),
+				Closer: origBody,
+			}
+			res.Header = originalHeader
+			closeOrigBody = false
+			slog.Error("response-header processor failed",
+				slog.String("error", err.Error()),
+				slog.String("url", res.Request.URL.String()),
+			)
+
+			return nil
+		}
 	}
 
 	return nil
