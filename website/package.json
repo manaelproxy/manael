@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "@fortawesome/fontawesome-free": "6.7.2",
-    "autoprefixer": "10.5.4",
+    "autoprefixer": "10.5.5",
     "bootstrap": "5.3.8",
     "postcss": "8.5.26",
     "postcss-cli": "11.0.1",
