@@ -16,7 +16,7 @@
     "lint-staged": "17.5.1",
     "oxfmt": "0.68.0",
     "oxlint": "1.83.0",
-    "ultracite": "7.10.6"
+    "ultracite": "7.11.1"
   },
   "packageManager": "pnpm@11.22.0"
 }
