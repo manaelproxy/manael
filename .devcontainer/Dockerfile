@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/go:2.3.2-1.25-bookworm@sha256:4b2afc34c02ad032788a823eb38d246680249adc223ddfa273affe68e9c803eb
+FROM mcr.microsoft.com/devcontainers/go:2.3.3-1.25-bookworm@sha256:2300b759440aa1b3dade1012ebb8cfa3baaa63bd6940e86e399c523a26f6e3cf
 
 # renovate: datasource=github-releases depName=gohugoio/hugo versioning=semver-coerced
 ARG HUGO_VERSION=0.160.1
