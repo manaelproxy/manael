@@ -198,16 +198,16 @@ importers:
         version: 6.7.2
       autoprefixer:
         specifier: 10.6.1
-        version: 10.6.1(postcss@8.5.30)
+        version: 10.6.1(postcss@8.5.31)
       bootstrap:
         specifier: 5.3.8
         version: 5.3.8(@popperjs/core@2.11.8)
       postcss:
-        specifier: 8.5.30
-        version: 8.5.30
+        specifier: 8.5.31
+        version: 8.5.31
       postcss-cli:
         specifier: 12.0.0
-        version: 12.0.0(jiti@2.6.1)(postcss@8.5.30)(yaml@2.9.1)
+        version: 12.0.0(jiti@2.6.1)(postcss@8.5.31)(yaml@2.9.1)
       wrangler:
         specifier: 4.151.1
         version: 4.151.1(@types/node@26.6.5)
@@ -1599,8 +1599,8 @@ packages:
   postcss-value-parser@4.2.0:
     resolution: {integrity: sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==}
 
-  postcss@8.5.30:
-    resolution: {integrity: sha512-zkd+e9S1AQHhmaBKye9zlFHWjOwVgqXl1q3ECYy8561K7qxR2cREf/STLskulBFd78k6AOFeA+ff1TtEzk9bAA==}
+  postcss@8.5.31:
+    resolution: {integrity: sha512-YUbWYCgErwnMAVkjUnYa+KlMBzGpHwiIt/DE7f0G33AuX2LH9UcTk6KgWxd3zRU+pN3u/C+Xl3EnMLM4Hea7Sg==}
     engines: {node: ^10 || ^12 || >=14}
 
   pretty-hrtime@1.0.3:
@@ -2471,13 +2471,13 @@ snapshots:
 
   argue-cli@3.2.0: {}
 
-  autoprefixer@10.6.1(postcss@8.5.30):
+  autoprefixer@10.6.1(postcss@8.5.31):
     dependencies:
       browserslist: 4.29.3
       caniuse-lite: 1.0.30001816
       fraction.js: 5.3.4
       picocolors: 1.1.1
-      postcss: 8.5.30
+      postcss: 8.5.31
       postcss-value-parser: 4.2.0
 
   baseline-browser-mapping@2.11.29: {}
@@ -2894,14 +2894,14 @@ snapshots:
       mlly: 1.8.2
       pathe: 2.0.3
 
-  postcss-cli@12.0.0(jiti@2.6.1)(postcss@8.5.30)(yaml@2.9.1):
+  postcss-cli@12.0.0(jiti@2.6.1)(postcss@8.5.31)(yaml@2.9.1):
     dependencies:
       chokidar: 5.0.0
       dependency-graph: 1.0.0
       picocolors: 1.1.1
-      postcss: 8.5.30
-      postcss-load-config: 6.0.1(jiti@2.6.1)(postcss@8.5.30)(yaml@2.9.1)
-      postcss-reporter: 7.1.0(postcss@8.5.30)
+      postcss: 8.5.31
+      postcss-load-config: 6.0.1(jiti@2.6.1)(postcss@8.5.31)(yaml@2.9.1)
+      postcss-reporter: 7.1.0(postcss@8.5.31)
       pretty-hrtime: 1.0.3
       read-cache: 1.0.2
       slash: 5.1.0
@@ -2912,23 +2912,23 @@ snapshots:
       - tsx
       - yaml
 
-  postcss-load-config@6.0.1(jiti@2.6.1)(postcss@8.5.30)(yaml@2.9.1):
+  postcss-load-config@6.0.1(jiti@2.6.1)(postcss@8.5.31)(yaml@2.9.1):
     dependencies:
       lilconfig: 3.1.4
     optionalDependencies:
       jiti: 2.6.1
-      postcss: 8.5.30
+      postcss: 8.5.31
       yaml: 2.9.1
 
-  postcss-reporter@7.1.0(postcss@8.5.30):
+  postcss-reporter@7.1.0(postcss@8.5.31):
     dependencies:
       picocolors: 1.1.1
-      postcss: 8.5.30
+      postcss: 8.5.31
       thenby: 1.4.1
 
   postcss-value-parser@4.2.0: {}
 
-  postcss@8.5.30:
+  postcss@8.5.31:
     dependencies:
       nanoid: 3.3.20
       picocolors: 1.1.1
