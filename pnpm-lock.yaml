@@ -188,8 +188,8 @@ importers:
         specifier: 1.89.0
         version: 1.89.0
       ultracite:
-        specifier: 8.0.2
-        version: 8.0.2(oxfmt@0.74.0)(oxlint@1.89.0)
+        specifier: 8.1.0
+        version: 8.1.0(oxfmt@0.74.0)(oxlint@1.89.0)
 
   website:
     devDependencies:
@@ -1607,12 +1607,12 @@ packages:
   ufo@1.6.4:
     resolution: {integrity: sha512-JFNbkD1Svwe0KvGi8GOeLcP4kAWQ609twvCdcHxq1oSL8svv39ZuSvajcD8B+5D0eL4+s1Is2D/O6KN3qcTeRA==}
 
-  ultracite@8.0.2:
-    resolution: {integrity: sha512-fXAMds8JnXvwizV4Ee3PFQNIu9zPvZtd2/+X6gh6ZWSvuzpiLkSWeUlsZvXIWRync+oLHgyKAje5cPgpeb61jw==}
-    engines: {node: '>=22.18.0'}
+  ultracite@8.1.0:
+    resolution: {integrity: sha512-YX14p9HzKjOZFi2N4zug+zM3757BZcRpxn8vnGKgO+0Vh3mnU9G1hZAgvSD9d1HAUyV1KSaCUAB8BfbqVXEnmQ==}
+    engines: {node: ^22.22.2 || >=24.15.0}
     hasBin: true
     peerDependencies:
-      '@biomejs/biome': ^2.5.0
+      '@biomejs/biome': ^2.6.2
       eslint: ^10.9.0
       oxfmt: '>=0.71.0 <1'
       oxlint: ^1.86.0
@@ -2855,7 +2855,7 @@ snapshots:
 
   ufo@1.6.4: {}
 
-  ultracite@8.0.2(oxfmt@0.74.0)(oxlint@1.89.0):
+  ultracite@8.1.0(oxfmt@0.74.0)(oxlint@1.89.0):
     dependencies:
       '@clack/prompts': 1.8.1
       cli-truncate: 6.1.1
