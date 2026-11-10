@@ -14,7 +14,7 @@
     "husky": "9.1.7",
     "is-ci": "4.1.0",
     "lint-staged": "17.6.0",
-    "oxfmt": "0.76.0",
+    "oxfmt": "0.77.0",
     "oxlint": "1.92.0",
     "ultracite": "8.1.1"
   },
