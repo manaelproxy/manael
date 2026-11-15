@@ -197,8 +197,8 @@ importers:
         specifier: 1.93.0
         version: 1.93.0
       ultracite:
-        specifier: 8.1.1
-        version: 8.1.1(oxfmt@0.78.0)(oxlint@1.93.0)
+        specifier: 8.2.0
+        version: 8.2.0(oxfmt@0.78.0)(oxlint@1.93.0)
 
   website:
     devDependencies:
@@ -1629,8 +1629,8 @@ packages:
   ufo@1.6.4:
     resolution: {integrity: sha512-JFNbkD1Svwe0KvGi8GOeLcP4kAWQ609twvCdcHxq1oSL8svv39ZuSvajcD8B+5D0eL4+s1Is2D/O6KN3qcTeRA==}
 
-  ultracite@8.1.1:
-    resolution: {integrity: sha512-L4gRVHVm8AWvKr/TF6Zz2g23awXsEn+2P4X1BXE8Xwm9p2ZggkQBFbroWM7eCkZ59PtAnMp3wmLFXbxVLv8Btw==}
+  ultracite@8.2.0:
+    resolution: {integrity: sha512-4g7+Lnx3ICVhdNKs4UXGHbhw9rHiECDy0YuDaS7/XaZOxU3vVBdzF804C9X2K5d6to+/+J8GWJ+h54BhQRmnEg==}
     engines: {node: ^22.22.2 || >=24.15.0}
     hasBin: true
     peerDependencies:
@@ -2884,7 +2884,7 @@ snapshots:
 
   ufo@1.6.4: {}
 
-  ultracite@8.1.1(oxfmt@0.78.0)(oxlint@1.93.0):
+  ultracite@8.2.0(oxfmt@0.78.0)(oxlint@1.93.0):
     dependencies:
       '@clack/prompts': 1.8.1
       cli-truncate: 6.2.0
