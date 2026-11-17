@@ -18,5 +18,5 @@
     "oxlint": "1.93.0",
     "ultracite": "8.2.0"
   },
-  "packageManager": "pnpm@12.20.0"
+  "packageManager": "pnpm@12.21.0"
 }
