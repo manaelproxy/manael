@@ -14,6 +14,6 @@
     "bootstrap": "5.3.9",
     "postcss": "8.5.32",
     "postcss-cli": "12.0.0",
-    "wrangler": "4.161.0"
+    "wrangler": "4.162.0"
   }
 }
