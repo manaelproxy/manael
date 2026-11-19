@@ -20,7 +20,9 @@
     ":timezone(Asia/Tokyo)",
     ":widenPeerDependencies"
   ],
-  "dependencyDashboardLabels": ["dependencies"],
+  "dependencyDashboard": {
+    "labels": ["dependencies"]
+  },
   "lockFileMaintenance": {
     "extends": [":semanticCommitType(build)"]
   },
