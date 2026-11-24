@@ -143,7 +143,18 @@ jobs:
 
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
-        run: brew install vips
+        run: |
+          brew install vips
+          # Keg-only dependencies such as libarchive are not linked into
+          # Homebrew's pkgconfig directory, so pkg-config cannot resolve
+          # vips.pc without their own directories on the search path.
+          for dep in $(brew deps vips); do
+            dir="$(brew --prefix "$dep")/lib/pkgconfig"
+            if [ -d "$dir" ]; then
+              PKG_CONFIG_PATH="$dir${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+            fi
+          done
+          echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH" >> "$GITHUB_ENV"
 
       - name: Build
         env:
