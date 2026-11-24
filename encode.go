@@ -65,8 +65,17 @@ func Encode(w io.Writer, src []byte, t string, resize *ResizeOptions, quality *Q
 			// An empty Fit is treated as "contain" per the ResizeOptions documentation.
 			opts.Enlarge = true
 		case "scale-down":
-			// Scale down to fit within the target box; never upscale.
-			// This is the bimg default when neither Crop nor Enlarge is set.
+			// Scale down to fit within the target box; never upscale. bimg
+			// has no such mode: with neither Crop nor Enlarge set it forces
+			// the exact box, enlarging the image and ignoring its aspect
+			// ratio, so only the side that limits the fit is passed, and
+			// nothing when the image already fits.
+			w, h, err := scaleDownSize(src, r.Width, r.Height)
+			if err != nil {
+				return err
+			}
+			opts.Width = w
+			opts.Height = h
 		}
 	}
 
@@ -77,4 +86,39 @@ func Encode(w io.Writer, src []byte, t string, resize *ResizeOptions, quality *Q
 
 	_, err = io.Copy(w, bytes.NewReader(out))
 	return err
+}
+
+// scaleDownSize returns the width and height to hand bimg for a scale-down of
+// src into a box of w by h, either of which may be zero for no limit. At most
+// one of the two it returns is non-zero, so that bimg keeps the aspect ratio,
+// and both are zero when src already fits the box.
+func scaleDownSize(src []byte, w, h int) (int, int, error) {
+	meta, err := bimg.NewImage(src).Metadata()
+	if err != nil {
+		return 0, 0, err
+	}
+	// bimg applies the EXIF orientation before it resizes, so the box is
+	// compared with the image as it will be displayed.
+	srcWidth, srcHeight := meta.Size.Width, meta.Size.Height
+	if meta.Orientation >= 5 && meta.Orientation <= 8 {
+		srcWidth, srcHeight = srcHeight, srcWidth
+	}
+	if srcWidth <= 0 || srcHeight <= 0 {
+		return 0, 0, errors.New("image has no size")
+	}
+
+	widthFits := w == 0 || w >= srcWidth
+	heightFits := h == 0 || h >= srcHeight
+	switch {
+	case widthFits && heightFits:
+		return 0, 0, nil
+	case heightFits:
+		return w, 0, nil
+	case widthFits:
+		return 0, h, nil
+	}
+	if float64(w)/float64(srcWidth) <= float64(h)/float64(srcHeight) {
+		return w, 0, nil
+	}
+	return 0, h, nil
 }
