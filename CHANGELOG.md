@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.2.1](https://github.com/manaelproxy/manael/compare/v3.2.0...v3.2.1) (2026-11-24)
+## [3.2.2](https://github.com/manaelproxy/manael/compare/v3.2.0...v3.2.2) (2026-11-24)
 
 
 ### Bug Fixes
