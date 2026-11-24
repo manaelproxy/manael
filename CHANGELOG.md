@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.1](https://github.com/manaelproxy/manael/compare/v3.2.0...v3.2.1) (2026-11-24)
+
+
+### Bug Fixes
+
+* keep fit=scale-down from enlarging or stretching an image ([#2156](https://github.com/manaelproxy/manael/issues/2156)) ([661c41f](https://github.com/manaelproxy/manael/commit/661c41f35de856a85ea9b1d11f45da5c9d0f710f))
+
 ## [3.2.0](https://github.com/manaelproxy/manael/compare/v3.1.1...v3.2.0) (2026-08-23)
 
 
