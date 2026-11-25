@@ -13,7 +13,7 @@
     "@commitlint/config-conventional": "21.2.4",
     "husky": "9.1.7",
     "is-ci": "4.1.0",
-    "lint-staged": "17.6.1",
+    "lint-staged": "17.6.2",
     "oxfmt": "0.79.0",
     "oxlint": "1.94.0",
     "ultracite": "8.3.1"
