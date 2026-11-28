@@ -11,4 +11,4 @@ command = 'pnpm build'
 directory = './public'
 not_found_handling = '404-page'
 binding = 'ASSETS'
-run_worker_first = ["/x/manael", "/x/manael/*"]
+run_worker_first = ["/x/manael", "/x/manael/*", "/x/image", "/x/image/*"]

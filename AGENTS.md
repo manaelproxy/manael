@@ -37,7 +37,7 @@ Run the checks for what changed, from the repository root, and do not describe a
 | Go code (`*.go`, `cmd/`, `internal/`) | `go build ./...`, `go test ./...`, `golangci-lint run`        |
 | Image processing behaviour end to end | `go test -tags=integration -timeout 10m ./...` (needs Docker) |
 | Markdown, JSON, YAML, TypeScript      | `pnpm format-check` (`pnpm format` to fix)                    |
-| `website/`                            | `pnpm build`                                                  |
+| `website/`                            | `pnpm build`, `pnpm test`                                     |
 
 The integration tests need Docker; a pull request says plainly when they were skipped rather than implying they passed.
 
