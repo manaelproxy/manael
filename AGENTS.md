@@ -25,6 +25,7 @@ Long-lived documentation and code comments state the rule or decision and the re
 - Commit subjects follow [Conventional Commits](https://www.conventionalcommits.org/); `commitlint` checks them in the `commit-msg` hook.
 - Disclose AI assistance with a single trailer in the form `Assisted-by: <tool>:<model>`, for example `Assisted-by: Claude Code:claude-opus-5-5`. Do not add `Co-Authored-By:` lines for an agent, or a "Generated with" footer to a pull request; `.claude/settings.json` turns Claude Code's own attribution off for this reason.
 - Fill in `.github/PULL_REQUEST_TEMPLATE.md` (Description / Related Issue / Checklist) and link the Issue the pull request closes.
+- Pull requests are squash-merged and the merge commit message is the pull request body, so the per-commit trailers do not survive the merge. End the body with the same `Assisted-by:` trailer as its last paragraph, and keep the template's `@coderabbitai summary` placeholder: without it CodeRabbit appends its summary after the trailer, and the trailer is no longer the last paragraph that Git reads trailers from.
 - Commit or push only when asked, and branch off `main` first.
 
 ### Verification before a push
