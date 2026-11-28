@@ -1,6 +1,6 @@
 # Manael Agent Guide
 
-Repository-specific conventions for agents. This file is the source of truth for implementation and review. `CLAUDE.md` imports it with `@AGENTS.md`, so every line here is loaded in every Claude Code session; keep it to norms and the reasons behind them.
+Repository-specific conventions for agents. This file is the source of truth for implementation and review. Claude Code reads it directly, as other coding agents do, so every line here is loaded in every session; keep it to norms and the reasons behind them. Do not add a `CLAUDE.md` or `CLAUDE.local.md`: while either exists, Claude Code reads that file instead of this one.
 
 ## Output language
 
