@@ -1,5 +1,44 @@
 # Changelog
 
+## [3.2.3](https://github.com/manaelproxy/manael/compare/v3.2.3...v3.2.3) (2026-11-28)
+
+
+### Features
+
+* add Claude Code configuration aligned with publira ([#2174](https://github.com/manaelproxy/manael/issues/2174)) ([9d2b382](https://github.com/manaelproxy/manael/commit/9d2b382a98381d2c7eb932eca288800a592bfd9f))
+* Add dedicated health check endpoint (/_health) ([#1632](https://github.com/manaelproxy/manael/issues/1632)) ([75d2091](https://github.com/manaelproxy/manael/commit/75d2091d57576cd5186b31645ec2010e6fb00829))
+* add PostProcessor hook to ProxyOptions for custom processing after image conversion ([#1733](https://github.com/manaelproxy/manael/issues/1733)) ([1cce252](https://github.com/manaelproxy/manael/commit/1cce252a23a8f949c2cf8c108fe0b5176cb7054d))
+* add response header processor ([#1962](https://github.com/manaelproxy/manael/issues/1962)) ([5b823a4](https://github.com/manaelproxy/manael/commit/5b823a4ca0eeb565b1ac97b089d32d80eab50fef))
+* do not forward manael transform query params to upstream ([#1651](https://github.com/manaelproxy/manael/issues/1651)) ([e1f71f2](https://github.com/manaelproxy/manael/commit/e1f71f272b2f410f1a8e12d0f6574e60a0139392))
+* Expose Prometheus metrics on a dedicated internal port ([#1631](https://github.com/manaelproxy/manael/issues/1631)) ([b7d4a25](https://github.com/manaelproxy/manael/commit/b7d4a2500875fd1628325ff78f7a6cd615f10662))
+* Format-specific encode quality control via `q` query parameter ([#1642](https://github.com/manaelproxy/manael/issues/1642)) ([a70f0ad](https://github.com/manaelproxy/manael/commit/a70f0ad305588c3bfe515fde59bca49a4936d4c5))
+* Image resize and crop via query parameters with security limits ([#1636](https://github.com/manaelproxy/manael/issues/1636)) ([aefe363](https://github.com/manaelproxy/manael/commit/aefe363dc53f757f7ea1cfbfa3eb969ec4128256))
+* make image resizing opt-in via MANAEL_ENABLE_RESIZE env var ([#1647](https://github.com/manaelproxy/manael/issues/1647)) ([3393ffc](https://github.com/manaelproxy/manael/commit/3393ffc02b79309d8442de9f24188640ac70e2c3))
+* migrate Go vanity URL resolution to Cloudflare Pages Functions ([#1640](https://github.com/manaelproxy/manael/issues/1640)) ([15f1c24](https://github.com/manaelproxy/manael/commit/15f1c247140747bad3538a7032d9b0cb4714f780))
+* migrate to structured logging using log/slog ([#1620](https://github.com/manaelproxy/manael/issues/1620)) ([5292627](https://github.com/manaelproxy/manael/commit/529262708a4efdf9ae9c646c6ce7272527fbf601))
+* pass request to post processor ([#1960](https://github.com/manaelproxy/manael/issues/1960)) ([d0bc891](https://github.com/manaelproxy/manael/commit/d0bc891e1c3fb670bb9ddeb8050952a18784b410))
+
+
+### Bug Fixes
+
+* **ci:** fix asset upload failure on immutable release by bundling assets at creation ([#1671](https://github.com/manaelproxy/manael/issues/1671)) ([28d45ca](https://github.com/manaelproxy/manael/commit/28d45ca3552a4f8975eaf7655029d4387f83dcad))
+* install ca-certificates in runtime Docker image for HTTPS support ([#1689](https://github.com/manaelproxy/manael/issues/1689)) ([0b5c070](https://github.com/manaelproxy/manael/commit/0b5c07019dbb891222d14a0ab56d86e33c447f2d))
+* keep fit=scale-down from enlarging or stretching an image ([#2156](https://github.com/manaelproxy/manael/issues/2156)) ([661c41f](https://github.com/manaelproxy/manael/commit/661c41f35de856a85ea9b1d11f45da5c9d0f710f))
+* pass ProxyOptions to scanAcceptHeader and check ([#1634](https://github.com/manaelproxy/manael/issues/1634)) ([03c1734](https://github.com/manaelproxy/manael/commit/03c1734413adf4783fc9a39bb62c20ccf493eb91))
+* **release:** use draft releases for asset uploads under Immutable Releases ([#1680](https://github.com/manaelproxy/manael/issues/1680)) ([6253764](https://github.com/manaelproxy/manael/commit/6253764a3b2f0605e5de396ed7a4490a2e84956b))
+* **website:** restore Docsy theme ([#1955](https://github.com/manaelproxy/manael/issues/1955)) ([c9c0a6e](https://github.com/manaelproxy/manael/commit/c9c0a6e6ea3bed84c05f6461d537b1e200a8782a))
+* **website:** route /x/manael through worker before assets ([#1752](https://github.com/manaelproxy/manael/issues/1752)) ([efa04e6](https://github.com/manaelproxy/manael/commit/efa04e6d87f7c7dd551bb7c7242d9fe9a9260249))
+
+
+### Miscellaneous Chores
+
+* release 3.2.3 ([#2180](https://github.com/manaelproxy/manael/issues/2180)) ([b723aa6](https://github.com/manaelproxy/manael/commit/b723aa6848c60c785d9f1b7a2e79b0966939fc44))
+
+
+### Continuous Integration
+
+* put keg-only Homebrew dependencies on the pkg-config path on macOS ([#2161](https://github.com/manaelproxy/manael/issues/2161)) ([6a77ee1](https://github.com/manaelproxy/manael/commit/6a77ee1aa75bf0dbb2f53262b6c344a4f63193ad))
+
 ## [3.2.3](https://github.com/manaelproxy/manael/compare/v3.2.2...v3.2.3) (2026-11-28)
 
 
