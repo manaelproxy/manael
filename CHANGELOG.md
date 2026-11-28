@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.2.3](https://github.com/manaelproxy/manael/compare/v3.2.2...v3.2.3) (2026-11-28)
+
+
+### Features
+
+* add Claude Code configuration aligned with publira ([#2174](https://github.com/manaelproxy/manael/issues/2174)) ([9d2b382](https://github.com/manaelproxy/manael/commit/9d2b382a98381d2c7eb932eca288800a592bfd9f))
+
+
+### Miscellaneous Chores
+
+* release 3.2.3 ([#2180](https://github.com/manaelproxy/manael/issues/2180)) ([b723aa6](https://github.com/manaelproxy/manael/commit/b723aa6848c60c785d9f1b7a2e79b0966939fc44))
+
 ## [3.2.2](https://github.com/manaelproxy/manael/compare/v3.2.0...v3.2.2) (2026-11-24)
 
 
