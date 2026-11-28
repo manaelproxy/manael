@@ -6,6 +6,7 @@
     "build": "hugo --minify",
     "dev": "hugo --watch",
     "generate-types": "wrangler types",
+    "test": "node --test 'src/**/*.test.ts'",
     "type-check": "pnpm run generate-types && tsc --noEmit"
   },
   "devDependencies": {

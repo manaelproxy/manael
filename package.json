@@ -6,7 +6,8 @@
     "build": "pnpm --filter @manael/website build",
     "format": "ultracite fix",
     "format-check": "ultracite check",
-    "prepare": "is-ci || husky"
+    "prepare": "is-ci || husky",
+    "test": "pnpm --filter @manael/website test"
   },
   "devDependencies": {
     "@commitlint/cli": "21.2.4",
