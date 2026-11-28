@@ -1,9 +1,180 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+#
+# Manael repository CodeRabbit config.
+# Self-contained: every setting is stated here rather than inherited from
+# Organization Settings. Resolved config: comment `@coderabbitai configuration`
+# on a PR.
+
+language: en-US
+
+tone_instructions: >-
+  Be concise and technical. No praise. Focus on bugs, security, HTTP behavior, public API breaks, and policy violations. Skip style nits and anything golangci-lint or oxlint already catches. Keep code identifiers, paths, and commands as-is.
+
+reviews:
+  profile: assertive
+  # The summary still fills the `@coderabbitai summary` placeholder in the PR
+  # template, which keeps it ahead of the `Assisted-by:` trailer.
+  high_level_summary: false
+  review_status: false
+  commit_status: false
+  changed_files_summary: false
+  sequence_diagrams: false
+  estimate_code_review_effort: false
+  suggested_labels: false
+  suggested_reviewers: false
+  in_progress_fortune: false
+  enable_prompt_for_ai_agents: false
+  auto_review:
+    enabled: false
+    auto_incremental_review: false
+  finishing_touches:
+    unit_tests:
+      enabled: false
+    autofix:
+      enabled: false
+    fix_ci:
+      enabled: false
+  auto_approvals:
+    enabled: true
+
+  path_filters:
+    # Repository-specific exclusions. CodeRabbit's own built-in ignored paths still
+    # apply on top of these, but that list is not published, so nothing here leans on
+    # it: every generated / lock file is named even when a default may cover it.
+    - "!go.sum"
+    - "!website/go.sum"
+    - "!pnpm-lock.yaml"
+    - "!.devcontainer/devcontainer-lock.json"
+    - "!CHANGELOG.md"
+    - "!website/worker-configuration.d.ts"
+
+  path_instructions:
+    - path: "**/*.go"
+      instructions: |
+        Go library and CLI for an image-converting HTTP proxy, built on libvips
+        through cgo (github.com/h2non/bimg). Source of truth: AGENTS.md.
+
+        - The root package is the public API of manael.org/x/manael/v3
+          (NewServeProxy, ProxyOption and the With* options). Flag removed or
+          changed exported identifiers and changed default behavior: they break
+          importers and need a major version.
+        - Emphasize error handling, closing response bodies on every path, and
+          context propagation.
+        - Untrusted input (request headers, query parameters, upstream bodies)
+          must not panic, allocate without bound, or bypass the configured limits.
+
+    - path: "*.go"
+      instructions: |
+        Proxy and image pipeline (proxy.go, encode.go, decode.go, resize.go,
+        quality.go, options.go).
+
+        - Only GET responses are converted; HEAD and other methods pass through
+          unchanged. Responses must keep `Vary: Accept`, and Content-Type,
+          Content-Length, and Content-Disposition must match the body actually sent.
+        - Bodies are read through MaxImageSize: flag reads that can exceed it, and
+          oversized, APNG, or animated GIF bodies must pass through intact
+          (buffered bytes plus the remainder of the original body).
+        - Query parameters Manael consumes (`q`, and the resize parameters when
+          resizing is enabled) are stripped before the request reaches the upstream.
+        - Resize requests stay within MaxResizeWidth / MaxResizeHeight and the
+          allowed width / height lists; flag paths that let a client force
+          arbitrary dimensions.
+        - AVIF stays opt-in (MANAEL_ENABLE_AVIF / WithAVIFEnabled).
+
+    - path: "cmd/manael/**/*.go"
+      instructions: |
+        CLI entry point. Keep it thin: flag and MANAEL_* environment parsing, then
+        library calls. An invalid value must be reported and stop startup, not be
+        silently ignored. A new or changed flag or environment variable also needs
+        website/content/en/docs/usage/configuration.md and its ja counterpart.
+
+    - path: "internal/**/*.go"
+      instructions: |
+        Accept negotiation (internal/httputil) and format sniffing (internal/format).
+        These parse untrusted bytes and headers: flag panics, unbounded reads, and
+        q-value or wildcard handling that diverges from RFC 9110. Behavior changes
+        should come with a fuzz seed or unit case.
+
+    - path: "**/*_test.go"
+      instructions: |
+        Test names (Test* functions and t.Run labels) are English. Prefer table
+        tests covering failure paths and edge cases. Unit tests must not need
+        Docker or the network; anything that does goes behind the `integration`
+        build tag with Testcontainers, like integration_test.go. Tests that depend
+        on optional libvips support (AVIF) skip when it is unavailable rather than fail.
+
+    - path: "website/content/**"
+      instructions: |
+        Hugo (Docsy) site published at manael.org, in English (content/en) and
+        Japanese (content/ja). The Japanese tree is the localized site, not a
+        translated copy of a repository document, and is written in Japanese.
+
+        - Every page exists in both trees. A content change in one should come
+          with the matching change in the other; flag a PR that updates only one
+          side unless it says the other is deferred.
+        - Documented flags, environment variables, defaults, and behavior must
+          match cmd/manael and the root package.
+
+    - path: "website/src/**/*.ts"
+      instructions: |
+        Cloudflare Worker serving the go-import / go-source vanity page for
+        manael.org/x/manael, then static assets. Keep every interpolated value
+        HTML-escaped and the module path and repository URL consistent with go.mod.
+
+    - path: "**/*.md"
+      instructions: |
+        Markdown this repository owns is written in English. Source of truth: the
+        "Documentation, test names, and GitHub: English" section of AGENTS.md.
+
+        - Flag any *.ja.md or other translated copy of a repository document,
+          the root README included. website/content/ja/** is the exception: it is
+          the Japanese locale of the website (see the website/content/** rules).
+        - The "Output language" section of AGENTS.md sets the language of replies
+          to the user, not the language of documents stored in the repository. Do
+          not cite it to ask for Japanese prose in a Markdown file.
+        - Documentation and code comments state the rule and its reason; they do
+          not cite the Issue it came from, except an open Issue used as a TODO.
+
+    - path: ".github/workflows/**"
+      instructions: |
+        CI and release workflows.
+
+        - Actions are pinned to a full commit SHA with a version comment, which
+          Renovate updates. Flag tag-only references.
+        - Flag secret exposure, pull_request_target, and permissions wider than
+          the job needs (release.yml legitimately needs contents / packages write).
+        - Jobs that build or test Go install libvips-dev first; keep the Go
+          version matrix consistent with go.mod.
+
+    - path: "{Dockerfile,examples/**}"
+      instructions: |
+        Container image and deployment examples. Base images are pinned by digest.
+        The runtime stage installs the libvips runtime library from the same Debian
+        release as the build stage's libvips-dev; flag a mismatch. Flag secrets
+        copied into the image and examples that drift from the documented
+        MANAEL_* configuration.
+
+  pre_merge_checks:
+    title:
+      mode: warning
+      requirements: >-
+        Short English Conventional Commits title (e.g. feat: ..., fix(proxy): ..., build(deps): ...). The PR is squash-merged, so the title becomes the merge commit subject.
+    description:
+      mode: warning
+    issue_assessment:
+      mode: off
+
 chat:
   art: false
-early_access: true
-language: en-US
-reviews:
-  poem: false
-  profile: chill
-  request_changes_workflow: true
+  allow_non_org_members: false
+  integrations:
+    jira:
+      usage: disabled
+    linear:
+      usage: disabled
+
+issue_enrichment:
+  planning:
+    enabled: false
+    auto_planning:
+      enabled: false
