@@ -2,8 +2,6 @@
 
 <!-- A clear and concise description of the changes in this pull request. -->
 
-@coderabbitai summary
-
 ### Related Issue
 
 <!-- Link to the related issue(s), e.g., Closes #123 -->

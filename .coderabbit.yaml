@@ -12,8 +12,8 @@ tone_instructions: >-
 
 reviews:
   profile: assertive
-  # The summary still fills the `@coderabbitai summary` placeholder in the PR
-  # template, which keeps it ahead of the `Assisted-by:` trailer.
+  # CodeRabbit still writes the summary wherever `@coderabbitai summary`
+  # appears in a PR description, so the PR template leaves it out.
   high_level_summary: false
   review_status: false
   commit_status: false
