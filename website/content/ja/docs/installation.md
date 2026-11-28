@@ -43,7 +43,7 @@ sudo install manael /usr/local/bin
 
 Manael のソースコードは [GitHub](https://github.com/manaelproxy/manael) にホストされています。Manael は [Go](https://golang.org/) で書かれていて、`go` コマンドを使って簡単にビルドできます。
 
-Manael v3.1 以降をソースからビルドするには Go 1.25 以降が必要です。
+Manael をソースからビルドするには Go 1.26 以降が必要です。
 
 ビルドには [libvips](https://www.libvips.org/) の開発用ヘッダーが必要です。`go build` を実行する前にインストールしてください。
 
