@@ -1,0 +1,22 @@
+{
+  "attribution": {
+    "commit": "",
+    "pr": "",
+    "sessionUrl": false
+  },
+  "permissions": {
+    "allow": [
+      "Bash(go build ./...)",
+      "Bash(go build ./cmd/manael)",
+      "Bash(go test ./...)",
+      "Bash(go test *)",
+      "Bash(go vet ./...)",
+      "Bash(gofmt -l *)",
+      "Bash(golangci-lint run)",
+      "Bash(golangci-lint run *)",
+      "Bash(make)",
+      "Bash(pnpm format)",
+      "Bash(pnpm format-check)"
+    ]
+  }
+}
